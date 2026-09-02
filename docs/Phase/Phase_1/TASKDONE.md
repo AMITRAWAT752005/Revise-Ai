@@ -25,18 +25,18 @@
 
 ## Register / Sign Up Page
 
-- [ ] Create the Register page
-- [ ] Implement approved Stitch design
-- [ ] Add Name input
-- [ ] Add Email input
-- [ ] Add Password input
-- [ ] Add Confirm Password input
-- [ ] Add show/hide password functionality
+- [x] Create the Register page
+- [x] Implement approved Stitch design
+- [x] Add Name input
+- [x] Add Email input
+- [x] Add Password input
+- [x] Add Confirm Password input
+- [x] Add show/hide password functionality
 - [ ] Add client-side validation
 - [ ] Add loading state
 - [ ] Add error state
 - [ ] Add success feedback
-- [ ] Add navigation to Login
+- [x] Add navigation to Login
 
 ## Login / Sign In Page
 
