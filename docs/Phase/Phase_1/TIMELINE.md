@@ -185,6 +185,147 @@ Phase 1 — Mail Verification Page (Mobile/Responsive), OTP Verification Success
 
 ---
 
+## Date: 03 September 2026
+### Team Member: Bikram Singh Bisht
+**Time:** 11:20 AM – 11:31 AM
+
+**Task Worked On:**
+Phase 1 — OTP Flow Integration, Forgot Password Fix & Signup/Reset Password Validation Improvements
+
+**Changes Made:**
+
+**1. Fix Registration Flow — Redirect to OTP after Sign Up**
+- Updated `client/src/pages/Auth/Signup.jsx` to redirect to `/verify-otp` (with email & context via route state) instead of showing `AccountSuccessModal`. New users are saved with `isVerified: false` and `pendingVerificationEmail` stored in `localStorage` as fallback.
+- Updated `client/src/pages/Auth/OTPVerification.jsx` to read `email` and `context` from route state. Displays the user's email in the subtitle. On successful OTP, marks `isVerified: true` in `localStorage` and clears `pendingVerificationEmail`.
+- Updated `client/src/components/Popups/OtpSuccessModal.jsx`: changed button label from "Continue to Dashboard" to "Continue to Login". Added optional `description` and `btnLabel` props for context-specific messages.
+
+**2. Fix Forgot Password Flow — Redirect to OTP before Reset Password**
+- Updated `client/src/pages/Auth/ForgotPassword.jsx` to redirect to `/verify-otp` with `context: 'password-reset'` instead of going directly to `/reset-password`.
+- Updated `client/src/pages/Auth/OTPVerification.jsx` so that `context === 'password-reset'` navigates to `/reset-password` on success, while `registration` navigates to `/login`.
+- `OtpSuccessModal` now shows context-specific text:
+  - Registration: *"Your email has been verified…"* / "Continue to Login"
+  - Password Reset: *"Your identity has been verified…"* / "Continue to Reset Password"
+
+**3. Fix Reset Password Validation — Inline errors instead of popup**
+- Removed `ResetFailureModal` trigger for password validation failures in `ResetPassword.jsx`. Validation errors now show inline below the affected field with red border + shake animation.
+- Added `fieldErrors` and `shakeFields` state; errors auto-clear on re-type.
+- Added `@keyframes shake`, `.shake`, `.inputError`, `.fieldError` to `ResetPassword.module.css`.
+
+**4. Signup — Specific Error Messages per Failure**
+- Updated `AccountFailureModal.jsx` to accept optional `title` and `message` props (with generic fallback).
+- Updated `Signup.jsx` to pass specific error info to `AccountFailureModal` per scenario:
+  - Missing fields → "Missing Information"
+  - Passwords don't match → "Passwords Don't Match"
+  - Duplicate email → "Email Already Registered" (shows the specific email)
+
+**Files Modified:**
+- `client/src/pages/Auth/Signup.jsx`
+- `client/src/pages/Auth/OTPVerification.jsx`
+- `client/src/pages/Auth/ForgotPassword.jsx`
+- `client/src/pages/Auth/ResetPassword.jsx`
+- `client/src/pages/Auth/ResetPassword.module.css`
+- `client/src/components/Popups/OtpSuccessModal.jsx`
+- `client/src/components/Popups/AccountFailureModal.jsx`
+- `docs/Phase/Phase_1/TASKDONE.md`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Branch:**
+`Phase_1`
+
+**Commit Reference:**
+*(pending)*
+
+**Testing Performed:**
+- Verified `/signup` navigates to `/verify-otp` with email displayed on successful registration.
+- Verified OTP page shows `OtpSuccessModal` and "Continue to Login" redirects to `/login` (registration context).
+- Verified `registeredUsers` in `localStorage` has `isVerified: true` after successful OTP.
+- Verified `000000` / `111111` OTP codes still trigger `OtpFailureModal`.
+- Verified Forgot Password → submit email → redirects to `/verify-otp` with email displayed.
+- Verified password-reset OTP success shows "Continue to Reset Password" and navigates to `/reset-password`.
+- Verified Reset Password: empty/weak/mismatched fields shake with inline error text; no modal appears.
+- Verified inline errors clear on re-type; success modal still appears on valid submission.
+- Verified Signup shows "Missing Information", "Passwords Don't Match", and "Email Already Registered" modals correctly.
+
+**Status:**
+🟢 Completed
+
+---
+
+## Date: 03 September 2026
+### Team Member: Bikram Singh Bisht
+**Time:** 11:45 AM
+
+**Task Worked On:**
+Phase 1 — Post-Registration Commitment Flow
+
+**Changes Made:**
+- Updated `client/src/pages/Auth/OTPVerification.jsx` so that after a successful registration OTP verification, the user is prompted to "Continue to Commitment" and redirected to `/commitment`.
+- Created a new `Commitment` page (`Commitment.jsx` and `Commitment.module.css`) to collect the user's learning goal and daily study target.
+- Added a `commitmentPending` flag to `localStorage` and `hasCompletedCommitment` to the user schema to ensure only new users can access the Commitment page.
+- Created a placeholder `Home` page (`Home.jsx`) and registered the new routes in `App.jsx`.
+- Submitting the Commitment form successfully sets `hasCompletedCommitment: true`, clears `commitmentPending`, and navigates the user to `/home`.
+- Updated `PROFILE.md` and `TASKDONE.md` with the new flow logic.
+
+**Files Modified:**
+- `client/src/pages/Auth/OTPVerification.jsx`
+- `client/src/pages/Commitment/Commitment.jsx` (New)
+- `client/src/pages/Commitment/Commitment.module.css` (New)
+- `client/src/pages/Home/Home.jsx` (New)
+- `client/src/App.jsx`
+- `docs/Phase/Phase_1/PROFILE.md`
+- `docs/Phase/Phase_1/TASKDONE.md`
+
+**Branch:**
+`Phase_1`
+
+**Commit Reference:**
+*(pending)*
+
+**Testing Performed:**
+- Verified that successfully verifying a registration OTP updates the `OtpSuccessModal` text to "Continue to Commitment".
+- Verified clicking "Continue to Commitment" routes to `/commitment`.
+- Verified that the `Commitment` page rejects users who do not have `commitmentPending: 'true'` in localStorage (redirects to `/login`).
+- Verified that submitting the Commitment form correctly updates user state, removes the pending flag, and navigates to `/home`.
+
+**Status:**
+🟢 Completed
+
+---
+
+## Date: 03 September 2026
+### Team Member: Bikram Singh Bisht
+**Time:** 11:58 AM
+
+**Task Worked On:**
+Phase 1 — Commitment Page UI Redesign (Stitch integration)
+
+**Changes Made:**
+- Redesigned `/commitment` to exactly match the Stitch design "Study Commitment Agreement (Final Interactive)" (Screen ID: 36e41ea420ee4ac390f679c03dfe4282).
+- Transformed the standard form into an interactive "Madlib" style contract.
+- Added floating animated SVGs, a paper texture background, and cursive digital signature styling (`Caveat` font).
+- Replaced standard inputs with inline pill selects/inputs that auto-resize.
+- Implemented button state changes simulating a fake submission delay before redirecting to `/home`.
+
+**Files Modified:**
+- `client/src/pages/Commitment/Commitment.jsx`
+- `client/src/pages/Commitment/Commitment.module.css`
+
+**Branch:**
+`Phase_1`
+
+**Commit Reference:**
+*(pending)*
+
+**Testing Performed:**
+- Verified the UI matches the required Stitch design visually.
+- Verified name input binds to the digital signature dynamically and auto-resizes.
+- Verified form submission disables the button, changes text to "Committed! Let's go!", and redirects to `/home`.
+
+**Status:**
+🟢 Completed
+
+---
+
 ## Next Steps
 
 - Implement backend API routes for authentication (`/api/auth/register`, `/api/auth/login`, `/api/auth/otp`).

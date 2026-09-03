@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './OtpSuccessModal.module.css';
 import logoImg from '../../assets/images/book-logo.png';
 
-const OtpSuccessModal = ({ onClose, onContinue }) => {
+const OtpSuccessModal = ({ onClose, onContinue, description, btnLabel }) => {
   const navigate = useNavigate();
 
   const handleContinue = () => {
@@ -11,7 +11,6 @@ const OtpSuccessModal = ({ onClose, onContinue }) => {
       onContinue();
     } else {
       if (onClose) onClose();
-      navigate('/login');
     }
   };
 
@@ -30,11 +29,11 @@ const OtpSuccessModal = ({ onClose, onContinue }) => {
 
         <h2 className={styles.title}>Verification Successful</h2>
         <p className={styles.description}>
-          Your email has been verified. You're all set to start learning.
+          {description || "Your email has been verified. You're all set to start learning."}
         </p>
 
         <button type="button" className={styles.continueBtn} onClick={handleContinue}>
-          Continue to Dashboard
+          {btnLabel || 'Continue to Login'}
           <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
         </button>
       </div>

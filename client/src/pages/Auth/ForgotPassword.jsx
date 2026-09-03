@@ -12,9 +12,10 @@ const ForgotPassword = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
-    // Automatically redirect to reset-password after simulating OTP send
+    // Store email for OTP page fallback, then redirect to OTP verification
+    localStorage.setItem('pendingVerificationEmail', email.trim());
     setTimeout(() => {
-      navigate('/reset-password');
+      navigate('/verify-otp', { state: { email: email.trim(), context: 'password-reset' } });
     }, 1200);
   };
 

@@ -101,7 +101,7 @@
 - [x] Create user registration flow
 - [ ] Generate registration OTP (backend integration pending)
 - [ ] Send registration OTP (backend integration pending)
-- [x] Redirect user to Login / Dashboard after account creation
+- [x] Redirect user to `/verify-otp` after account creation
 
 ---
 
@@ -144,11 +144,23 @@
 - [ ] Handle successful Google authentication
 - [ ] Check whether Google user already exists
 - [ ] Create account for a new Google user
+- [ ] Set `commitmentPending: true` for new Google users
 - [ ] Log in an existing Google user
 - [ ] Create authentication session/token
 - [ ] Redirect successful Google user into ReviseAI
 - [ ] Handle cancelled authentication
 - [ ] Handle Google authentication errors
+
+---
+
+# 6.5 Commitment System (New Users Only)
+
+- [x] Create Commitment Page (`/commitment`)
+- [x] Restrict access to new users only (`commitmentPending` flag)
+- [x] Collect learning goals and study targets
+- [x] Update user schema to include `hasCompletedCommitment`
+- [x] Save completion status in `localStorage`
+- [x] Redirect to `/home` upon completion
 
 ---
 
@@ -160,7 +172,7 @@
 - [x] Handle email submission appropriately
 - [ ] Generate Password Reset OTP (backend)
 - [ ] Send Password Reset OTP (backend)
-- [x] Redirect user to Reset Password / Login
+- [x] Redirect user to `/verify-otp` (with email & context: 'password-reset' via route state)
 
 ---
 
@@ -209,10 +221,11 @@
 ## Flow A — New User
 
 - [x] Register
-- [x] Account Created Success Modal
-- [x] Redirect to Login
-- [x] Login
-- [x] Enter ReviseAI
+- [x] Redirect to OTP Verification page (email passed via route state)
+- [x] OTP Verified — `OtpSuccessModal` shown (Continue to Commitment)
+- [x] Redirect to Commitment Page (`/commitment`)
+- [x] Enter Commitment Details
+- [x] Redirect to Home (`/home`)
 
 ## Flow B — Existing User
 
@@ -230,10 +243,12 @@
 
 - [x] Open Forgot Password
 - [x] Submit Email
-- [x] Open Reset Password
-- [x] Change Password
-- [x] Reset Password Success Modal
-- [x] Login with New Password
+- [ ] Redirect to OTP Verification page (email passed via route state)
+- [ ] OTP Verified — Redirect to Reset Password page
+- [ ] Enter New Password + Confirm Password
+- [ ] Reset Password Success Modal
+- [ ] Reset Password Failure Modal
+- [ ] Redirect to Login
 
 ---
 

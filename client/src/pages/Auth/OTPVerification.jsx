@@ -1,10 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './OTPVerification.module.css';
 import OtpSuccessModal from '../../components/Popups/OtpSuccessModal';
 import OtpFailureModal from '../../components/Popups/OtpFailureModal';
 import logoImg from '../../assets/images/book-logo.png';
 
 const OTPVerification = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email || localStorage.getItem('pendingVerificationEmail') || '';
+  const context = location.state?.context || 'registration'; // 'registration' | 'password-reset'
+
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [modalState, setModalState] = useState(null); // 'success' | 'failure' | null
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -85,6 +91,16 @@ const OTPVerification = () => {
     if (code === '000000' || code === '111111') {
       setModalState('failure');
     } else {
+      // Mark the user as verified in localStorage
+      if (context === 'registration' && email) {
+        const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        const updated = users.map(u =>
+          u.email.toLowerCase() === email.toLowerCase() ? { ...u, isVerified: true, hasCompletedCommitment: false } : u
+        );
+        localStorage.setItem('registeredUsers', JSON.stringify(updated));
+        localStorage.removeItem('pendingVerificationEmail');
+        localStorage.setItem('commitmentPending', 'true');
+      }
       localStorage.setItem('isVerified', 'true');
       setModalState('success');
     }
@@ -118,7 +134,8 @@ const OTPVerification = () => {
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>Verify your email</h2>
           <p className={styles.cardSubtitle}>
-            We've sent a 6-digit verification code to your email address.
+            We've sent a 6-digit verification code to{' '}
+            {email ? <strong>{email}</strong> : 'your email address'}.
           </p>
 
           <form className={styles.form} onSubmit={handleSubmit}>
@@ -174,7 +191,15 @@ const OTPVerification = () => {
 
       {/* Pop Up Modals */}
       {modalState === 'success' && (
-        <OtpSuccessModal onClose={() => setModalState(null)} />
+        <OtpSuccessModal
+          onClose={() => navigate(context === 'password-reset' ? '/reset-password' : '/commitment')}
+          description={
+            context === 'password-reset'
+              ? 'Your identity has been verified. You can now create a new password.'
+              : "Your email has been verified. You're all set to start your commitment."
+          }
+          btnLabel={context === 'password-reset' ? 'Continue to Reset Password' : 'Continue to Commitment'}
+        />
       )}
       {modalState === 'failure' && (
         <OtpFailureModal onClose={() => setModalState(null)} onResend={handleResend} />

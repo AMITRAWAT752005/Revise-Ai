@@ -1,0 +1,317 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ReviseAI - Study Commitment</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=Caveat:wght@700&amp;display=swap" rel="stylesheet">
+<script src="https://unpkg.com/webgl-shader-element" type="module"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "reviseai-indigo": "#5E5CE6",
+                        "reviseai-cyan": "#64D2FF",
+                        "on-secondary-fixed-variant": "#7200a3",
+                        "on-primary-fixed-variant": "#332dbc",
+                        "outline": "#777586",
+                        "on-primary-container": "#f4f1ff",
+                        "inverse-surface": "#303032",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#0c006b",
+                        "surface-bright": "#fcf8fb",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#4d4ad5",
+                        "secondary": "#9026c3",
+                        "on-secondary-fixed": "#310048",
+                        "surface-container": "#f0edef",
+                        "inverse-primary": "#c2c1ff",
+                        "tertiary-container": "#00789a",
+                        "tertiary-fixed": "#bee9ff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#e5f5ff",
+                        "surface-dim": "#dcd9dc",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e4e2e4",
+                        "surface": "#fcf8fb",
+                        "secondary-fixed-dim": "#e9b3ff",
+                        "on-tertiary-fixed-variant": "#004d64",
+                        "tertiary-fixed-dim": "#68d3ff",
+                        "primary": "#4441cc",
+                        "secondary-container": "#cb66fe",
+                        "on-background": "#1b1b1d",
+                        "on-surface-variant": "#464554",
+                        "secondary-fixed": "#f6d9ff",
+                        "surface-variant": "#e4e2e4",
+                        "inverse-on-surface": "#f3f0f2",
+                        "background": "#fcf8fb",
+                        "tertiary": "#005e79",
+                        "primary-fixed-dim": "#c2c1ff",
+                        "on-tertiary-fixed": "#001f2a",
+                        "surface-container-low": "#f6f3f5",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#eae7ea",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#4a006b",
+                        "on-surface": "#1b1b1d",
+                        "primary-fixed": "#e2dfff",
+                        "outline-variant": "#c7c4d7",
+                        "primary-container": "#5e5ce6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "lg": "48px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "base": "8px",
+                        "sm": "12px",
+                        "margin-desktop": "40px",
+                        "xs": "4px",
+                        "xl": "80px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "stats-xl": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "signature": ["Caveat", "cursive"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "stats-xl": ["40px", { "lineHeight": "1", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+                        "label-sm": ["13px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .paper-shadow {
+            box-shadow: 0 20px 40px rgba(94, 92, 230, 0.15), 
+                        0 1px 3px rgba(94, 92, 230, 0.08),
+                        0 0 0 1px rgba(94, 92, 230, 0.05) inset;
+        }
+        
+        .pill-input {
+            background: theme('colors.surface-container-high');
+            border: 2px solid transparent;
+            color: theme('colors.reviseai-indigo');
+            font-weight: 700;
+            text-align: center;
+            padding: 4px 12px;
+            margin: 0 4px;
+            border-radius: 9999px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .pill-input:hover, .pill-input:focus {
+            outline: none;
+            background: white;
+            border-color: theme('colors.reviseai-cyan');
+            box-shadow: 0 4px 12px rgba(100, 210, 255, 0.3);
+            transform: translateY(-2px) scale(1.02);
+            color: theme('colors.reviseai-indigo');
+        }
+
+        select.pill-input {
+            appearance: none;
+            padding-right: 24px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%235E5CE6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 12px;
+        }
+
+        .btn-pressable {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-pressable:active {
+            transform: scale(0.95);
+        }
+        .btn-pressable:hover {
+            box-shadow: 0 10px 25px -5px rgba(94, 92, 230, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes slide-up-fade {
+            0% { opacity: 0; transform: translateY(60px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        @keyframes float-medium {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(-5deg); }
+        }
+        
+        .animate-entrance {
+            animation: slide-up-fade 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .float-1 { animation: float-slow 6s ease-in-out infinite; }
+        .float-2 { animation: float-medium 8s ease-in-out infinite reverse; }
+        .float-3 { animation: float-slow 7s ease-in-out infinite 1s; }
+        .float-4 { animation: float-medium 9s ease-in-out infinite 0.5s; }
+
+    </style>
+</head>
+<body class="bg-surface-container-low min-h-screen flex text-on-surface relative z-0 overflow-hidden">
+
+<!-- Sidebar Context (Simulated) -->
+
+<!-- Main Content Area -->
+<main class="w-full min-h-screen flex items-center justify-center p-4 md:p-8 relative">
+<!-- Floating Decorations -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
+<div class="relative w-full max-w-[1000px] h-full max-h-[800px]">
+<!-- Star 1 -->
+<svg class="absolute top-20 left-10 w-12 h-12 text-reviseai-cyan/60 float-1" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+</svg>
+<!-- Book -->
+<svg class="absolute bottom-32 left-20 w-16 h-16 text-reviseai-indigo/40 float-2" fill="currentColor" viewBox="0 0 24 24">
+<path d="M4 19V5c0-1.1.9-2 2-2h13v14H6c-1.1 0-2 .9-2 2s.9 2 2 2h12v-2H6v-2h12v-2H4z"></path>
+</svg>
+<!-- Sparkles -->
+<svg class="absolute top-40 right-24 w-10 h-10 text-yellow-400/70 float-3" fill="currentColor" viewBox="0 0 24 24">
+<path d="M19 3h-1V1h-2v2h-1a1 1 0 00-1 1v1h-2v2h2v1a1 1 0 001 1h1v2h2v-2h1a1 1 0 001-1v-1h2V6h-2V4a1 1 0 00-1-1zm-9.5 4C8.1 7 7 8.1 7 9.5V11H5.5C4.1 11 3 12.1 3 13.5V15h1.5c1.4 0 2.5 1.1 2.5 2.5V19H8.5c1.4 0 2.5-1.1 2.5-2.5V15H12.5c1.4 0 2.5-1.1 2.5-2.5V11H13.5c-1.4 0-2.5-1.1-2.5-2.5V7H9.5z"></path>
+</svg>
+<!-- Grad Cap -->
+<svg class="absolute bottom-40 right-16 w-20 h-20 text-reviseai-indigo/30 float-4" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72l5 2.73 5-2.73v3.72z"></path>
+</svg>
+</div>
+</div>
+<!-- The Commitment Card -->
+<div class="w-full max-w-[700px] relative animate-entrance opacity-0">
+<div class="bg-[#FFFDF9]/95 backdrop-blur-md rounded-2xl paper-shadow p-8 md:p-12 relative overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]">
+<!-- Header Section -->
+<div class="text-center mb-10">
+<h1 class="font-headline-lg text-3xl md:text-4xl text-on-surface tracking-tight font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-reviseai-indigo to-purple-600">
+                    ✨ MY REVISION COMMITMENT ✨
+                </h1>
+<p class="font-body-md text-lg text-on-surface-variant font-medium">
+                    Small promises. Consistent effort. Big results.
+                </p>
+</div>
+<!-- Madlib Content -->
+<div class="text-center md:text-left leading-[2.5] text-xl font-body-lg text-on-surface/90">
+                Today, I, 
+                <input aria-label="Your Name" class="pill-input w-40 font-signature text-2xl !pb-0" placeholder="Your Name" type="text" value="Alex" style="width: 100px;">, 
+                make a promise to my future self. As a proud 
+                <select aria-label="Student Type" class="pill-input w-44">
+<option>College Student</option>
+<option>School Student</option>
+</select>, 
+                I will dedicate at least 
+                <select aria-label="Time per day" class="pill-input w-32">
+<option>15 min</option>
+<option>30 min</option>
+<option>45 min</option>
+<option>1 hour</option>
+<option>2 hours</option>
+</select> 
+                every day to my studies, completing at least 
+                <select aria-label="Flashcards per session" class="pill-input w-24">
+<option>5</option>
+<option>10</option>
+<option>20</option>
+<option>50</option>
+</select> 
+                flashcards to maintain my momentum and achieve my goals.
+            </div>
+<!-- Divider -->
+<div class="w-24 h-1 bg-gradient-to-r from-reviseai-indigo to-reviseai-cyan rounded-full mx-auto my-10 opacity-50"></div>
+<!-- Signature Area -->
+<div class="flex justify-end px-4 mb-8">
+<div class="text-center">
+<div class="w-56 border-b-2 border-outline-variant/60 h-12 flex items-end justify-center text-reviseai-indigo font-signature text-3xl italic pb-1">
+                        Alex
+                    </div>
+<span class="font-label-sm text-xs text-outline mt-2 block uppercase tracking-wider">Digital Signature</span>
+</div>
+</div>
+<!-- Action Button -->
+<div class="flex justify-center mt-4">
+<button class="bg-reviseai-indigo hover:bg-opacity-90 text-white px-8 py-4 rounded-xl font-headline-md text-lg flex items-center gap-3 btn-pressable w-full md:w-auto justify-center shadow-lg shadow-reviseai-indigo/30" id="commitBtn">
+                    🚀 I Commit to My Journey
+                </button>
+</div>
+</div>
+</div>
+</main>
+<script>
+    // Confetti effect on click
+    document.getElementById('commitBtn').addEventListener('click', function() {
+        const duration = 3000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#5E5CE6', '#64D2FF', '#cb66fe']
+            });
+            confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#5E5CE6', '#64D2FF', '#cb66fe']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+        
+        // Change button text temporarily
+        const originalText = this.innerHTML;
+        this.innerHTML = "✨ Committed! Let's go! ✨";
+        this.classList.add('bg-reviseai-cyan', 'text-reviseai-indigo');
+        
+        setTimeout(() => {
+            this.innerHTML = originalText;
+            this.classList.remove('bg-reviseai-cyan', 'text-reviseai-indigo');
+        }, 3000);
+    });
+
+    // Auto-resize text inputs based on content
+    document.querySelectorAll('.pill-input[type="text"]').forEach(input => {
+        const resize = () => {
+            // Very rough estimation for signature font width
+            input.style.width = Math.max(100, (input.value.length * 15) + 30) + 'px';
+        };
+        input.addEventListener('input', resize);
+        resize(); // Initial resize
+    });
+</script>
+
+
+</body></html>

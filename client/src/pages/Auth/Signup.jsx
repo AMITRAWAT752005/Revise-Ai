@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './Signup.module.css';
-import AccountSuccessModal from '../../components/Popups/AccountSuccessModal';
 import AccountFailureModal from '../../components/Popups/AccountFailureModal';
 
 import logoImg from '../../assets/images/book-logo.png';
@@ -17,13 +16,14 @@ const GoogleIcon = () => (
 );
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [modalState, setModalState] = useState(null); // 'success' | 'failure' | null
+  const [errorInfo, setErrorInfo] = useState(null); // { title, message } | null
 
   const togglePasswordVisibility = (e) => {
     e.preventDefault();
@@ -37,21 +37,44 @@ const Signup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (fullName && email && password && password === confirmPassword) {
-      // Save new user into localStorage registeredUsers
-      const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-      const userExists = existingUsers.some(u => u.email.trim().toLowerCase() === email.trim().toLowerCase());
 
-      if (userExists) {
-        setModalState('failure');
-      } else {
-        const updatedUsers = [...existingUsers, { fullName, email: email.trim(), password }];
-        localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
-        setModalState('success');
-      }
-    } else {
-      setModalState('failure');
+    // Check for missing fields
+    if (!fullName || !email || !password || !confirmPassword) {
+      setErrorInfo({
+        title: 'Missing Information',
+        message: 'Please fill in all fields before creating your account.',
+      });
+      return;
     }
+
+    // Check passwords match
+    if (password !== confirmPassword) {
+      setErrorInfo({
+        title: 'Passwords Don\'t Match',
+        message: 'The passwords you entered do not match. Please check and try again.',
+      });
+      return;
+    }
+
+    // Check for duplicate email
+    const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const userExists = existingUsers.some(u => u.email.trim().toLowerCase() === email.trim().toLowerCase());
+
+    if (userExists) {
+      setErrorInfo({
+        title: 'Email Already Registered',
+        message: `An account with ${email} already exists. Try logging in or use a different email.`,
+      });
+      return;
+    }
+
+    // Save user as unverified; OTP verification will mark them verified
+    const updatedUsers = [...existingUsers, { fullName, email: email.trim(), password, isVerified: false }];
+    localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+    // Store pending email for OTP page
+    localStorage.setItem('pendingVerificationEmail', email.trim());
+    // Redirect to OTP verification page
+    navigate('/verify-otp', { state: { email: email.trim(), context: 'registration' } });
   };
 
   return (
@@ -191,11 +214,12 @@ const Signup = () => {
       </main>
 
       {/* Pop Up Modals */}
-      {modalState === 'success' && (
-        <AccountSuccessModal onClose={() => setModalState(null)} />
-      )}
-      {modalState === 'failure' && (
-        <AccountFailureModal onClose={() => setModalState(null)} />
+      {errorInfo && (
+        <AccountFailureModal
+          onClose={() => setErrorInfo(null)}
+          title={errorInfo.title}
+          message={errorInfo.message}
+        />
       )}
     </div>
   );

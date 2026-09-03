@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './ResetPassword.module.css';
 import ResetSuccessModal from '../../components/Popups/ResetSuccessModal';
-import ResetFailureModal from '../../components/Popups/ResetFailureModal';
 
 import logoImg from '../../assets/images/book-logo.png';
 
@@ -10,7 +9,9 @@ const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [modalState, setModalState] = useState(null); // 'success' | 'failure' | null
+  const [modalState, setModalState] = useState(null); // 'success' | null
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [shakeFields, setShakeFields] = useState({});
 
   // Password validation checks
   const hasMinLength = newPassword.length >= 8;
@@ -23,13 +24,39 @@ const ResetPassword = () => {
     strengthLevel = 'medium';
   }
 
+  const triggerShake = (fields) => {
+    setShakeFields(fields);
+    setTimeout(() => setShakeFields({}), 600);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newPassword && confirmPassword && newPassword === confirmPassword && hasMinLength) {
-      setModalState('success');
-    } else {
-      setModalState('failure');
+    const errors = {};
+
+    if (!newPassword) {
+      errors.newPassword = 'Please enter a new password.';
+    } else if (!hasMinLength) {
+      errors.newPassword = 'Password must be at least 8 characters.';
+    } else if (!hasSymbolOrNum) {
+      errors.newPassword = 'Password must contain a number or symbol.';
     }
+
+    if (!confirmPassword) {
+      errors.confirmPassword = 'Please confirm your password.';
+    } else if (newPassword && confirmPassword !== newPassword) {
+      errors.confirmPassword = 'Passwords do not match.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      triggerShake(
+        Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+      );
+      return;
+    }
+
+    setFieldErrors({});
+    setModalState('success');
   };
 
   return (
@@ -52,14 +79,17 @@ const ResetPassword = () => {
             {/* New Password Field */}
             <div className={styles.inputGroup}>
               <label className={styles.label} htmlFor="new_password">New Password</label>
-              <div className={styles.inputWrapper}>
+              <div className={`${styles.inputWrapper} ${shakeFields.newPassword ? styles.shake : ''}`}>
                 <input
                   id="new_password"
                   type={showNewPassword ? "text" : "password"}
-                  className={styles.input}
+                  className={`${styles.input} ${fieldErrors.newPassword ? styles.inputError : ''}`}
                   placeholder="Enter new password"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    if (fieldErrors.newPassword) setFieldErrors(prev => ({ ...prev, newPassword: '' }));
+                  }}
                   required
                 />
                 <button
@@ -73,6 +103,9 @@ const ResetPassword = () => {
                   </span>
                 </button>
               </div>
+              {fieldErrors.newPassword && (
+                <p className={styles.fieldError}>{fieldErrors.newPassword}</p>
+              )}
 
               {/* Password Strength Indicator */}
               {newPassword.length > 0 && (
@@ -111,17 +144,23 @@ const ResetPassword = () => {
             {/* Confirm Password Field */}
             <div className={styles.inputGroup}>
               <label className={styles.label} htmlFor="confirm_password">Confirm Password</label>
-              <div className={styles.inputWrapper}>
+              <div className={`${styles.inputWrapper} ${shakeFields.confirmPassword ? styles.shake : ''}`}>
                 <input
                   id="confirm_password"
                   type="password"
-                  className={styles.input}
+                  className={`${styles.input} ${fieldErrors.confirmPassword ? styles.inputError : ''}`}
                   placeholder="Confirm new password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    if (fieldErrors.confirmPassword) setFieldErrors(prev => ({ ...prev, confirmPassword: '' }));
+                  }}
                   required
                 />
               </div>
+              {fieldErrors.confirmPassword && (
+                <p className={styles.fieldError}>{fieldErrors.confirmPassword}</p>
+              )}
             </div>
 
             {/* Submit Action */}
@@ -142,9 +181,6 @@ const ResetPassword = () => {
       {/* Pop Up Modals */}
       {modalState === 'success' && (
         <ResetSuccessModal onClose={() => setModalState(null)} />
-      )}
-      {modalState === 'failure' && (
-        <ResetFailureModal onClose={() => setModalState(null)} />
       )}
     </div>
   );

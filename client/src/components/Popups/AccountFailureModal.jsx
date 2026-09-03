@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './AccountFailureModal.module.css';
 import logoImg from '../../assets/images/book-logo.png';
 
-const AccountFailureModal = ({ onClose }) => {
+const AccountFailureModal = ({ onClose, title, message }) => {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
@@ -14,9 +14,9 @@ const AccountFailureModal = ({ onClose }) => {
             <span className="material-symbols-outlined">error</span>
           </div>
         </div>
-        <h2 className={styles.title}>Account Creation Failed</h2>
+        <h2 className={styles.title}>{title || 'Account Creation Failed'}</h2>
         <p className={styles.description}>
-          We couldn't create your account. An account with this email address may already exist or the input data was invalid.
+          {message || "We couldn't create your account. An account with this email address may already exist or the input data was invalid."}
         </p>
         <div className={styles.actionsStack}>
           <button type="button" className={styles.tryAgainBtn} onClick={onClose}>

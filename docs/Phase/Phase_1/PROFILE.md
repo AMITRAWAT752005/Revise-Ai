@@ -245,6 +245,7 @@ User
 ├── Email
 ├── Password / Authentication Provider
 ├── Verification Status
+├── Commitment Status (hasCompletedCommitment)
 ├── Account Creation Date
 └── Last Updated Date
 ```
@@ -285,8 +286,8 @@ By the end of Phase 1, these flows must work completely.
 Register
 → OTP
 → Verify Account
-→ Login
-→ Enter ReviseAI
+→ Commitment Page
+→ Enter ReviseAI (Home)
 ```
 
 ## Flow B — Existing User
