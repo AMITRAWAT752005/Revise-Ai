@@ -3,6 +3,7 @@ import Signup from './pages/Auth/Signup';
 import Login from './pages/Auth/Login';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import ResetPassword from './pages/Auth/ResetPassword';
+import OTPVerification from './pages/Auth/OTPVerification';
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-otp" element={<OTPVerification />} />
+          <Route path="/otp-verification" element={<OTPVerification />} />
         </Routes>
       </div>
     </Router>
