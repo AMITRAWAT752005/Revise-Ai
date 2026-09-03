@@ -54,16 +54,16 @@
 
 ## OTP Verification Page
 
-- [ ] Create the OTP Verification page
-- [x] Implement approved Stitch design concepts
-- [ ] Add OTP input interface
-- [ ] Add OTP validation
-- [ ] Add invalid OTP feedback
-- [ ] Add expired OTP feedback
-- [ ] Add Resend OTP functionality
-- [ ] Add resend cooldown/timer
-- [ ] Add loading state
-- [ ] Add success feedback
+- [x] Create the OTP Verification page
+- [x] Implement approved Stitch design concepts (`OTP Verification - Mobile`)
+- [x] Add OTP input interface (6-digit input boxes with auto-focus & keyboard navigation)
+- [x] Add OTP validation
+- [x] Add invalid OTP feedback (`OtpFailureModal`)
+- [x] Add expired OTP feedback (`OtpFailureModal`)
+- [x] Add Resend OTP functionality
+- [x] Add resend cooldown/timer (30-second timer & toast message)
+- [x] Add loading state / feedback
+- [x] Add success feedback (`OtpSuccessModal`)
 
 ## Forgot Password Page
 
