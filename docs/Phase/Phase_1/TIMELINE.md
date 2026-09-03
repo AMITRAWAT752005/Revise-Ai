@@ -45,7 +45,7 @@ Phase 1 — Sign Up Page UI (Desktop & Mobile Responsive)
 - `desktop_signup.html` (temporary scratch file)
 
 **Branch:**
-`main`
+`Phase_1`
 
 **Commit Reference:**
 *(pending)*
@@ -63,35 +63,83 @@ Phase 1 — Sign Up Page UI (Desktop & Mobile Responsive)
 - Show/hide password toggle implemented with React state.
 - Client-side form validation, loading states, and API integration are pending (Phase 1 backend tasks).
 
+---
+
+## Date: 03 September 2026
+### Team Member: Anshul Gusain
+**Time:** 08:30 AM
+
 **Task Worked On:**
-[Describe the specific task.]
+Phase 1 — Sign In Page, Forgot Password Page, Reset Password Page, and Authentication Pop-Up Modals
+
 **Changes Made:**
-- Change 1
-- Change 2
-- Change 3
+- Created `client/src/pages/Auth/Login.jsx` and `Login.module.css` matching Stitch `Login - Desktop` & `Login - Mobile` designs with ReviseAI Book Logo (`book-logo.png`), email/password inputs with show/hide password toggle, and right-side desktop streak illustration card.
+- Created `client/src/pages/Auth/ForgotPassword.jsx` and `ForgotPassword.module.css` matching Stitch `Forgot Password` designs with `lock_reset` badge icon and email input with mail icon.
+- Created `client/src/pages/Auth/ResetPassword.jsx` and `ResetPassword.module.css` matching Stitch `Reset Password` designs with dynamic password strength meter & validation checklist.
+- Created `client/src/components/Popups/LoginSuccessModal.jsx` & `LoginSuccessModal.module.css` featuring ReviseAI Book Logo and green checkmark icon (`#34C759`).
+- Created `client/src/components/Popups/LoginFailureModal.jsx` & `LoginFailureModal.module.css` matching Stitch `Login Failed - Desktop` with red error icon (`#ba1a1a`) and direct **"Create an Account"** redirect button.
+- Created `client/src/components/Popups/AccountSuccessModal.jsx` & `AccountSuccessModal.module.css` for successful account creation feedback.
+- Created `client/src/components/Popups/AccountFailureModal.jsx` & `AccountFailureModal.module.css` for account creation failure feedback.
+- Created `client/src/components/Popups/ResetSuccessModal.jsx` & `ResetSuccessModal.module.css` for password reset success feedback.
+- Created `client/src/components/Popups/ResetFailureModal.jsx` & `ResetFailureModal.module.css` for password reset failure feedback.
+- Updated `client/src/pages/Auth/Signup.jsx` to persist registered user accounts in `localStorage` (`registeredUsers`) and connect success/failure modals.
+- Integrated account lookup logic in `Login.jsx` against registered accounts & demo accounts (`student@university.edu` / `password123`); failed logins prompt users to create an account and redirect to `/signup`.
+- Updated `client/src/App.jsx` to register `/login`, `/forgot-password`, and `/reset-password` routes.
+- Removed all temporary test buttons across form cards.
 
 **Files Created:**
-- `path/to/file`
+- `client/src/pages/Auth/Login.jsx`
+- `client/src/pages/Auth/Login.module.css`
+- `client/src/pages/Auth/ForgotPassword.jsx`
+- `client/src/pages/Auth/ForgotPassword.module.css`
+- `client/src/pages/Auth/ResetPassword.jsx`
+- `client/src/pages/Auth/ResetPassword.module.css`
+- `client/src/components/Popups/LoginSuccessModal.jsx`
+- `client/src/components/Popups/LoginSuccessModal.module.css`
+- `client/src/components/Popups/LoginFailureModal.jsx`
+- `client/src/components/Popups/LoginFailureModal.module.css`
+- `client/src/components/Popups/AccountSuccessModal.jsx`
+- `client/src/components/Popups/AccountSuccessModal.module.css`
+- `client/src/components/Popups/AccountFailureModal.jsx`
+- `client/src/components/Popups/AccountFailureModal.module.css`
+- `client/src/components/Popups/ResetSuccessModal.jsx`
+- `client/src/components/Popups/ResetSuccessModal.module.css`
+- `client/src/components/Popups/ResetFailureModal.jsx`
+- `client/src/components/Popups/ResetFailureModal.module.css`
+
 **Files Modified:**
-- `path/to/file`
+- `client/src/App.jsx`
+- `client/src/pages/Auth/Signup.jsx`
+- `docs/Phase/Phase_1/TASKDONE.md`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
 **Files Deleted:**
 - None
+
 **Branch:**
-`branch-name`
+`Phase_1`
+
 **Commit Reference:**
-`commit-hash` *(if available)*
+*(pending)*
+
 **Testing Performed:**
-- Test performed
-- Result
+- Executed `npm run build` -> 46 modules transformed in 221ms with 0 errors.
+- Verified account check & signup persistence via `localStorage`.
+- Verified successful login popup & redirection.
+- Verified failed login popup & "Create an Account" redirect to `/signup`.
+- Verified password reset modals and strength meter functionality.
+- Verified ReviseAI Book Logo rendering across all screens.
+
 **Status:**
-🟡 In Progress / 🟢 Completed / 🔴 Blocked
+🟢 Completed
+
 **Notes / Blockers:**
-[Any important information, dependency, issue, or blocker.]
+- All auth UI pages, modals, and flow redirections are fully functional on the frontend.
+- Backend API integration and backend OTP sending remain for upcoming phase tasks.
 
 ---
 
-
 ## Next Steps
 
-- Next task
-- Next task
+- Implement backend API routes for authentication (`/api/auth/register`, `/api/auth/login`, `/api/auth/otp`).
+- Integrate MongoDB user database schema with hashed passwords.
