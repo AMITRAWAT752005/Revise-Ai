@@ -1,5 +1,5 @@
-const express = require('express');
-const cors = require('cors');
+import cors from 'cors';
+import express from 'express';
 
 const app = express();
 
@@ -11,4 +11,4 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is healthy' });
 });
 
-module.exports = app;
+export default app;

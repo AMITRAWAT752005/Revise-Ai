@@ -326,7 +326,42 @@ Phase 1 — Commitment Page UI Redesign (Stitch integration)
 
 ---
 
+## Date: 03 September 2026
+### Team Member: Amit Rawat
+
+**Task Worked On:**
+Phase 1 — MongoDB User Schema and Database Connection Setup
+
+**Changes Made:**
+- Added the Mongoose `User` model with the requested account, commitment, and timestamp fields.
+- Added the MongoDB connection helper using `MONGO_URI`.
+- Updated server startup to load the server `.env` file, connect to MongoDB, and start listening only after a successful connection.
+- Updated the server package to use ES modules and added the Mongoose dependency.
+
+**Files Created:**
+- `server/src/models/User.js`
+- `server/src/config/db.js`
+
+**Files Modified:**
+- `server/src/server.js`
+- `server/src/app.js`
+- `server/package.json`
+- `server/package-lock.json`
+- `server/.env.example`
+
+**Testing Performed:**
+- Verified all changed server modules pass syntax and workspace diagnostics checks.
+- Verified the model exposes the requested fields and maps to the `users` collection.
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+- Authentication API routes, password hashing flow, and OTP backend integration remain pending.
+
+---
+
 ## Next Steps
 
 - Implement backend API routes for authentication (`/api/auth/register`, `/api/auth/login`, `/api/auth/otp`).
-- Integrate MongoDB user database schema with hashed passwords.
+- Integrate password hashing with the backend registration and login flow.

@@ -201,6 +201,8 @@
 # 10. User Data & Database
 
 - [x] Create user data structure schema (`fullName`, `email`, `password`)
+- [x] Create MongoDB `User` schema with timestamps and required account fields
+- [x] Configure MongoDB connection using `MONGO_URI`
 - [x] Add unique email handling
 - [x] Support registered users persistence (`localStorage`)
 - [x] Test user data creation and retrieval
