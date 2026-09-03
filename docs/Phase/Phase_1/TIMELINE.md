@@ -337,10 +337,13 @@ Phase 1 — MongoDB User Schema and Database Connection Setup
 - Added the MongoDB connection helper using `MONGO_URI`.
 - Updated server startup to load the server `.env` file, connect to MongoDB, and start listening only after a successful connection.
 - Updated the server package to use ES modules and added the Mongoose dependency.
+- Added Added the Mongoose `otp ` model.
 
 **Files Created:**
 - `server/src/models/User.js`
 - `server/src/config/db.js`
+- `server/src/models/Otp.js`
+
 
 **Files Modified:**
 - `server/src/server.js`
@@ -352,6 +355,7 @@ Phase 1 — MongoDB User Schema and Database Connection Setup
 **Testing Performed:**
 - Verified all changed server modules pass syntax and workspace diagnostics checks.
 - Verified the model exposes the requested fields and maps to the `users` collection.
+- Verified the model exposes the requested fields and maps to the `otp` collection.
 
 **Status:**
 🟢 Completed

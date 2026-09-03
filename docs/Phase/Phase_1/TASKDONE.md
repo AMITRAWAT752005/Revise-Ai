@@ -206,6 +206,7 @@
 - [x] Add unique email handling
 - [x] Support registered users persistence (`localStorage`)
 - [x] Test user data creation and retrieval
+- [x] create otp structure schema.
 
 ---
 
