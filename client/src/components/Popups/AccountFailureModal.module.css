@@ -1,0 +1,141 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgba(27, 27, 29, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+.modalCard {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(94, 92, 230, 0.08), 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid rgba(199, 196, 215, 0.3);
+  animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.logoHeader {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.logoImg {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.iconWrapper {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.iconCircle {
+  width: 72px;
+  height: 72px;
+  border-radius: 9999px;
+  background-color: rgba(255, 218, 214, 0.5);
+  border: 1px solid #ffdad6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconCircle span {
+  color: #ba1a1a;
+  font-size: 44px;
+  font-variation-settings: 'FILL' 1;
+}
+
+.title {
+  font-size: 24px;
+  line-height: 1.3;
+  font-weight: 700;
+  color: #1b1b1d;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #464554;
+  margin-bottom: 28px;
+  padding: 0 8px;
+}
+
+.actionsStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tryAgainBtn {
+  display: inline-flex;
+  width: 100%;
+  height: 50px;
+  background-color: #5e5ce6;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #332dbc;
+  transition: all 0.15s ease;
+}
+
+.tryAgainBtn:hover {
+  background-color: #4441cc;
+}
+
+.tryAgainBtn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.closeBtn {
+  display: inline-flex;
+  width: 100%;
+  height: 44px;
+  background-color: transparent;
+  color: #4441cc;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.closeBtn:hover {
+  background-color: #f0edef;
+  border-color: rgba(199, 196, 215, 0.5);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}

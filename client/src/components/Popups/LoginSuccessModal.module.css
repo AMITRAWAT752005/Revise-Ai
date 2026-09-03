@@ -1,0 +1,113 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgba(27, 27, 29, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+.modalCard {
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 8px 32px rgba(94, 92, 230, 0.1);
+  text-align: center;
+  border: 1px solid rgba(199, 196, 215, 0.3);
+  animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.logoHeader {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.logoImg {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.iconWrapper {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.iconCircle {
+  width: 72px;
+  height: 72px;
+  border-radius: 9999px;
+  background-color: rgba(52, 199, 89, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconCircle span {
+  color: #34C759;
+  font-size: 44px;
+  font-variation-settings: 'wght' 600, 'FILL' 1;
+}
+
+.title {
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #1b1b1d;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #464554;
+  margin-bottom: 28px;
+  padding: 0 8px;
+}
+
+.actionBtn {
+  display: inline-flex;
+  width: 100%;
+  height: 52px;
+  background-color: #5E5CE6;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #332dbc;
+  transition: all 0.15s ease;
+}
+
+.actionBtn:hover {
+  background-color: #4441cc;
+}
+
+.actionBtn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}

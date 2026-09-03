@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Signup.module.css';
+import AccountSuccessModal from '../../components/Popups/AccountSuccessModal';
+import AccountFailureModal from '../../components/Popups/AccountFailureModal';
 
 import logoImg from '../../assets/images/book-logo.png';
 import illustrationImg from '../../assets/images/signup-illustration.png';
@@ -17,6 +19,11 @@ const GoogleIcon = () => (
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [modalState, setModalState] = useState(null); // 'success' | 'failure' | null
 
   const togglePasswordVisibility = (e) => {
     e.preventDefault();
@@ -28,12 +35,30 @@ const Signup = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (fullName && email && password && password === confirmPassword) {
+      // Save new user into localStorage registeredUsers
+      const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      const userExists = existingUsers.some(u => u.email.trim().toLowerCase() === email.trim().toLowerCase());
+
+      if (userExists) {
+        setModalState('failure');
+      } else {
+        const updatedUsers = [...existingUsers, { fullName, email: email.trim(), password }];
+        localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+        setModalState('success');
+      }
+    } else {
+      setModalState('failure');
+    }
+  };
+
   return (
     <div className={styles.container}>
       <main className={styles.mainCard}>
         {/* Left Side: Branding / Illustration */}
         <div className={styles.leftSide}>
-          {/* Decorative Background Elements */}
           <div className={styles.blobTop}></div>
           <div className={styles.blobBottom}></div>
           
@@ -78,12 +103,19 @@ const Signup = () => {
               <div className={styles.dividerLine}></div>
             </div>
             
-            <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+            <form className={styles.form} onSubmit={handleSubmit}>
               <div className={styles.inputGroup}>
                 <label htmlFor="fullName">Full Name</label>
                 <div className={styles.inputWrapper}>
                   <span className={`material-symbols-outlined ${styles.inputIcon}`}>person</span>
-                  <input id="fullName" type="text" placeholder="John Doe" />
+                  <input
+                    id="fullName"
+                    type="text"
+                    placeholder="John Doe"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
                 </div>
               </div>
               
@@ -91,7 +123,14 @@ const Signup = () => {
                 <label htmlFor="email">Email Address</label>
                 <div className={styles.inputWrapper}>
                   <span className={`material-symbols-outlined ${styles.inputIcon}`}>mail</span>
-                  <input id="email" type="email" placeholder="you@example.com" />
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
               </div>
               
@@ -102,7 +141,10 @@ const Signup = () => {
                   <input 
                     id="password" 
                     type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
                   />
                   <button type="button" className={styles.togglePasswordBtn} onClick={togglePasswordVisibility}>
                     <span className="material-symbols-outlined">
@@ -119,7 +161,10 @@ const Signup = () => {
                   <input 
                     id="confirmPassword" 
                     type={showConfirmPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
                   />
                   <button type="button" className={styles.togglePasswordBtn} onClick={toggleConfirmPasswordVisibility}>
                     <span className="material-symbols-outlined">
@@ -134,7 +179,7 @@ const Signup = () => {
                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
               </button>
             </form>
-            
+
             <div className={styles.footerText}>
               <p>
                 Already have an account?{' '}
@@ -144,6 +189,14 @@ const Signup = () => {
           </div>
         </div>
       </main>
+
+      {/* Pop Up Modals */}
+      {modalState === 'success' && (
+        <AccountSuccessModal onClose={() => setModalState(null)} />
+      )}
+      {modalState === 'failure' && (
+        <AccountFailureModal onClose={() => setModalState(null)} />
+      )}
     </div>
   );
 };
