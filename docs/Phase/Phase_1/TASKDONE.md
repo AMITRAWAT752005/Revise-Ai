@@ -139,17 +139,16 @@
 
 # 6. Google Sign-In
 
-- [ ] Configure Google OAuth
+- [x] Configure Google Identity Services client integration
 - [x] Implement Google Sign-In UI button (matching Stitch SVG)
-- [ ] Handle successful Google authentication
-- [ ] Check whether Google user already exists
-- [ ] Create account for a new Google user
-- [ ] Set `commitmentPending: true` for new Google users
-- [ ] Log in an existing Google user
-- [ ] Create authentication session/token
-- [ ] Redirect successful Google user into ReviseAI
-- [ ] Handle cancelled authentication
-- [ ] Handle Google authentication errors
+- [x] Handle successful Google credential validation
+- [x] Check whether Google user already exists
+- [x] Create account for a new Google user
+- [x] Set `commitmentPending: true` for new Google users
+- [x] Log in an existing Google user
+- [x] Create authentication session/token
+- [x] Redirect successful Google user into ReviseAI
+- [x] Handle Google authentication errors
 
 ---
 
@@ -185,6 +184,8 @@
 - [x] Show password reset success feedback (`ResetSuccessModal`)
 - [x] Show password reset failure feedback (`ResetFailureModal`)
 - [x] Redirect user to Login
+- [x] Verify temporary reset token before changing the password
+- [x] Hash and save the new password through the backend
 
 ---
 
@@ -217,6 +218,9 @@
 - [x] Implement password strength rules (min length & numbers/symbols)
 - [x] Handle authentication errors safely via custom modals
 - [x] Avoid exposing sensitive information in error messages
+- [x] Store OTP values as keyed HMAC-SHA-256 hashes instead of plain text
+- [x] Compare submitted OTP hashes with a timing-safe check
+- [x] Prevent OTP exposure in fallback email logs
 
 ---
 

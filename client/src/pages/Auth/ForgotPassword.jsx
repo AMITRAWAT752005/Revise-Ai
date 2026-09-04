@@ -14,11 +14,16 @@ const ForgotPassword = () => {
     setSubmitted(true);
 
     try {
-      await fetch('/api/auth/otp/send', {
+      const response = await fetch('/api/auth/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), purpose: 'PASSWORD_RESET' }),
       });
+
+      if (!response.ok) {
+        setSubmitted(false);
+        return;
+      }
       
       // Store email for OTP page fallback, then redirect to OTP verification
       localStorage.setItem('pendingVerificationEmail', email.trim());

@@ -107,6 +107,9 @@ const OTPVerification = () => {
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('commitmentPending', 'true');
       }
+      if (context === 'password-reset' && data.token) {
+        localStorage.setItem('tempResetToken', data.token);
+      }
 
       setModalState('success');
     } catch (err) {

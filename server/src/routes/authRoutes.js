@@ -4,6 +4,7 @@ import {
   verifyOtpController,
   registerController,
   loginController,
+  googleLoginController,
   getProfileController,
   logoutController,
   resetPasswordController,
@@ -16,6 +17,7 @@ const router = express.Router();
 // Public Authentication Routes
 router.post('/register', registerController);
 router.post('/login', loginController);
+router.post('/google', googleLoginController);
 router.post('/logout', logoutController);
 router.post('/reset-password', resetPasswordController);
 

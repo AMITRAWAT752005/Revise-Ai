@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { sendOtp, verifyOtp } from '../services/otpService.js';
-import { generateToken } from '../utils/jwtUtils.js';
+import { generateToken, verifyToken } from '../utils/jwtUtils.js';
 import { validateName, validateEmail, validatePassword } from '../utils/validationUtils.js';
 import User from '../models/User.js';
 
@@ -203,6 +204,69 @@ export const loginController = async (req, res) => {
 };
 
 /**
+ * Validate a Google ID token and sign in or create the matching user.
+ */
+export const googleLoginController = async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential || typeof credential !== 'string') {
+      return res.status(400).json({ error: 'Google credential is required.' });
+    }
+
+    const googleResponse = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`,
+    );
+    if (!googleResponse.ok) {
+      return res.status(401).json({ error: 'Invalid Google credential.' });
+    }
+
+    const googleUser = await googleResponse.json();
+    if (googleUser.email_verified !== 'true' || !googleUser.email) {
+      return res.status(401).json({ error: 'Google account email is not verified.' });
+    }
+
+    if (process.env.GOOGLE_CLIENT_ID && googleUser.aud !== process.env.GOOGLE_CLIENT_ID) {
+      return res.status(401).json({ error: 'Google credential was issued for another application.' });
+    }
+
+    const normalizedEmail = googleUser.email.trim().toLowerCase();
+    let user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      user = await User.create({
+        name: googleUser.name || normalizedEmail.split('@')[0],
+        email: normalizedEmail,
+        password: await bcrypt.hash(crypto.randomBytes(32).toString('hex'), 10),
+        type: 'google',
+        isVerified: true,
+        commitmentPending: true,
+      });
+    } else if (user.type !== 'google') {
+      user.type = 'google';
+      user.isVerified = true;
+      await user.save();
+    }
+
+    const token = generateToken({ userId: user._id, email: user.email });
+    return res.status(200).json({
+      message: 'Google login successful',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        type: user.type,
+        isVerified: user.isVerified,
+        commitmentPending: user.commitmentPending,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message || 'Server error during Google login.' });
+  }
+};
+
+/**
  * Controller to get current authenticated user profile
  */
 export const getProfileController = async (req, res) => {
@@ -222,19 +286,39 @@ export const logoutController = async (req, res) => {
   res.status(200).json({ message: 'Logged out successfully.' });
 };
 
-/**
- * Controller to handle password reset (TEMPLATE)
- * Currently a placeholder that returns success without DB operation.
- */
 export const resetPasswordController = async (req, res) => {
   try {
     const { newPassword } = req.body;
-    // TODO: Verify the temporary token from req.headers.authorization
-    // TODO: Hash the new password and save it to the DB
 
-    res.status(200).json({ message: 'Password reset successfully. (Template logic)' });
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({ error: passwordValidation.error });
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Password reset token required.' });
+    }
+
+    const decoded = verifyToken(authHeader.slice(7));
+    if (!decoded.temporary || !decoded.email) {
+      return res.status(401).json({ error: 'Invalid password reset token.' });
+    }
+
+    const user = await User.findOne({ email: decoded.email });
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({ message: 'Password reset successfully.' });
   } catch (error) {
-    res.status(500).json({ error: error.message || 'Server error during password reset.' });
+    if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ error: 'Invalid or expired password reset token.' });
+    }
+    return res.status(500).json({ error: error.message || 'Server error during password reset.' });
   }
 };
 

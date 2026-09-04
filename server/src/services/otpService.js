@@ -5,6 +5,11 @@ import crypto from 'crypto';
 const MAX_ATTEMPTS = 5;
 const COOLDOWN_SECONDS = 30;
 
+const hashOtp = (otpCode) => crypto
+  .createHmac('sha256', process.env.JWT_SECRET || 'reviseai_dev_otp_secret')
+  .update(otpCode)
+  .digest('hex');
+
 /**
  * Generates a random 6-digit numeric OTP
  * @returns {string} 6-digit OTP
@@ -40,7 +45,7 @@ export const sendOtp = async (email, purpose) => {
   // Create new OTP record
   const newOtp = new Otp({
     email,
-    otp: otpCode, // In a production app, consider hashing this before saving
+    otpHash: hashOtp(otpCode),
     purpose,
     attempts: 0,
     lastSentAt: new Date(),
@@ -73,7 +78,12 @@ export const verifyOtp = async (email, otpCode, purpose) => {
     throw new Error('Maximum attempts exceeded. Please request a new OTP.');
   }
 
-  if (otpRecord.otp !== otpCode) {
+  const submittedOtpHash = Buffer.from(hashOtp(otpCode), 'utf8');
+  const storedOtpHash = Buffer.from(otpRecord.otpHash, 'utf8');
+  const isValidOtp = submittedOtpHash.length === storedOtpHash.length
+    && crypto.timingSafeEqual(submittedOtpHash, storedOtpHash);
+
+  if (!isValidOtp) {
     otpRecord.attempts += 1;
     await otpRecord.save();
     

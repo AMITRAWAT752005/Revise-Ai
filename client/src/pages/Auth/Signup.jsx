@@ -35,6 +35,43 @@ const Signup = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  const handleGoogleSignUp = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId || !window.google?.accounts?.id) {
+      setErrorInfo({
+        title: 'Google Sign-Up Unavailable',
+        message: 'Google sign-up is not configured. Please use email registration.',
+      });
+      return;
+    }
+
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: async ({ credential }) => {
+        try {
+          const response = await fetch('/api/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credential }),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setErrorInfo({ title: 'Google Sign-Up Failed', message: data.error || 'Unable to sign up with Google.' });
+            return;
+          }
+
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          navigate(data.user.commitmentPending ? '/commitment' : '/home');
+        } catch (error) {
+          setErrorInfo({ title: 'Network Error', message: 'Unable to connect to the server. Please try again later.' });
+        }
+      },
+    });
+    window.google.accounts.id.prompt();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -129,7 +166,7 @@ const Signup = () => {
               <p className={styles.formSubtitle}>Join ReviseAI and accelerate your learning.</p>
             </div>
             
-            <button className={styles.googleBtn} type="button">
+            <button className={styles.googleBtn} type="button" onClick={handleGoogleSignUp}>
               <GoogleIcon />
               <span>Sign up with Google</span>
             </button>

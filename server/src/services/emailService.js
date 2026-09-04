@@ -116,7 +116,7 @@ const getEmailTemplate = (otp, purpose) => {
  */
 export const sendVerificationEmail = async (to, otp, purpose) => {
   if (!process.env.BREVO_API_KEY) {
-    console.warn('BREVO_API_KEY is missing. Skipping actual email send. OTP is:', otp);
+    console.warn('BREVO_API_KEY is missing. Skipping actual email send.');
     return { success: true, message: 'Simulated email send' };
   }
 

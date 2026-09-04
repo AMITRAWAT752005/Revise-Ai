@@ -605,6 +605,82 @@ Phase 1 — Email Service Migration and Commitment DB Schema Fix
 
 ---
 
+## Date: 04 September 2026
+
+### Team Member: Amit Rawat
+Time: 4:03 pm
+**Task Worked On:**
+Phase 1 — Google Credential Authentication and Complete Forgot Password Flow
+
+**Changes Made:**
+- Added `/api/auth/google` to validate Google ID tokens, find or create users, link an existing email account, and return the standard JWT/user response.
+- Connected the existing login and signup Google buttons to Google Identity Services.
+- Completed password reset token verification, password hashing, and database persistence.
+- Connected the forgot-password UI to OTP response handling and temporary reset-token storage.
+
+**Files Created:**
+- None
+
+**Files Modified:**
+- `server/src/controllers/authController.js`
+- `server/src/routes/authRoutes.js`
+- `client/src/pages/Auth/Login.jsx`
+- `client/src/pages/Auth/Signup.jsx`
+- `client/src/pages/Auth/ForgotPassword.jsx`
+- `client/src/pages/Auth/OTPVerification.jsx`
+- `client/src/pages/Auth/ResetPassword.jsx`
+- `client/index.html`
+- `client/.env.example`
+- `docs/Phase/Phase_1/TASKDONE.md`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Client production build passed with 51 modules and no errors.
+- Backend syntax checks passed.
+- Workspace diagnostics passed for all changed authentication files.
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+- Google sign-in requires `VITE_GOOGLE_CLIENT_ID` in the client environment.
+- Live Google and email delivery testing requires configured external credentials/services.
+
+---
+
+## Date: 04 September 2026
+
+### Team Member: Amit Rawat
+
+**Task Worked On:**
+Phase 1 — Secure OTP Storage
+
+**Changes Made:**
+- Replaced plain-text OTP storage with keyed HMAC-SHA-256 hashes in the OTP model and service.
+- Compared submitted and stored hashes using a timing-safe comparison.
+- Removed the raw OTP from the fallback email-service log.
+- Preserved the existing five-minute TTL expiry, resend cooldown, attempt limit, and delete-after-verification behavior.
+
+**Files Modified:**
+- `server/src/models/Otp.js`
+- `server/src/services/otpService.js`
+- `server/src/services/emailService.js`
+- `docs/Phase/Phase_1/TASKDONE.md`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Syntax checks passed for all changed server files.
+- Workspace diagnostics reported no errors.
+- Confirmed raw OTP storage, comparison, and logging patterns were removed.
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+- Existing OTP records created before this change use the old field and must be requested again after deployment.
+
+---
+
 ## Next Steps
 
 - Refine placeholder implementations for Reset Password.

@@ -26,6 +26,40 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleGoogleSignIn = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId || !window.google?.accounts?.id) {
+      setModalState('failure');
+      return;
+    }
+
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: async ({ credential }) => {
+        try {
+          const response = await fetch('/api/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credential }),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setModalState('failure');
+            return;
+          }
+
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          setModalState('success');
+        } catch (error) {
+          setModalState('failure');
+        }
+      },
+    });
+    window.google.accounts.id.prompt();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -136,7 +170,7 @@ const Login = () => {
             </div>
 
             {/* Google Sign In */}
-            <button className={styles.googleBtn} type="button">
+            <button className={styles.googleBtn} type="button" onClick={handleGoogleSignIn}>
               <GoogleIcon />
               <span>Continue with Google</span>
             </button>
