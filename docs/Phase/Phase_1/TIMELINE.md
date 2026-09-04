@@ -365,7 +365,48 @@ Phase 1 — MongoDB User Schema and Database Connection Setup
 
 ---
 
+## Date: 04 September 2026
+### Team Member: Bikram Singh Bisht
+**Time:** 07:45 AM
+
+**Task Worked On:**
+Phase 1 — Backend OTP and Email Verification Implementation
+
+**Changes Made:**
+- Updated MongoDB `Otp.js` model to include `purpose` (ACCOUNT_VERIFICATION, PASSWORD_RESET) and track `attempts`. Updated unique index to handle purpose separation.
+- Installed `resend` package for email integration.
+- Created `server/src/services/emailService.js` to send verification emails with the ReviseAI-styled HTML template using the Resend API.
+- Created `server/src/services/otpService.js` with functions to `generateOtp`, `sendOtp` (handling resend cooldowns), and `verifyOtp` (handling expiration, maximum attempts, and rate limiting).
+- Created `server/src/controllers/authController.js` to handle `/otp/send` and `/otp/verify` requests, including purpose-specific validations.
+- Created `server/src/routes/authRoutes.js` and mounted them in `server/src/app.js` under `/api/auth`.
+
+**Files Created:**
+- `server/src/services/emailService.js`
+- `server/src/services/otpService.js`
+- `server/src/controllers/authController.js`
+- `server/src/routes/authRoutes.js`
+
+**Files Modified:**
+- `server/src/models/Otp.js`
+- `server/src/app.js`
+- `server/package.json`
+- `server/package-lock.json`
+- `docs/Phase/Phase_1/TASKDONE.md`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node --check` syntax verification across all new and modified server files successfully.
+- Verified correct installation of `resend` dependency.
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+- A valid `RESEND_API` key must be set in `.env` for actual emails to be dispatched. If missing, it will gracefully warn in the console and skip sending, but still return success for development purposes.
+
+---
+
 ## Next Steps
 
-- Implement backend API routes for authentication (`/api/auth/register`, `/api/auth/login`, `/api/auth/otp`).
+- Implement backend API routes for authentication (`/api/auth/register`, `/api/auth/login`).
 - Integrate password hashing with the backend registration and login flow.

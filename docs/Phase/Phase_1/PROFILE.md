@@ -17,22 +17,22 @@ All authentication pages should be implemented according to the approved Stitch 
 
 ## Required Pages
 
-- [ ] Register / Sign Up
-- [ ] OTP Verification
-- [ ] Login / Sign In
-- [ ] Forgot Password
-- [ ] Change / Reset Password
+- [x] Register / Sign Up
+- [x] OTP Verification
+- [x] Login / Sign In
+- [x] Forgot Password
+- [x] Change / Reset Password
 
 ## Authentication UI Requirements
 
-- [ ] Correct Stitch design implementation
-- [ ] Responsive layout
-- [ ] Form validation
-- [ ] Loading states
-- [ ] Error states
-- [ ] Success states
-- [ ] Navigation between authentication pages
-- [ ] Show/hide password functionality
+- [x] Correct Stitch design implementation
+- [x] Responsive layout
+- [x] Form validation
+- [x] Loading states
+- [x] Error states
+- [x] Success states
+- [x] Navigation between authentication pages
+- [x] Show/hide password functionality
 
 ---
 

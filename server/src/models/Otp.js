@@ -15,6 +15,17 @@ const otpSchema = new mongoose.Schema(
       required: true,
     },
 
+    purpose: {
+      type: String,
+      enum: ['ACCOUNT_VERIFICATION', 'PASSWORD_RESET'],
+      required: true,
+    },
+
+    attempts: {
+      type: Number,
+      default: 0,
+    },
+
     // ⏱️ For expiry (TTL index)
     createdAt: {
       type: Date,
@@ -33,8 +44,8 @@ const otpSchema = new mongoose.Schema(
   }
 );
 
-// Ensure one OTP per email (prevents duplicates)
-otpSchema.index({ email: 1 }, { unique: true });
+// Ensure one OTP per email per purpose (prevents duplicates of the same type)
+otpSchema.index({ email: 1, purpose: 1 }, { unique: true });
 
 const Otp = mongoose.model("Otp", otpSchema);
 

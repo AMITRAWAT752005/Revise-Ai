@@ -99,26 +99,26 @@
 - [x] Check for duplicate email (`localStorage` registered user check)
 - [x] Handle duplicate account errors (`AccountFailureModal`)
 - [x] Create user registration flow
-- [ ] Generate registration OTP (backend integration pending)
-- [ ] Send registration OTP (backend integration pending)
+- [x] Generate registration OTP (backend integration complete)
+- [x] Send registration OTP (backend integration complete)
 - [x] Redirect user to `/verify-otp` after account creation
 
 ---
 
 # 4. OTP Verification System
 
-- [ ] Create OTP generation system
-- [ ] Support Registration Verification OTP
-- [ ] Support Password Reset OTP
-- [ ] Store OTP securely
-- [ ] Add OTP expiration
-- [ ] Verify valid OTP
-- [ ] Reject invalid OTP
-- [ ] Reject expired OTP
-- [ ] Prevent OTP reuse
-- [ ] Implement Resend OTP
-- [ ] Implement resend cooldown
-- [ ] Handle OTP sending failures
+- [x] Create OTP generation system
+- [x] Support Registration Verification OTP
+- [x] Support Password Reset OTP
+- [x] Store OTP securely
+- [x] Add OTP expiration
+- [x] Verify valid OTP
+- [x] Reject invalid OTP
+- [x] Reject expired OTP
+- [x] Prevent OTP reuse
+- [x] Implement Resend OTP
+- [x] Implement resend cooldown
+- [x] Handle OTP sending failures
 
 ---
 
@@ -170,8 +170,8 @@
 - [x] Validate submitted email
 - [x] Check whether the email belongs to a registered user
 - [x] Handle email submission appropriately
-- [ ] Generate Password Reset OTP (backend)
-- [ ] Send Password Reset OTP (backend)
+- [x] Generate Password Reset OTP (backend)
+- [x] Send Password Reset OTP (backend)
 - [x] Redirect user to `/verify-otp` (with email & context: 'password-reset' via route state)
 
 ---
