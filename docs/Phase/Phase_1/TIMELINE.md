@@ -681,6 +681,33 @@ Phase 1 — Secure OTP Storage
 
 ---
 
+## Date: 04 September 2026
+
+### Team Member: Bikram Singh Bisht
+
+**Time:** 05:25 PM
+
+**Task Worked On:**
+Phase 1 — Google Sign-In Button Fix
+
+**Changes Made:**
+- Identified a silent failure bug where clicking the "Continue with Google" button did nothing due to the Google Identity Services `prompt()` (One Tap UI) being blocked by browser settings or cooldown periods.
+- Refactored `client/src/pages/Auth/Login.jsx` and `client/src/pages/Auth/Signup.jsx` to use Google's official `renderButton` API instead of `.prompt()`.
+- Replaced the custom Google buttons with a centered container (`div`) to host the official, reliable Google Sign-In iframe, ensuring the standard popup authentication flow triggers correctly upon user interaction.
+
+**Files Modified:**
+- `client/src/pages/Auth/Login.jsx`
+- `client/src/pages/Auth/Signup.jsx`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Verified the official Google Sign-In button renders correctly and is centered on both the Login and Signup pages.
+
+**Status:**
+🟢 Completed
+
+---
+
 ## Next Steps
 
 - Refine placeholder implementations for Reset Password.
