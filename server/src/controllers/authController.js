@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { sendOtp, verifyOtp } from '../services/otpService.js';
 import { generateToken } from '../utils/jwtUtils.js';
+import { validateName, validateEmail, validatePassword } from '../utils/validationUtils.js';
 import User from '../models/User.js';
 
 /**
@@ -81,8 +82,20 @@ export const registerController = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Name, email, and password are required.' });
+    // Validate inputs
+    const nameValidation = validateName(name);
+    if (!nameValidation.isValid) {
+      return res.status(400).json({ error: nameValidation.error });
+    }
+
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      return res.status(400).json({ error: emailValidation.error });
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({ error: passwordValidation.error });
     }
 
     const normalizedEmail = email.trim().toLowerCase();
