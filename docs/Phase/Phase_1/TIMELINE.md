@@ -557,6 +557,54 @@ None.
 
 ---
 
+## Date: 04 September 2026
+
+### Team Member: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 1 — Frontend and Backend Auth Integration
+
+**Changes Made:**
+- Updated `client/vite.config.js` with server proxy to route `/api` to backend.
+- Refactored `client/src/pages/Auth/Signup.jsx` to replace `localStorage` with `fetch('/api/auth/register')`.
+- Refactored `client/src/pages/Auth/OTPVerification.jsx` to use `/api/auth/otp/verify` and `/api/auth/otp/send`. JWT is saved to `localStorage` on verification.
+- Refactored `client/src/pages/Auth/Login.jsx` to use `/api/auth/login` and save JWT token.
+- Refactored `client/src/pages/Auth/ForgotPassword.jsx` to call `/api/auth/otp/send` directly.
+- Implemented `/api/auth/reset-password` and `/api/auth/commitment` placeholder endpoints in backend.
+- Updated `server/src/controllers/authController.js` to automatically call `sendOtp` upon successful user registration and modified `verifyOtpController` to issue a JWT.
+
+**Testing Performed:**
+- Evaluated frontend `npm run build` with 0 errors.
+
+**Status:**
+🟢 Completed
+
+---
+
+## Date: 04 September 2026
+
+### Team Member: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 1 — Email Service Migration and Commitment DB Schema Fix
+
+**Changes Made:**
+- Migrated the email delivery system from Resend to the Brevo API in `server/src/services/emailService.js`.
+- Removed the `resend` npm package and implemented a native `fetch` call to Brevo's REST API `/v3/smtp/email`.
+- Resolved `.env` file corruption issues and properly added `BREVO_API_KEY`.
+- Fixed the `User` schema in `server/src/models/User.js` to correctly map the commitment fields: added `studentType` (String), updated `commitTime` (String) to store time per day, and mapped flashcards to `cardCommits` (Number).
+- Updated `updateCommitmentController` in `server/src/controllers/authController.js` to save the correct field mappings to MongoDB.
+- Fixed a navigation bug in `client/src/pages/Auth/OTPVerification.jsx` by properly setting the `commitmentPending` flag in localStorage after verification, allowing access to the `/commitment` page.
+
+**Testing Performed:**
+- Verified OTP emails are successfully delivered via Brevo.
+- Verified that completing the Commitment form correctly stores `studentType`, `commitTime`, `cardCommits`, and `hasCompletedCommitment` in the MongoDB User document.
+
+**Status:**
+🟢 Completed
+
+---
+
 ## Next Steps
 
-- Integrate frontend Auth pages (`Signup`, `Login`, `OTPVerification`) to call backend endpoints.
+- Refine placeholder implementations for Reset Password.

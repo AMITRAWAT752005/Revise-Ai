@@ -27,13 +27,19 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
     commitTime: {
-      type: Date,
+      type: String, // e.g. '30 min', '1 hour' — daily study time commitment
+      default: null,
+    },
+    studentType: {
+      type: String,
+      enum: ['College Student', 'School Student', 'Professional'],
+      default: null,
     },
     commitmentPending: {
       type: Boolean,
       default: false,
     },
-    isVerified: {
+    hasCompletedCommitment: {
       type: Boolean,
       default: false,
     },

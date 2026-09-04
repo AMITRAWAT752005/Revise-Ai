@@ -28,21 +28,32 @@ const Commitment = () => {
     }
   }, [navigate]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) return;
 
     setIsSubmitting(true);
 
-    // Save commitment details to user profile (mock)
-    setTimeout(() => {
-      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-      const updated = users.map(u => ({ ...u, hasCompletedCommitment: true }));
-      localStorage.setItem('registeredUsers', JSON.stringify(updated));
+    try {
+      const token = localStorage.getItem('authToken');
+      await fetch('/api/auth/commitment', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ studentType, timePerDay, flashcards }),
+      });
       
       localStorage.removeItem('commitmentPending');
-      navigate('/home');
-    }, 1500); // Fake delay for button animation
+      // Adding a small delay for the animation effect
+      setTimeout(() => {
+        navigate('/home');
+      }, 1000);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    }
   };
 
   return (

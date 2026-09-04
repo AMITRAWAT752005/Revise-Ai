@@ -1,10 +1,6 @@
-import { Resend } from 'resend';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-// Ensure the Resend API key is available
-const resend = new Resend(process.env.RESEND_API);
 
 /**
  * Generates the HTML template for the OTP email.
@@ -113,36 +109,47 @@ const getEmailTemplate = (otp, purpose) => {
 };
 
 /**
- * Sends an OTP verification email using Resend.
+ * Sends an OTP verification email using Brevo (Sendinblue).
  * @param {string} to - The recipient's email address
  * @param {string} otp - The 6-digit OTP code
  * @param {string} purpose - 'ACCOUNT_VERIFICATION' or 'PASSWORD_RESET'
  */
 export const sendVerificationEmail = async (to, otp, purpose) => {
-  if (!process.env.RESEND_API) {
-    console.warn('RESEND_API key is missing. Skipping actual email send. OTP is:', otp);
-    return;
+  if (!process.env.BREVO_API_KEY) {
+    console.warn('BREVO_API_KEY is missing. Skipping actual email send. OTP is:', otp);
+    return { success: true, message: 'Simulated email send' };
   }
 
   const subject = purpose === 'ACCOUNT_VERIFICATION' 
     ? 'Verify your ReviseAI account' 
     : 'Reset your ReviseAI password';
-
-  // Using a fallback sender email if a verified domain is not set up on Resend yet.
-  // Note: Resend requires a verified domain to send from custom addresses like <noreply@reviseai.com>.
-  // We use onboarding@resend.dev as a fallback for testing if needed, but will try ReviseAI first.
   
   try {
-    const data = await resend.emails.send({
-      from: 'ReviseAI <onboarding@resend.dev>', // Use onboarding@resend.dev for testing without verified domain
-      to,
-      subject,
-      html: getEmailTemplate(otp, purpose),
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'ReviseAI', email: 'bikramsb314@gmail.com' },
+        to: [{ email: to }],
+        subject: subject,
+        htmlContent: getEmailTemplate(otp, purpose)
+      })
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Brevo API Error:', errorData);
+      throw new Error('Failed to send verification email.');
+    }
+
+    const data = await response.json();
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending email via Resend:', error);
+    console.error('Error sending email via Brevo:', error);
     throw new Error('Failed to send verification email.');
   }
 };

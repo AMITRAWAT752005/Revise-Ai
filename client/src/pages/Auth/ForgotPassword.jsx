@@ -9,14 +9,24 @@ const ForgotPassword = () => {
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
-    // Store email for OTP page fallback, then redirect to OTP verification
-    localStorage.setItem('pendingVerificationEmail', email.trim());
-    setTimeout(() => {
+
+    try {
+      await fetch('/api/auth/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), purpose: 'PASSWORD_RESET' }),
+      });
+      
+      // Store email for OTP page fallback, then redirect to OTP verification
+      localStorage.setItem('pendingVerificationEmail', email.trim());
       navigate('/verify-otp', { state: { email: email.trim(), context: 'password-reset' } });
-    }, 1200);
+    } catch (error) {
+      setSubmitted(false);
+      // Handle error visually if needed
+    }
   };
 
   return (

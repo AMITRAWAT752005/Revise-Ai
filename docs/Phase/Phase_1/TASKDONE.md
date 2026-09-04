@@ -158,8 +158,8 @@
 - [x] Create Commitment Page (`/commitment`)
 - [x] Restrict access to new users only (`commitmentPending` flag)
 - [x] Collect learning goals and study targets
-- [x] Update user schema to include `hasCompletedCommitment`
-- [x] Save completion status in `localStorage`
+- [x] Update user schema to include `studentType`, `commitTime`, `cardCommits`, and `hasCompletedCommitment`
+- [x] Save completion status in database
 - [x] Redirect to `/home` upon completion
 
 ---
@@ -247,12 +247,12 @@
 
 - [x] Open Forgot Password
 - [x] Submit Email
-- [ ] Redirect to OTP Verification page (email passed via route state)
-- [ ] OTP Verified — Redirect to Reset Password page
-- [ ] Enter New Password + Confirm Password
-- [ ] Reset Password Success Modal
-- [ ] Reset Password Failure Modal
-- [ ] Redirect to Login
+- [x] Redirect to OTP Verification page (email passed via route state)
+- [x] OTP Verified — Redirect to Reset Password page
+- [x] Enter New Password + Confirm Password
+- [x] Reset Password Success Modal
+- [x] Reset Password Failure Modal
+- [x] Redirect to Login
 
 ---
 

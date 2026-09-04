@@ -26,25 +26,27 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check account existence from localStorage registeredUsers
-    const storedUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    // Seed default demo user if not present
-    const demoUsers = [
-      { email: 'student@university.edu', password: 'password123' },
-      { email: 'demo@revise.ai', password: 'password123' },
-      ...storedUsers
-    ];
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const match = demoUsers.find(
-      (u) => u.email.trim().toLowerCase() === email.trim().toLowerCase() && u.password === password
-    );
+      const data = await response.json();
 
-    if (match) {
-      setModalState('success');
-    } else {
+      if (response.ok) {
+        localStorage.setItem('authToken', data.token);
+        // Optionally save user data
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setModalState('success');
+      } else {
+        setModalState('failure');
+      }
+    } catch (err) {
       setModalState('failure');
     }
   };

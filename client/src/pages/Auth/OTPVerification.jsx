@@ -78,7 +78,7 @@ const OTPVerification = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const code = otp.join('');
     
@@ -87,36 +87,57 @@ const OTPVerification = () => {
       return;
     }
 
-    // Demo check: '000000' or '111111' triggers failure modal, all other 6-digit codes succeed
-    if (code === '000000' || code === '111111') {
-      setModalState('failure');
-    } else {
-      // Mark the user as verified in localStorage
-      if (context === 'registration' && email) {
-        const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-        const updated = users.map(u =>
-          u.email.toLowerCase() === email.toLowerCase() ? { ...u, isVerified: true, hasCompletedCommitment: false } : u
-        );
-        localStorage.setItem('registeredUsers', JSON.stringify(updated));
-        localStorage.removeItem('pendingVerificationEmail');
+    try {
+      const purpose = context === 'password-reset' ? 'PASSWORD_RESET' : 'ACCOUNT_VERIFICATION';
+      const response = await fetch('/api/auth/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp: code, purpose }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setModalState('failure');
+        return;
+      }
+
+      // On successful registration OTP, store the token and set commitment flag
+      if (context === 'registration' && data.token) {
+        localStorage.setItem('authToken', data.token);
         localStorage.setItem('commitmentPending', 'true');
       }
-      localStorage.setItem('isVerified', 'true');
+
       setModalState('success');
+    } catch (err) {
+      setModalState('failure');
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (resendCooldown > 0) return;
-    setResendCooldown(30);
-    setToastMessage('A new 6-digit verification code has been sent to your email!');
-    setOtp(['', '', '', '', '', '']);
-    if (inputRefs.current[0]) {
-      inputRefs.current[0].focus();
+    
+    try {
+      const purpose = context === 'password-reset' ? 'PASSWORD_RESET' : 'ACCOUNT_VERIFICATION';
+      await fetch('/api/auth/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, purpose }),
+      });
+      
+      setResendCooldown(30);
+      setToastMessage('A new 6-digit verification code has been sent to your email!');
+      setOtp(['', '', '', '', '', '']);
+      if (inputRefs.current[0]) {
+        inputRefs.current[0].focus();
+      }
+      setTimeout(() => {
+        setToastMessage('');
+      }, 4000);
+    } catch (err) {
+      setToastMessage('Failed to resend OTP. Please try again.');
+      setTimeout(() => setToastMessage(''), 4000);
     }
-    setTimeout(() => {
-      setToastMessage('');
-    }, 4000);
   };
 
   return (

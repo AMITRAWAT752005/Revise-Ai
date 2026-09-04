@@ -29,7 +29,7 @@ const ResetPassword = () => {
     setTimeout(() => setShakeFields({}), 600);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = {};
 
@@ -56,7 +56,23 @@ const ResetPassword = () => {
     }
 
     setFieldErrors({});
-    setModalState('success');
+    
+    try {
+      // Assuming you saved the temporary token from the OTP verify step
+      // const tempToken = localStorage.getItem('tempResetToken');
+      await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          // 'Authorization': `Bearer ${tempToken}`
+        },
+        body: JSON.stringify({ newPassword }),
+      });
+      setModalState('success');
+    } catch (err) {
+      // Handle error
+      console.error(err);
+    }
   };
 
   return (

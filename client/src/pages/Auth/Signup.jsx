@@ -35,7 +35,7 @@ const Signup = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Check for missing fields
@@ -56,25 +56,39 @@ const Signup = () => {
       return;
     }
 
-    // Check for duplicate email
-    const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const userExists = existingUsers.some(u => u.email.trim().toLowerCase() === email.trim().toLowerCase());
-
-    if (userExists) {
-      setErrorInfo({
-        title: 'Email Already Registered',
-        message: `An account with ${email} already exists. Try logging in or use a different email.`,
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: fullName, email: email.trim(), password }),
       });
-      return;
-    }
 
-    // Save user as unverified; OTP verification will mark them verified
-    const updatedUsers = [...existingUsers, { fullName, email: email.trim(), password, isVerified: false }];
-    localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
-    // Store pending email for OTP page
-    localStorage.setItem('pendingVerificationEmail', email.trim());
-    // Redirect to OTP verification page
-    navigate('/verify-otp', { state: { email: email.trim(), context: 'registration' } });
+      const data = await response.json();
+
+      if (response.status === 409) {
+        setErrorInfo({
+          title: 'Email Already Registered',
+          message: data.error || `An account with ${email} already exists. Try logging in or use a different email.`,
+        });
+        return;
+      }
+
+      if (!response.ok) {
+        setErrorInfo({
+          title: 'Registration Failed',
+          message: data.error || 'Something went wrong during registration. Please try again.',
+        });
+        return;
+      }
+
+      // Redirect to OTP verification page
+      navigate('/verify-otp', { state: { email: email.trim(), context: 'registration' } });
+    } catch (err) {
+      setErrorInfo({
+        title: 'Network Error',
+        message: 'Unable to connect to the server. Please try again later.',
+      });
+    }
   };
 
   return (
