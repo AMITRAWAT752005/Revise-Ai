@@ -406,7 +406,53 @@ Phase 1 — Backend OTP and Email Verification Implementation
 
 ---
 
+## Date: 04 September 2026
+### Team Member: Anukool Negi
+**Time:** 09:30 AM
+
+**Task Worked On:**
+Phase 1 — Backend Login, JWT Generation & Verification, Authentication Middleware, and Protected Routes
+
+**Changes Made:**
+- Installed `jsonwebtoken` and `bcryptjs` dependencies in `server`.
+- Updated `server/.env.example` with `JWT_SECRET` and `JWT_EXPIRES_IN` configuration.
+- Added `isVerified` boolean field to `server/src/models/User.js`.
+- Created `server/src/utils/jwtUtils.js` for token generation (`generateToken`) and token verification (`verifyToken`).
+- Created `server/src/middleware/authMiddleware.js` (`authenticateToken`) to validate `Bearer <token>` authorization headers and attach authenticated user objects to `req.user`.
+- Updated `server/src/controllers/authController.js` to implement:
+  - `registerController`: Hashes passwords with `bcryptjs` before persisting user documents.
+  - `loginController`: Validates email/password credentials, verifies password hashes using `bcrypt.compare`, and returns signed JWT tokens.
+  - `getProfileController`: Returns authenticated user profiles.
+  - `logoutController`: Acknowledges logout requests.
+- Updated `server/src/routes/authRoutes.js` to expose `/register`, `/login`, `/logout`, `/profile`, `/me`, and `/protected` endpoints.
+
+**Files Created:**
+- `server/src/utils/jwtUtils.js`
+- `server/src/middleware/authMiddleware.js`
+
+**Files Modified:**
+- `server/package.json`
+- `server/package-lock.json`
+- `server/.env.example`
+- `server/src/models/User.js`
+- `server/src/controllers/authController.js`
+- `server/src/routes/authRoutes.js`
+- `docs/Phase/Phase_1/TASKDONE.md`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node --check` syntax verification across all server files (`app.js`, `server.js`, `User.js`, `jwtUtils.js`, `authMiddleware.js`, `authController.js`, `authRoutes.js`) — 0 syntax errors.
+- Verified successful installation of `jsonwebtoken` and `bcryptjs` dependencies.
+- Verified frontend build with `npm run build` in `client` — 51 modules transformed in 217ms with 0 errors.
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+None.
+
+---
+
 ## Next Steps
 
-- Implement backend API routes for authentication (`/api/auth/register`, `/api/auth/login`).
-- Integrate password hashing with the backend registration and login flow.
+- Integrate frontend Auth pages (`Signup`, `Login`, `OTPVerification`) to call backend endpoints.

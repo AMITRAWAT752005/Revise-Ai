@@ -191,10 +191,11 @@
 # 9. Authentication State & Session Management
 
 - [x] Create client-side authentication state management
-- [x] Keep authenticated users logged in appropriately (`localStorage`)
+- [x] Keep authenticated users logged in appropriately (`localStorage` & JWT Bearer header)
 - [x] Create routes for `/signup`, `/login`, `/forgot-password`, `/reset-password`
-- [ ] Create protected routes (backend integration pending)
-- [ ] Redirect unauthorized users to Login
+- [x] Create backend JWT authentication middleware (`authenticateToken`)
+- [x] Create protected routes (`/api/auth/profile`, `/api/auth/me`, `/api/auth/protected`)
+- [x] Redirect unauthorized users / return 401 Unauthorized errors
 
 ---
 
