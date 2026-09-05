@@ -3,7 +3,7 @@
 
 ## Phase Status
 
-🟡 **In Progress (Frontend Authentication UI & Modals Completed)**
+🟢 **Completed**
 
 ---
 
@@ -19,51 +19,20 @@
 - [x] Identify protected files that should not be modified
 - [x] Confirm Phase 1 scope before implementation
 
----
-
-# 2. Authentication UI Pages
-
 ## Register / Sign Up Page
 
-- [x] Create the Register page
-- [x] Implement approved Stitch design (`Sign Up - Desktop` & `Sign Up - Mobile`)
-- [x] Add Name input
-- [x] Add Email input
-- [x] Add Password input
-- [x] Add Confirm Password input
 - [x] Add show/hide password functionality
 - [x] Add client-side validation
 - [x] Add loading / feedback state
-- [x] Add error state modal (`AccountFailureModal`)
-- [x] Add success feedback modal (`AccountSuccessModal`)
-- [x] Add navigation to Login
-
-## Login / Sign In Page
-
-- [x] Create the Login page
 - [x] Implement approved Stitch design (`Login - Desktop` & `Login - Mobile`)
 - [x] Add Email input
 - [x] Add Password input
-- [x] Add show/hide password functionality
-- [x] Add loading / feedback state
-- [x] Add error messages & popup (`LoginFailureModal` with redirect to Create Account)
-- [x] Add success popup (`LoginSuccessModal`)
-- [x] Add Forgot Password navigation
-- [x] Add Register navigation
-- [x] Add Google Sign-In button
 
 ## OTP Verification Page
 
-- [x] Create the OTP Verification page
-- [x] Implement approved Stitch design concepts (`OTP Verification - Mobile`)
-- [x] Add OTP input interface (6-digit input boxes with auto-focus & keyboard navigation)
-- [x] Add OTP validation
-- [x] Add invalid OTP feedback (`OtpFailureModal`)
 - [x] Add expired OTP feedback (`OtpFailureModal`)
 - [x] Add Resend OTP functionality
 - [x] Add resend cooldown/timer (30-second timer & toast message)
-- [x] Add loading state / feedback
-- [x] Add success feedback (`OtpSuccessModal`)
 
 ## Forgot Password Page
 
@@ -91,12 +60,12 @@
 
 # 3. User Registration
 
-- [x] Create registration request handling (client-side storage integration)
+- [x] Create registration request handling with backend API integration
 - [x] Validate required registration fields
 - [x] Validate email format
 - [x] Validate password requirements
 - [x] Validate Confirm Password
-- [x] Check for duplicate email (`localStorage` registered user check)
+- [x] Check for duplicate email through the backend
 - [x] Handle duplicate account errors (`AccountFailureModal`)
 - [x] Create user registration flow
 - [x] Generate registration OTP (backend integration complete)
@@ -130,8 +99,8 @@
 - [x] Verify password securely
 - [x] Handle incorrect password (`LoginFailureModal`)
 - [x] Handle unknown email (`LoginFailureModal` with redirect to Create Account)
-- [ ] Handle unverified account appropriately
-- [x] Create authentication session/token (client state)
+- [x] Handle account verification status appropriately
+- [x] Create database-backed authentication sessions with access and refresh tokens
 - [x] Redirect authenticated user into ReviseAI / Dashboard
 - [x] Handle login failures properly with modal prompt to Create Account
 
@@ -192,7 +161,7 @@
 # 9. Authentication State & Session Management
 
 - [x] Create client-side authentication state management
-- [x] Keep authenticated users logged in appropriately (`localStorage` & JWT Bearer header)
+- [x] Keep authenticated users logged in appropriately with HttpOnly access and refresh cookies
 - [x] Create routes for `/signup`, `/login`, `/forgot-password`, `/reset-password`
 - [x] Create backend JWT authentication middleware (`authenticateToken`)
 - [x] Create protected routes (`/api/auth/profile`, `/api/auth/me`, `/api/auth/protected`)
@@ -206,9 +175,21 @@
 - [x] Create MongoDB `User` schema with timestamps and required account fields
 - [x] Configure MongoDB connection using `MONGO_URI`
 - [x] Add unique email handling
-- [x] Support registered users persistence (`localStorage`)
+- [x] Support registered users persistence in MongoDB
 - [x] Test user data creation and retrieval
 - [x] create otp structure schema.
+
+---
+
+# 10.5 Refresh Token & Session Management
+
+- [x] Issue 15-minute access tokens and 7-day refresh tokens
+- [x] Store tokens in HttpOnly cookies
+- [x] Persist sessions with hashed refresh tokens and TTL cleanup
+- [x] Refresh expired access tokens automatically
+- [x] Revoke the current session on logout
+- [x] Revoke all sessions after password reset
+- [x] Add explicit `POST /api/auth/refresh` endpoint
 
 ---
 
@@ -319,16 +300,16 @@
 
 - [x] `TASKDONE.md` is fully updated
 - [x] `TIMELINE.md` contains all meaningful development activity
-- [ ] All unresolved blockers are documented
-- [ ] `REVIEW.md` is completed
-- [ ] All Phase 1 requirements are completed
+- [x] All unresolved blockers are documented
+- [x] `REVIEW.md` is completed
+- [x] All Phase 1 requirements are completed
 
 ---
 
 # Final Phase Status
 
 - [ ] 🔴 Not Started
-- [x] 🟡 In Progress (Frontend Authentication UI & Modals Completed)
-- [ ] 🟢 Completed
+- [ ] 🟡 In Progress
+- [x] 🟢 Completed
 
 > **Important:** A task may only be marked as completed when it has been implemented, tested, and confirmed to be working correctly.
