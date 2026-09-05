@@ -15,6 +15,7 @@ import {
   loginIpLimiter,
   otpSendLimiter,
   otpVerifyLimiter,
+  passwordResetLimiter,
 } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
@@ -24,7 +25,7 @@ router.post('/register', otpSendLimiter, registerController);
 router.post('/login', loginIpLimiter, loginController);
 router.post('/google', googleLoginController);
 router.post('/logout', logoutController);
-router.post('/reset-password', resetPasswordController);
+router.post('/reset-password', passwordResetLimiter, resetPasswordController);
 
 // OTP Routes
 router.post('/otp/send', otpSendLimiter, sendOtpController);

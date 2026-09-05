@@ -800,3 +800,45 @@ Phase 1.1 — TASK 2: Login Throttling + OTP Rate Limiting (Abuse Protection)
 **Notes / Blockers:**
 None.
 
+---
+
+## Date: 05 September 2026
+
+### Team Member: Anshul Gusain
+
+**Time:** 11:50 AM
+
+**Task Worked On:**
+Phase 1.1 — Password Reset Protection, OTP Cooldown Verification & Committed Test Suite
+
+**Changes Made:**
+- **Password Reset Rate Limiting (`passwordResetLimiter`)**:
+  - Added dedicated sliding window rate limiter for `POST /reset-password` in `server/src/middleware/rateLimiter.js` (default 10 requests per IP per 15-minute window; configurable via `PASSWORD_RESET_MAX` and `PASSWORD_RESET_WINDOW_MS`).
+  - Mounted `passwordResetLimiter` on `/reset-password` in `server/src/routes/authRoutes.js` to protect against brute-forcing password reset tokens.
+  - Documented `PASSWORD_RESET_MAX` and `PASSWORD_RESET_WINDOW_MS` in `server/.env.example`.
+- **Committed Automated Test Suite**:
+  - Created and committed `server/tests/auth_security.test.js` into the repository.
+  - Updated `server/package.json` to configure `"test": "node tests/auth_security.test.js"`.
+- **OTP Resend Cooldown & Rate Limiter Verification**:
+  - Added automated unit and integration tests confirming that the existing 30-second DB-level cooldown in `otpService.js` and the sliding window email rate limiter (5 requests / hour) on `/otp/send` function harmoniously without conflict.
+
+**Files Created:**
+- `server/tests/auth_security.test.js`
+
+**Files Modified:**
+- `server/src/middleware/rateLimiter.js`
+- `server/src/routes/authRoutes.js`
+- `server/.env.example`
+- `server/package.json`
+- `docs/Phase/Phase_1/TASKDONE.md`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Executed `npm test` on `server` (14/14 automated security & rate limiting tests passed with 0 errors).
+- Executed `npm run build` on `client` (51 modules transformed in 498ms with 0 errors).
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+None.

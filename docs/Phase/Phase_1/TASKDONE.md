@@ -224,6 +224,9 @@
 - [x] Implement Login brute-force throttling (IP rate limiting + account-level failed attempt protection)
 - [x] Implement OTP sending rate limiting (email hourly limit + IP limit + 30s resend cooldown)
 - [x] Implement OTP verification attempt rate limiting and brute-force protection
+- [x] Implement Password Reset rate limiting & token brute-force protection (`passwordResetLimiter` on `/reset-password`)
+- [x] Verify OTP 30-second DB-level cooldown working in combination with email hourly rate limiter
+- [x] Create committed automated test suite in repo (`server/tests/auth_security.test.js` & `npm test`)
 
 ---
 

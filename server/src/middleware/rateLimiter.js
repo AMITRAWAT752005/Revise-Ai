@@ -26,6 +26,10 @@ const CONFIG = {
   // OTP Verify: 15 verification attempts per IP/email per 15 minutes
   OTP_VERIFY_MAX: parseInt(process.env.OTP_VERIFY_MAX || '15', 10),
   OTP_VERIFY_WINDOW_MS: parseInt(process.env.OTP_VERIFY_WINDOW_MS || String(15 * 60 * 1000), 10),
+
+  // Password Reset: 10 requests per IP per 15 minutes
+  PASSWORD_RESET_MAX: parseInt(process.env.PASSWORD_RESET_MAX || '10', 10),
+  PASSWORD_RESET_WINDOW_MS: parseInt(process.env.PASSWORD_RESET_WINDOW_MS || String(15 * 60 * 1000), 10),
 };
 
 // In-memory sliding window stores
@@ -33,6 +37,7 @@ const ipStore = new Map();
 const failedLoginStore = new Map();
 const otpSendEmailStore = new Map();
 const otpVerifyStore = new Map();
+const passwordResetStore = new Map();
 
 // Periodic cleanup timer every 5 minutes to prevent memory leaks
 const cleanupInterval = setInterval(() => {
@@ -54,6 +59,7 @@ const cleanupInterval = setInterval(() => {
   pruneMap(failedLoginStore, CONFIG.LOGIN_ACCOUNT_WINDOW_MS);
   pruneMap(otpSendEmailStore, CONFIG.OTP_SEND_EMAIL_WINDOW_MS);
   pruneMap(otpVerifyStore, CONFIG.OTP_VERIFY_WINDOW_MS);
+  pruneMap(passwordResetStore, CONFIG.PASSWORD_RESET_WINDOW_MS);
 }, 5 * 60 * 1000);
 
 // Unref timer so Node process isn't kept alive during tests or shutdowns
@@ -228,6 +234,29 @@ export const otpVerifyLimiter = (req, res, next) => {
 };
 
 /**
+ * Middleware to rate limit Password Reset attempts (by IP)
+ */
+export const passwordResetLimiter = (req, res, next) => {
+  const clientIp = req.ip || req.connection?.remoteAddress || 'unknown-ip';
+  const { allowed, retryAfterSeconds } = checkSlidingWindow(
+    passwordResetStore,
+    `pw_reset_ip:${clientIp}`,
+    CONFIG.PASSWORD_RESET_MAX,
+    CONFIG.PASSWORD_RESET_WINDOW_MS
+  );
+
+  if (!allowed) {
+    res.setHeader('Retry-After', retryAfterSeconds);
+    return res.status(429).json({
+      error: 'Too many password reset attempts. Please try again later.',
+    });
+  }
+
+  recordHit(passwordResetStore, `pw_reset_ip:${clientIp}`, CONFIG.PASSWORD_RESET_WINDOW_MS);
+  next();
+};
+
+/**
  * Helper to clear all stores for testing purposes
  */
 export const resetAllRateLimitStores = () => {
@@ -235,4 +264,5 @@ export const resetAllRateLimitStores = () => {
   failedLoginStore.clear();
   otpSendEmailStore.clear();
   otpVerifyStore.clear();
+  passwordResetStore.clear();
 };
