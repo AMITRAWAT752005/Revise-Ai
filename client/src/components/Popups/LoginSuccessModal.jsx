@@ -6,22 +6,21 @@ import logoImg from '../../assets/images/book-logo.png';
 const LoginSuccessModal = ({ onClose }) => {
   const navigate = useNavigate();
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (onClose) onClose();
-    const userStr = localStorage.getItem('user');
     let destination = '/home'; // Default destination
-    
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        if (user.commitmentPending) {
-          destination = '/commitment';
-        }
-      } catch (e) {
-        console.error("Failed to parse user from localStorage", e);
+
+    try {
+      const response = await fetch('/api/auth/me', { credentials: 'include' });
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.user.commitmentPending) destination = '/commitment';
       }
+    } catch {
+      // ProtectedRoute performs the final authentication check.
     }
-    
+
     navigate(destination);
   };
 

@@ -842,3 +842,57 @@ Phase 1.1 — Password Reset Protection, OTP Cooldown Verification & Committed T
 
 **Notes / Blockers:**
 None.
+
+## Date: 05 September 2026
+
+### Team Member: Amit Rawat
+
+**Task Worked On:**
+Phase 1.1 — TASK 1: JWT Migration to HttpOnly Cookie Authentication
+
+**Changes Made:**
+- Added separate HttpOnly cookies for normal authentication and temporary password-reset authorization.
+- Issued the normal authentication cookie after registration OTP verification, email login, and Google authentication.
+- Updated `authenticateToken` to read the HttpOnly authentication cookie while retaining temporary Bearer compatibility during migration.
+- Updated logout to clear authentication cookies and password reset completion to clear only its temporary cookie.
+- Configured credentialed CORS with an explicit `CLIENT_ORIGIN` and environment-controlled cookie settings.
+- Added frontend credentialed requests and backend-backed protected route checks through `/api/auth/me`.
+- Removed frontend storage and use of normal JWTs in `localStorage` and removed frontend Bearer headers.
+
+**Files Created:**
+- `server/src/utils/authCookie.js`
+- `client/src/components/ProtectedRoute.jsx`
+
+**Files Modified:**
+- `server/src/app.js`
+- `server/src/controllers/authController.js`
+- `server/src/middleware/authMiddleware.js`
+- `server/.env.example`
+- `client/src/App.jsx`
+- `client/src/components/Popups/LoginSuccessModal.jsx`
+- `client/src/pages/Auth/Login.jsx`
+- `client/src/pages/Auth/Signup.jsx`
+- `client/src/pages/Auth/ForgotPassword.jsx`
+- `client/src/pages/Auth/OTPVerification.jsx`
+- `client/src/pages/Auth/ResetPassword.jsx`
+- `client/src/pages/Commitment/Commitment.jsx`
+- `docs/Phase/Phase_1/TASKDONE.md`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Server security suite passed: 14/14 tests.
+- Client production build passed: 52 modules, 0 errors.
+- Client lint completed with existing warnings only.
+- Backend syntax checks and workspace diagnostics passed.
+- Cookie utility checks passed for HttpOnly flags, parsing, and clearing.
+- Confirmed no frontend `authToken`, `tempResetToken`, or Bearer usage remains.
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+- Production deployments on different sites must use HTTPS with `AUTH_COOKIE_SAME_SITE=none` and an explicit `CLIENT_ORIGIN`.
+- Bearer support remains temporarily for migration rollback compatibility and should be removed only after end-to-end cookie verification.
+
+
+---

@@ -58,13 +58,12 @@ const ResetPassword = () => {
     setFieldErrors({});
     
     try {
-      const tempToken = localStorage.getItem('tempResetToken');
       const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${tempToken}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ newPassword }),
       });
 
@@ -74,7 +73,6 @@ const ResetPassword = () => {
         return;
       }
 
-      localStorage.removeItem('tempResetToken');
       setModalState('success');
     } catch (err) {
       // Handle error

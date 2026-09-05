@@ -17,6 +17,7 @@ const ForgotPassword = () => {
       const response = await fetch('/api/auth/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: email.trim(), purpose: 'PASSWORD_RESET' }),
       });
 

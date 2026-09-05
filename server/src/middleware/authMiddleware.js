@@ -1,19 +1,19 @@
 import { verifyToken } from '../utils/jwtUtils.js';
+import { AUTH_COOKIE_NAME, getCookie } from '../utils/authCookie.js';
 import User from '../models/User.js';
 
 /**
- * Middleware to authenticate requests using JWT Bearer tokens
+ * Middleware to authenticate requests using the HttpOnly auth cookie.
+ * Bearer tokens remain supported temporarily for migration compatibility.
  */
 export const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Access token required. Please log in.' });
-    }
+    const token = getCookie(req, AUTH_COOKIE_NAME)
+      || (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null);
 
-    const token = authHeader.split(' ')[1];
     if (!token) {
-      return res.status(401).json({ error: 'Access token missing. Please log in.' });
+      return res.status(401).json({ error: 'Access token required. Please log in.' });
     }
 
     const decoded = verifyToken(token);

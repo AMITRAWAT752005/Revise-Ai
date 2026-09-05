@@ -218,6 +218,12 @@
 - [x] Implement password strength rules (min length & numbers/symbols)
 - [x] Handle authentication errors safely via custom modals
 - [x] Avoid exposing sensitive information in error messages
+- [x] Issue authentication through HttpOnly cookies
+- [x] Read protected-request authentication from cookies
+- [x] Send frontend authentication requests with credentials
+- [x] Initialize protected routes through `/api/auth/me`
+- [x] Clear authentication cookies on logout
+- [x] Preserve the existing temporary password-reset flow with a separate cookie
 - [x] Store OTP values as keyed HMAC-SHA-256 hashes instead of plain text
 - [x] Compare submitted OTP hashes with a timing-safe check
 - [x] Prevent OTP exposure in fallback email logs

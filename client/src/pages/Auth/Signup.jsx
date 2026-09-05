@@ -40,6 +40,7 @@ const Signup = () => {
       const response = await fetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ credential }),
       });
       const data = await response.json();
@@ -49,7 +50,6 @@ const Signup = () => {
         return;
       }
 
-      localStorage.setItem('authToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
       if (data.user.commitmentPending) {
@@ -101,6 +101,7 @@ const Signup = () => {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ name: fullName, email: email.trim(), password }),
       });
 

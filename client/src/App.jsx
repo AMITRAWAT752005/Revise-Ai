@@ -6,6 +6,7 @@ import ResetPassword from './pages/Auth/ResetPassword';
 import OTPVerification from './pages/Auth/OTPVerification';
 import Commitment from './pages/Commitment/Commitment';
 import Home from './pages/Home/Home';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -19,8 +20,8 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-otp" element={<OTPVerification />} />
           <Route path="/otp-verification" element={<OTPVerification />} />
-          <Route path="/commitment" element={<Commitment />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/commitment" element={<ProtectedRoute><Commitment /></ProtectedRoute>} />
+          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>

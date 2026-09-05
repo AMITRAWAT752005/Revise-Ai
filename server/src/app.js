@@ -5,7 +5,13 @@ import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+    callback(null, !origin || origin === allowedOrigin);
+  },
+  credentials: true,
+}));
 app.use(express.json());
 
 // Basic health check route

@@ -92,6 +92,7 @@ const OTPVerification = () => {
       const response = await fetch('/api/auth/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, otp: code, purpose }),
       });
 
@@ -103,12 +104,9 @@ const OTPVerification = () => {
       }
 
       // On successful registration OTP, store the token and set commitment flag
-      if (context === 'registration' && data.token) {
-        localStorage.setItem('authToken', data.token);
+      if (context === 'registration' && data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('commitmentPending', 'true');
-      }
-      if (context === 'password-reset' && data.token) {
-        localStorage.setItem('tempResetToken', data.token);
       }
 
       setModalState('success');
@@ -125,6 +123,7 @@ const OTPVerification = () => {
       await fetch('/api/auth/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, purpose }),
       });
       

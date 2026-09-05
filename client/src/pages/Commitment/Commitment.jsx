@@ -49,15 +49,14 @@ const Commitment = () => {
     setIsSubmitting(true);
 
     try {
-      const token = localStorage.getItem('authToken');
-      await fetch('/api/auth/commitment', {
+      const response = await fetch('/api/auth/commitment', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ studentType, timePerDay, flashcards }),
       });
+
+      if (!response.ok) throw new Error('Unable to save commitment.');
       
       localStorage.removeItem('commitmentPending');
       // Adding a small delay for the animation effect

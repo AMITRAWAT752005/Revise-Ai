@@ -4,6 +4,14 @@ import { sendOtp, verifyOtp } from '../services/otpService.js';
 import { generateToken, verifyToken } from '../utils/jwtUtils.js';
 import { validateName, validateEmail, validatePassword } from '../utils/validationUtils.js';
 import { isAccountLoginThrottled, recordFailedLogin, resetFailedLogin } from '../middleware/rateLimiter.js';
+import {
+  clearAuthCookies,
+  clearResetCookie,
+  getCookie,
+  RESET_COOKIE_NAME,
+  setAuthCookie,
+  setResetCookie,
+} from '../utils/authCookie.js';
 import User from '../models/User.js';
 
 /**
@@ -74,6 +82,7 @@ export const verifyOtpController = async (req, res) => {
         
         // Generate JWT token so they are logged in automatically
         token = generateToken({ userId: user._id, email: user.email });
+        setAuthCookie(res, token);
         authUser = {
           id: user._id,
           name: user.name,
@@ -86,6 +95,7 @@ export const verifyOtpController = async (req, res) => {
     } else if (purpose === 'PASSWORD_RESET') {
       // Generate a temporary token to authorize the reset-password endpoint
       token = generateToken({ email: normalizedEmail, temporary: true }, '15m');
+      setResetCookie(res, token);
     }
 
     res.status(200).json({ ...result, token, user: authUser });
@@ -198,6 +208,7 @@ export const loginController = async (req, res) => {
 
     // Generate JWT token
     const token = generateToken({ userId: user._id, email: user.email });
+    setAuthCookie(res, token);
 
     res.status(200).json({
       message: 'Login successful',
@@ -264,6 +275,7 @@ export const googleLoginController = async (req, res) => {
     }
 
     const token = generateToken({ userId: user._id, email: user.email });
+    setAuthCookie(res, token);
     return res.status(200).json({
       message: 'Google login successful',
       token,
@@ -298,6 +310,7 @@ export const getProfileController = async (req, res) => {
  * Controller to handle logout (stateless JWT acknowledgment)
  */
 export const logoutController = async (req, res) => {
+  clearAuthCookies(res);
   res.status(200).json({ message: 'Logged out successfully.' });
 };
 
@@ -310,12 +323,14 @@ export const resetPasswordController = async (req, res) => {
       return res.status(400).json({ error: passwordValidation.error });
     }
 
+    const resetCookie = getCookie(req, RESET_COOKIE_NAME);
     const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
+    const resetToken = resetCookie || (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null);
+    if (!resetToken) {
       return res.status(401).json({ error: 'Password reset token required.' });
     }
 
-    const decoded = verifyToken(authHeader.slice(7));
+    const decoded = verifyToken(resetToken);
     if (!decoded.temporary || !decoded.email) {
       return res.status(401).json({ error: 'Invalid password reset token.' });
     }
@@ -327,6 +342,7 @@ export const resetPasswordController = async (req, res) => {
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
+    clearResetCookie(res);
 
     return res.status(200).json({ message: 'Password reset successfully.' });
   } catch (error) {
