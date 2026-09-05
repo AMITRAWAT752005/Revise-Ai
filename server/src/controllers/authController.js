@@ -98,7 +98,7 @@ export const verifyOtpController = async (req, res) => {
       setResetCookie(res, token);
     }
 
-    res.status(200).json({ ...result, token, user: authUser });
+    res.status(200).json({ ...result, user: authUser });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -212,7 +212,6 @@ export const loginController = async (req, res) => {
 
     res.status(200).json({
       message: 'Login successful',
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -278,7 +277,6 @@ export const googleLoginController = async (req, res) => {
     setAuthCookie(res, token);
     return res.status(200).json({
       message: 'Google login successful',
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -323,9 +321,7 @@ export const resetPasswordController = async (req, res) => {
       return res.status(400).json({ error: passwordValidation.error });
     }
 
-    const resetCookie = getCookie(req, RESET_COOKIE_NAME);
-    const authHeader = req.headers.authorization;
-    const resetToken = resetCookie || (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null);
+    const resetToken = getCookie(req, RESET_COOKIE_NAME);
     if (!resetToken) {
       return res.status(401).json({ error: 'Password reset token required.' });
     }

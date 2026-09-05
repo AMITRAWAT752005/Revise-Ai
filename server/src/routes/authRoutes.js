@@ -31,7 +31,7 @@ router.post('/reset-password', passwordResetLimiter, resetPasswordController);
 router.post('/otp/send', otpSendLimiter, sendOtpController);
 router.post('/otp/verify', otpVerifyLimiter, verifyOtpController);
 
-// Protected Routes (Require valid JWT Bearer token)
+// Protected Routes (Require a valid HttpOnly authentication cookie)
 router.get('/profile', authenticateToken, getProfileController);
 router.get('/me', authenticateToken, getProfileController);
 router.post('/commitment', authenticateToken, updateCommitmentController);

@@ -224,6 +224,8 @@
 - [x] Initialize protected routes through `/api/auth/me`
 - [x] Clear authentication cookies on logout
 - [x] Preserve the existing temporary password-reset flow with a separate cookie
+- [x] Remove Bearer-token fallback from protected authentication
+- [x] Remove JWT fields from authentication response bodies
 - [x] Store OTP values as keyed HMAC-SHA-256 hashes instead of plain text
 - [x] Compare submitted OTP hashes with a timing-safe check
 - [x] Prevent OTP exposure in fallback email logs

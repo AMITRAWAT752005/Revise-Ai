@@ -896,3 +896,33 @@ Phase 1.1 — TASK 1: JWT Migration to HttpOnly Cookie Authentication
 
 
 ---
+
+## Date: 05 September 2026
+
+### Team Member: Amit Rawat
+
+**Task Worked On:**
+Phase 1.1 — TASK 1 Final Cookie-Only Authentication Hardening
+
+**Changes Made:**
+- Removed the temporary Bearer-token fallback from protected authentication middleware.
+- Removed Bearer-token fallback from password reset authorization.
+- Removed JWT `token` fields from login, Google login, and OTP verification responses.
+- Kept JWTs available only through HttpOnly cookies.
+
+**Testing Performed:**
+- Verified login response does not contain a `token` field.
+- Verified cookie includes `HttpOnly` and `SameSite=Lax`.
+- Verified cookie-authenticated `/api/auth/me` returns `200`.
+- Verified Bearer-only `/api/auth/me` returns `401`.
+- Verified logout clears the cookie and `/api/auth/me` returns `401` afterward.
+- Server tests passed: 14/14.
+- Client build passed successfully.
+- Temporary MongoDB test user was removed after testing.
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+- Google live browser testing requires the configured Google Client ID to allow the local frontend origin.
+- Brevo live delivery requires a real verified recipient address; no synthetic email was sent.
