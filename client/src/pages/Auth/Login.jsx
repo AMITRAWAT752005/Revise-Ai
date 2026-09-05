@@ -21,7 +21,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [modalState, setModalState] = useState(null); // 'success' | 'failure' | null
+  const [modalState, setModalState] = useState(null); // 'success' | 'failure' | 'locked' | null
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -87,7 +87,7 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(data.user));
         setModalState('success');
       } else {
-        setModalState('failure');
+        setModalState(response.status === 429 ? 'locked' : 'failure');
       }
     } catch (err) {
       setModalState('failure');
@@ -210,8 +210,11 @@ const Login = () => {
       {modalState === 'success' && (
         <LoginSuccessModal onClose={() => setModalState(null)} />
       )}
-      {modalState === 'failure' && (
-        <LoginFailureModal onClose={() => setModalState(null)} />
+      {(modalState === 'failure' || modalState === 'locked') && (
+        <LoginFailureModal
+          onClose={() => setModalState(null)}
+          isLocked={modalState === 'locked'}
+        />
       )}
     </div>
   );
