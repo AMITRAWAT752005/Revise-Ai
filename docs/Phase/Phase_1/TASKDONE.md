@@ -235,6 +235,11 @@
 - [x] Implement Password Reset rate limiting & token brute-force protection (`passwordResetLimiter` on `/reset-password`)
 - [x] Verify OTP 30-second DB-level cooldown working in combination with email hourly rate limiter
 - [x] Create committed automated test suite in repo (`server/tests/auth_security.test.js` & `npm test`)
+- [x] Configure Helmet security HTTP headers middleware
+- [x] Harden CORS configuration with origin validation (`CLIENT_ORIGIN`) and credentials support
+- [x] Restrict request payload size with 10KB body limit (`express.json({ limit: '10kb' })`)
+- [x] Implement production-safe global error handling middleware (`errorHandler` in `errorMiddleware.js`)
+- [x] Implement Zod-based server-side input validation middleware (`validateRequest` & `authSchemas.js`) across all endpoints (`/register`, `/login`, `/google`, `/otp/send`, `/otp/verify`, `/reset-password`, `/commitment`)
 
 ---
 

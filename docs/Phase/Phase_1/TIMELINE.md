@@ -926,3 +926,49 @@ Phase 1.1 — TASK 1 Final Cookie-Only Authentication Hardening
 **Notes / Blockers:**
 - Google live browser testing requires the configured Google Client ID to allow the local frontend origin.
 - Brevo live delivery requires a real verified recipient address; no synthetic email was sent.
+
+---
+
+## Date: 05 September 2026
+
+### Team Member: Anukool Negi
+
+**Time:** 01:20 PM
+
+**Task Worked On:**
+Phase 1.1 — TASK 5: Security Middleware & Zod Input Validation
+
+**Changes Made:**
+- Installed `zod` and `helmet` packages in `server/package.json`.
+- Configured Helmet HTTP security headers middleware (`helmet()`) in `server/src/app.js`.
+- Hardened CORS configuration with `CLIENT_ORIGIN` domain validation and credentials support.
+- Restricted body parser payload size limits to 10KB (`express.json({ limit: '10kb' })` and `express.urlencoded({ limit: '10kb', extended: true })`) to prevent payload-based DoS attacks.
+- Created global error handling middleware `errorHandler` in `server/src/middleware/errorMiddleware.js` to suppress stack traces, database errors, and sensitive internal details in production.
+- Created reusable declarative Zod validation schemas in `server/src/schemas/authSchemas.js` (`registerSchema`, `loginSchema`, `sendOtpSchema`, `verifyOtpSchema`, `resetPasswordSchema`, `googleAuthSchema`, `commitmentSchema`).
+- Created Zod request validation middleware `validateRequest` in `server/src/middleware/validateMiddleware.js` formatting validation errors as standard `{ error: '...' }` HTTP 400 responses.
+- Mounted `validateRequest` across all public and protected authentication routes in `server/src/routes/authRoutes.js`.
+
+**Files Created:**
+- `server/src/schemas/authSchemas.js`
+- `server/src/middleware/validateMiddleware.js`
+- `server/src/middleware/errorMiddleware.js`
+
+**Files Modified:**
+- `server/package.json`
+- `server/package-lock.json`
+- `server/src/app.js`
+- `server/src/routes/authRoutes.js`
+- `docs/Phase/Phase_1/TASKDONE.md`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node --check` syntax verification across all server JS files — 0 syntax errors.
+- Executed server security and rate limiter test suite (`npm test`) — 14/14 tests passed with 0 failures.
+- Ran client production build (`npm run build`) in `client/` — 52 modules transformed in 210ms with 0 errors.
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+None.
+
