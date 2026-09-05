@@ -747,3 +747,56 @@ After a user signed up or logged in via Google, they were being redirected direc
 
 **Status:**
 🟢 Completed
+
+---
+
+## Date: 05 September 2026
+
+### Team Member: Anshul Gusain
+
+**Time:** 10:15 AM
+
+**Task Worked On:**
+Phase 1.1 — TASK 2: Login Throttling + OTP Rate Limiting (Abuse Protection)
+
+**Changes Made:**
+- Implemented native in-memory sliding window rate limiting and abuse protection in `server/src/middleware/rateLimiter.js` with zero external dependencies.
+- Added **Login Throttling (`loginIpLimiter` & `isAccountLoginThrottled`)**:
+  - IP-based rate limiting on `/login` (30 requests per IP per 15-minute window).
+  - Account-level failed attempt protection (maximum 5 consecutive failed login attempts per normalized email within a 15-minute window; returns HTTP 429 with `Retry-After` header).
+  - Automatic failure counter reset upon successful authentication.
+- Added **OTP Sending Rate Limiter (`otpSendLimiter`)**:
+  - Email-level rate limiting on `/otp/send` and `/register` (maximum 5 OTP requests per email per hour).
+  - IP-level rate limiting (maximum 20 OTP requests per IP per 15-minute window).
+  - Preserved the existing 30-second per-record resend cooldown in `otpService.js`.
+- Added **OTP Verification Attempt Protection (`otpVerifyLimiter`)**:
+  - Rate limiting on `/otp/verify` (maximum 15 verification attempts per IP/email per 15-minute window).
+  - Preserved all existing cryptographic protections: 6-digit OTP, HMAC-SHA-256 hashing, timing-safe comparison (`crypto.timingSafeEqual`), 5-minute TTL expiry, and single-use deletion.
+- Updated `server/src/controllers/authController.js` to check account-level login throttling, record failed login attempts, and clear counters on successful login.
+- Updated `server/src/routes/authRoutes.js` to mount rate limiting middleware on `/login`, `/otp/send`, `/otp/verify`, and `/register`.
+- Updated `server/.env.example` to document rate limiting configuration variables (`RATE_LIMIT_ENABLED`, `LOGIN_ACCOUNT_MAX_FAILS`, `LOGIN_IP_MAX`, `OTP_SEND_EMAIL_MAX`, `OTP_SEND_IP_MAX`, `OTP_VERIFY_MAX`).
+
+**Files Created:**
+- `server/src/middleware/rateLimiter.js`
+
+**Files Modified:**
+- `server/src/controllers/authController.js`
+- `server/src/routes/authRoutes.js`
+- `server/.env.example`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Executed unit & integration test suite (`test_rate_limiter.js`) covering:
+  - Account login throttling (locked after 5 failed attempts; reset on successful login).
+  - Login IP rate limiting (blocks on 31st request with 429 and `Retry-After` header).
+  - OTP send rate limiting (blocks 6th request with same email within 1 hour).
+  - OTP verification rate limiting (blocks 16th verification attempt with 429).
+- Verified `node --check` syntax on all backend files with 0 errors.
+- Verified frontend build with `npm run build` on `client` (51 modules transformed in 597ms with 0 errors).
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+None.
+

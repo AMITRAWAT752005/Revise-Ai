@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { sendOtp, verifyOtp } from '../services/otpService.js';
 import { generateToken, verifyToken } from '../utils/jwtUtils.js';
 import { validateName, validateEmail, validatePassword } from '../utils/validationUtils.js';
+import { isAccountLoginThrottled, recordFailedLogin, resetFailedLogin } from '../middleware/rateLimiter.js';
 import User from '../models/User.js';
 
 /**
@@ -169,17 +170,31 @@ export const loginController = async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
+    // Check account-level brute-force throttling
+    const throttleCheck = isAccountLoginThrottled(normalizedEmail);
+    if (throttleCheck.throttled) {
+      res.setHeader('Retry-After', throttleCheck.retryAfterSeconds);
+      return res.status(429).json({
+        error: `Too many failed login attempts. Please try again in ${Math.ceil(throttleCheck.retryAfterSeconds / 60)} minutes.`,
+      });
+    }
+
     // Find user by email
     const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
+      recordFailedLogin(normalizedEmail);
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     // Compare password hash
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      recordFailedLogin(normalizedEmail);
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
+
+    // Successful login: reset failed attempt counter
+    resetFailedLogin(normalizedEmail);
 
     // Generate JWT token
     const token = generateToken({ userId: user._id, email: user.email });

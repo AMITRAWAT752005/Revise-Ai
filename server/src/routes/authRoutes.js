@@ -11,19 +11,24 @@ import {
   updateCommitmentController,
 } from '../controllers/authController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
+import {
+  loginIpLimiter,
+  otpSendLimiter,
+  otpVerifyLimiter,
+} from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
 // Public Authentication Routes
-router.post('/register', registerController);
-router.post('/login', loginController);
+router.post('/register', otpSendLimiter, registerController);
+router.post('/login', loginIpLimiter, loginController);
 router.post('/google', googleLoginController);
 router.post('/logout', logoutController);
 router.post('/reset-password', resetPasswordController);
 
 // OTP Routes
-router.post('/otp/send', sendOtpController);
-router.post('/otp/verify', verifyOtpController);
+router.post('/otp/send', otpSendLimiter, sendOtpController);
+router.post('/otp/verify', otpVerifyLimiter, verifyOtpController);
 
 // Protected Routes (Require valid JWT Bearer token)
 router.get('/profile', authenticateToken, getProfileController);

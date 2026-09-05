@@ -221,6 +221,9 @@
 - [x] Store OTP values as keyed HMAC-SHA-256 hashes instead of plain text
 - [x] Compare submitted OTP hashes with a timing-safe check
 - [x] Prevent OTP exposure in fallback email logs
+- [x] Implement Login brute-force throttling (IP rate limiting + account-level failed attempt protection)
+- [x] Implement OTP sending rate limiting (email hourly limit + IP limit + 30s resend cooldown)
+- [x] Implement OTP verification attempt rate limiting and brute-force protection
 
 ---
 
