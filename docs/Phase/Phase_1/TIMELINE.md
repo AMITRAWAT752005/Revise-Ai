@@ -710,4 +710,40 @@ Phase 1 — Google Sign-In Button Fix
 
 ## Next Steps
 
-- Refine placeholder implementations for Reset Password.
+- Verify full end-to-end auth flows (Google + Email).
+
+---
+
+## Date: 05 September 2026
+
+### Team Member: Bikram Singh Bisht
+
+**Time:** 07:24 AM
+
+**Task Worked On:**
+Phase 1 — Google Sign-In Commitment Redirect Fix
+
+**Problem Identified:**
+After a user signed up or logged in via Google, they were being redirected directly to `/home` instead of `/commitment`, even though `commitmentPending: true` was correctly set in the database. The cause was a two-part bug:
+
+1. **`Commitment.jsx` gate:** The page guard was only checking for a standalone `commitmentPending` key in `localStorage` (set during the old email-registration flow), which was never being set during the Google auth flow. So the gate immediately redirected away from `/commitment`.
+2. **`Login.jsx` Google handler:** After Google auth, the code triggered the `LoginSuccessModal`, which previously had a hardcoded `navigate('/')`. Even after the modal was updated to read from `localStorage`, it was still showing an unnecessary intermediate step.
+
+**Changes Made:**
+- **`client/src/pages/Commitment/Commitment.jsx`:** Updated the `useEffect` gate to also check `user.commitmentPending` inside the `localStorage['user']` JSON object, not just the standalone `commitmentPending` key.
+- **`client/src/pages/Auth/Login.jsx`:** Imported `useNavigate`. For the Google auth response handler, replaced `setModalState('success')` with a direct `navigate()` call that checks `data.user.commitmentPending`. Also now correctly sets the standalone `commitmentPending` key in `localStorage`.
+- **`client/src/pages/Auth/Signup.jsx`:** The Google auth response handler now also correctly sets the standalone `commitmentPending` key in `localStorage` before navigating.
+
+**Files Modified:**
+- `client/src/pages/Commitment/Commitment.jsx`
+- `client/src/pages/Auth/Login.jsx`
+- `client/src/pages/Auth/Signup.jsx`
+- `docs/Phase/Phase_1/TIMELINE.md`
+
+**Testing Performed:**
+- Verified Google login correctly redirects a new user (`commitmentPending: true`) to `/commitment`.
+- Verified Google login correctly redirects a returning user (`commitmentPending: false`) to `/home`.
+- Verified `Commitment.jsx` page guard allows access when `commitmentPending` is true (either via standalone key or `user` object).
+
+**Status:**
+🟢 Completed

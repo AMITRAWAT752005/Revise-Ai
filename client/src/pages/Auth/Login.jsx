@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
 import LoginSuccessModal from '../../components/Popups/LoginSuccessModal';
 import LoginFailureModal from '../../components/Popups/LoginFailureModal';
@@ -17,6 +17,7 @@ const GoogleIcon = () => (
 );
 
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,7 +43,13 @@ const Login = () => {
 
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      setModalState('success');
+
+      if (data.user.commitmentPending) {
+        localStorage.setItem('commitmentPending', 'true');
+      }
+
+      // Navigate directly — skip the modal for Google auth
+      navigate(data.user.commitmentPending ? '/commitment' : '/home');
     } catch (error) {
       setModalState('failure');
     }

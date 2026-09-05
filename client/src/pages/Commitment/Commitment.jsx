@@ -11,8 +11,22 @@ const Commitment = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    let isPending = localStorage.getItem('commitmentPending') === 'true';
+
+    if (userStr && !isPending) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.commitmentPending === true) {
+          isPending = true;
+        }
+      } catch (e) {
+        console.error("Failed to parse user from localStorage", e);
+      }
+    }
+
     // Only allow new users with pending commitment
-    if (localStorage.getItem('commitmentPending') !== 'true') {
+    if (!isPending) {
       navigate('/login');
       return;
     }

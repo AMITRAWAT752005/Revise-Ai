@@ -8,7 +8,21 @@ const LoginSuccessModal = ({ onClose }) => {
 
   const handleContinue = () => {
     if (onClose) onClose();
-    navigate('/');
+    const userStr = localStorage.getItem('user');
+    let destination = '/home'; // Default destination
+    
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.commitmentPending) {
+          destination = '/commitment';
+        }
+      } catch (e) {
+        console.error("Failed to parse user from localStorage", e);
+      }
+    }
+    
+    navigate(destination);
   };
 
   return (

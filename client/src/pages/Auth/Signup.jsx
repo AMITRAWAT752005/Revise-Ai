@@ -51,6 +51,11 @@ const Signup = () => {
 
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      
+      if (data.user.commitmentPending) {
+        localStorage.setItem('commitmentPending', 'true');
+      }
+      
       navigate(data.user.commitmentPending ? '/commitment' : '/home');
     } catch (error) {
       setErrorInfo({ title: 'Network Error', message: 'Unable to connect to the server. Please try again later.' });
