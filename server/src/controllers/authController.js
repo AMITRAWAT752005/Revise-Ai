@@ -2,14 +2,18 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sendOtp, verifyOtp } from '../services/otpService.js';
 import { generateToken, verifyToken } from '../utils/jwtUtils.js';
+import { generateAccessToken, generateRefreshTokenJWT, verifyAccessToken } from '../utils/tokenUtils.js';
+import { generateRefreshToken, createSession, revokeAllUserSessions, revokeSession } from '../services/sessionService.js';
 import { validateName, validateEmail, validatePassword } from '../utils/validationUtils.js';
 import { isAccountLoginThrottled, recordFailedLogin, resetFailedLogin } from '../middleware/rateLimiter.js';
 import {
   clearAuthCookies,
   clearResetCookie,
   getCookie,
+  REFRESH_COOKIE_NAME,
   RESET_COOKIE_NAME,
   setAuthCookie,
+  setRefreshCookie,
   setResetCookie,
 } from '../utils/authCookie.js';
 import User from '../models/User.js';
@@ -80,9 +84,35 @@ export const verifyOtpController = async (req, res) => {
         user.isVerified = true;
         await user.save();
         
-        // Generate JWT token so they are logged in automatically
-        token = generateToken({ userId: user._id, email: user.email });
-        setAuthCookie(res, token);
+        // ✅ NEW SESSION-BASED AUTHENTICATION
+        // Generate raw refresh token (cryptographically random)
+        const rawRefreshToken = generateRefreshToken();
+
+        // Create session in database (stores hashed refresh token)
+        const session = await createSession(user._id, rawRefreshToken, {
+          userAgent: req.headers['user-agent'] || null,
+          ipAddress: req.ip || req.connection?.remoteAddress || null,
+        });
+
+        if (session) {
+          // Generate access token (short-lived: 15 minutes)
+          const accessToken = generateAccessToken({ 
+            userId: user._id, 
+            email: user.email,
+            sessionId: session._id,
+          });
+
+          // Generate refresh token JWT (carries session ID)
+          const refreshTokenJWT = generateRefreshTokenJWT({
+            userId: user._id,
+            sessionId: session._id,
+          });
+
+          // Set both cookies
+          setAuthCookie(res, accessToken);
+          setRefreshCookie(res, refreshTokenJWT);
+        }
+
         authUser = {
           id: user._id,
           name: user.name,
@@ -206,9 +236,36 @@ export const loginController = async (req, res) => {
     // Successful login: reset failed attempt counter
     resetFailedLogin(normalizedEmail);
 
-    // Generate JWT token
-    const token = generateToken({ userId: user._id, email: user.email });
-    setAuthCookie(res, token);
+    // ✅ NEW SESSION-BASED AUTHENTICATION
+    // Generate raw refresh token (cryptographically random)
+    const rawRefreshToken = generateRefreshToken();
+
+    // Create session in database (stores hashed refresh token)
+    const session = await createSession(user._id, rawRefreshToken, {
+      userAgent: req.headers['user-agent'] || null,
+      ipAddress: req.ip || req.connection?.remoteAddress || null,
+    });
+
+    if (!session) {
+      return res.status(500).json({ error: 'Failed to create session.' });
+    }
+
+    // Generate access token (short-lived: 15 minutes)
+    const accessToken = generateAccessToken({ 
+      userId: user._id, 
+      email: user.email,
+      sessionId: session._id,
+    });
+
+    // Generate refresh token JWT (carries session ID)
+    const refreshTokenJWT = generateRefreshTokenJWT({
+      userId: user._id,
+      sessionId: session._id,
+    });
+
+    // Set both cookies
+    setAuthCookie(res, accessToken);
+    setRefreshCookie(res, refreshTokenJWT);
 
     res.status(200).json({
       message: 'Login successful',
@@ -273,8 +330,37 @@ export const googleLoginController = async (req, res) => {
       await user.save();
     }
 
-    const token = generateToken({ userId: user._id, email: user.email });
-    setAuthCookie(res, token);
+    // ✅ NEW SESSION-BASED AUTHENTICATION
+    // Generate raw refresh token (cryptographically random)
+    const rawRefreshToken = generateRefreshToken();
+
+    // Create session in database (stores hashed refresh token)
+    const session = await createSession(user._id, rawRefreshToken, {
+      userAgent: req.headers['user-agent'] || null,
+      ipAddress: req.ip || req.connection?.remoteAddress || null,
+    });
+
+    if (!session) {
+      return res.status(500).json({ error: 'Failed to create session.' });
+    }
+
+    // Generate access token (short-lived: 15 minutes)
+    const accessToken = generateAccessToken({ 
+      userId: user._id, 
+      email: user.email,
+      sessionId: session._id,
+    });
+
+    // Generate refresh token JWT (carries session ID)
+    const refreshTokenJWT = generateRefreshTokenJWT({
+      userId: user._id,
+      sessionId: session._id,
+    });
+
+    // Set both cookies
+    setAuthCookie(res, accessToken);
+    setRefreshCookie(res, refreshTokenJWT);
+
     return res.status(200).json({
       message: 'Google login successful',
       user: {
@@ -305,11 +391,43 @@ export const getProfileController = async (req, res) => {
 };
 
 /**
- * Controller to handle logout (stateless JWT acknowledgment)
+ * Controller to handle logout (revoke current session)
  */
 export const logoutController = async (req, res) => {
-  clearAuthCookies(res);
-  res.status(200).json({ message: 'Logged out successfully.' });
+  try {
+    // ✅ NEW SESSION-BASED LOGOUT
+    // Try to get refresh token and session ID to revoke the current session
+    const refreshTokenJWT = getCookie(req, REFRESH_COOKIE_NAME);
+    let sessionRevoked = false;
+
+    if (refreshTokenJWT) {
+      try {
+        const decoded = verifyToken(refreshTokenJWT);
+        if (decoded.sessionId) {
+          await revokeSession(decoded.sessionId);
+          sessionRevoked = true;
+        }
+      } catch (error) {
+        // If refresh token is invalid/expired, we still proceed with logout
+        // Just clear the cookies
+      }
+    }
+
+    // Clear all authentication cookies
+    clearAuthCookies(res);
+
+    res.status(200).json({ 
+      message: 'Logged out successfully.',
+      sessionRevoked,
+    });
+  } catch (error) {
+    // Even if session revocation fails, still clear cookies
+    clearAuthCookies(res);
+    res.status(200).json({ 
+      message: 'Logged out successfully.',
+      error: 'Session revocation encountered an error, but cookies cleared.',
+    });
+  }
 };
 
 export const resetPasswordController = async (req, res) => {
@@ -338,9 +456,19 @@ export const resetPasswordController = async (req, res) => {
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
-    clearResetCookie(res);
 
-    return res.status(200).json({ message: 'Password reset successfully.' });
+    // ✅ NEW SESSION REVOCATION ON PASSWORD RESET
+    // Revoke all existing sessions for this user (security best practice)
+    const revocationResult = await revokeAllUserSessions(user._id);
+
+    clearResetCookie(res);
+    // Also clear auth cookies to force re-login
+    clearAuthCookies(res);
+
+    return res.status(200).json({ 
+      message: 'Password reset successfully. Please log in again.',
+      sessionsRevoked: revocationResult.revokedCount,
+    });
   } catch (error) {
     if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Invalid or expired password reset token.' });
@@ -388,5 +516,80 @@ export const updateCommitmentController = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message || 'Server error saving commitment.' });
+  }
+};
+
+/**
+ * Controller to handle token refresh
+ * Validates refresh token and issues new access token
+ * Usually called by middleware, but can be called explicitly
+ */
+export const refreshTokenController = async (req, res) => {
+  try {
+    const refreshTokenJWT = getCookie(req, REFRESH_COOKIE_NAME);
+
+    if (!refreshTokenJWT) {
+      return res.status(401).json({ error: 'Refresh token required.' });
+    }
+
+    try {
+      // Decode refresh token JWT
+      const decoded = verifyToken(refreshTokenJWT);
+
+      if (!decoded.sessionId || !decoded.userId) {
+        return res.status(401).json({ error: 'Invalid refresh token payload.' });
+      }
+
+      // Validate refresh token against database session
+      const { validateRefreshToken, updateLastUsed } = await import('../services/sessionService.js');
+      const session = await validateRefreshToken(refreshTokenJWT, decoded.sessionId);
+
+      if (!session) {
+        return res.status(401).json({ 
+          error: 'Refresh token is invalid, expired, or revoked.' 
+        });
+      }
+
+      // Get user
+      const user = await User.findById(decoded.userId).select('-password');
+      if (!user) {
+        return res.status(401).json({ error: 'User account no longer exists.' });
+      }
+
+      // Generate new access token
+      const newAccessToken = generateAccessToken({
+        userId: user._id,
+        email: user.email,
+        sessionId: session._id,
+      });
+
+      // Update last used timestamp for session
+      await updateLastUsed(session._id);
+
+      // Set new access token cookie
+      setAuthCookie(res, newAccessToken);
+
+      return res.status(200).json({
+        message: 'Token refreshed successfully.',
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          type: user.type,
+          isVerified: user.isVerified,
+          commitmentPending: user.commitmentPending,
+        },
+      });
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'Refresh token expired. Please log in again.' });
+      }
+      if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({ error: 'Invalid refresh token format.' });
+      }
+      return res.status(401).json({ error: 'Token refresh failed.' });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message || 'Server error during token refresh.' });
   }
 };

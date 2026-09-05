@@ -972,3 +972,49 @@ Phase 1.1 — TASK 5: Security Middleware & Zod Input Validation
 **Notes / Blockers:**
 None.
 
+---
+
+## Date: 05 September 2026
+
+### Team Member: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 1.1 — TASK 4: Refresh Token + Session Management
+
+**Changes Made:**
+- Created `server/src/models/Session.js` with refresh token hashing and session revocation support.
+- Created `server/src/services/sessionService.js` for session CRUD and token validation.
+- Created `server/src/utils/tokenUtils.js` for access token (15m) and refresh token (7d) generation with type checking.
+- Updated `server/src/utils/authCookie.js` to set both access and refresh token cookies.
+- Updated `server/src/controllers/authController.js` to create sessions on login/OTP, revoke on logout/reset-password, added `refreshTokenController`.
+- Rewrote `server/src/middleware/authMiddleware.js` for auto-refresh on token expiry.
+- Updated `server/src/routes/authRoutes.js` with `POST /api/auth/refresh` endpoint.
+- Fixed `server/src/models/User.js`: Added missing `isVerified` field (CRITICAL).
+
+**Files Created:**
+- `server/src/models/Session.js`
+- `server/src/services/sessionService.js`
+- `server/src/utils/tokenUtils.js`
+
+**Files Modified:**
+- `server/src/utils/authCookie.js`
+- `server/src/controllers/authController.js`
+- `server/src/middleware/authMiddleware.js`
+- `server/src/routes/authRoutes.js`
+- `server/src/models/User.js`
+
+**Testing Performed:**
+- Syntax check: PASS
+- Server startup with MongoDB: SUCCESS
+- Client build (Vite): PASS (52 modules)
+- Security test suite: 14/14 PASS
+- Login/logout/refresh flows: VERIFIED
+- Session revocation (logout & password reset): VERIFIED
+- Auto-refresh on token expiry: VERIFIED
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+None.
+

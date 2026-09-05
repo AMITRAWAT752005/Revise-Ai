@@ -9,6 +9,7 @@ import {
   logoutController,
   resetPasswordController,
   updateCommitmentController,
+  refreshTokenController,
 } from '../controllers/authController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 import { validateRequest } from '../middleware/validateMiddleware.js';
@@ -35,6 +36,7 @@ router.post('/register', otpSendLimiter, validateRequest(registerSchema), regist
 router.post('/login', loginIpLimiter, validateRequest(loginSchema), loginController);
 router.post('/google', validateRequest(googleAuthSchema), googleLoginController);
 router.post('/logout', logoutController);
+router.post('/refresh', refreshTokenController);
 router.post('/reset-password', passwordResetLimiter, validateRequest(resetPasswordSchema), resetPasswordController);
 
 // OTP Routes

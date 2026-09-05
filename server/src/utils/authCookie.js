@@ -1,4 +1,5 @@
 export const AUTH_COOKIE_NAME = 'reviseai_auth';
+export const REFRESH_COOKIE_NAME = 'reviseai_refresh';
 export const RESET_COOKIE_NAME = 'reviseai_password_reset';
 
 const getCookieOptions = (maxAge) => ({
@@ -10,8 +11,22 @@ const getCookieOptions = (maxAge) => ({
   maxAge,
 });
 
+/**
+ * Set access token cookie (short-lived: 15 minutes)
+ * @param {Object} res - Express response object
+ * @param {string} token - Access token
+ */
 export const setAuthCookie = (res, token) => {
-  res.cookie(AUTH_COOKIE_NAME, token, getCookieOptions(7 * 24 * 60 * 60 * 1000));
+  res.cookie(AUTH_COOKIE_NAME, token, getCookieOptions(15 * 60 * 1000));
+};
+
+/**
+ * Set refresh token cookie (long-lived: 7 days)
+ * @param {Object} res - Express response object
+ * @param {string} token - Refresh token
+ */
+export const setRefreshCookie = (res, token) => {
+  res.cookie(REFRESH_COOKIE_NAME, token, getCookieOptions(7 * 24 * 60 * 60 * 1000));
 };
 
 export const setResetCookie = (res, token) => {
@@ -21,6 +36,7 @@ export const setResetCookie = (res, token) => {
 export const clearAuthCookies = (res) => {
   const options = getCookieOptions(0);
   res.clearCookie(AUTH_COOKIE_NAME, options);
+  res.clearCookie(REFRESH_COOKIE_NAME, options);
   res.clearCookie(RESET_COOKIE_NAME, options);
 };
 
