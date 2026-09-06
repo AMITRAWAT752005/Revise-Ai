@@ -12,6 +12,7 @@
 
 # Timeline Entries
 
+
 ## Date: 06 September 2026
 
 ### Team Member: Anukool Negi
@@ -265,4 +266,33 @@ Revision - Commitment Prompt (Desktop & Mobile) Layout Alignment with Design Moc
 
 **Status:**
 🟢 Completed
+
+## Date: 06 September 2026
+
+### Team Member: Amit Rawat
+
+**Task Worked On:**
+Phase 2 — User Progress and Subject Data Models
+
+**Changes Made:**
+- Added `server/src/models/UserProgress.js` with a unique `User` reference and progress metrics for XP, level, streaks, answered/correct questions, study time, daily revision goals, and activity timestamps.
+- Added `server/src/models/Subject.js` with a required `User` reference, subject status, mastery percentage validation, and unit/topic/question totals.
+- Enabled Mongoose timestamps on both models.
+
+**Files Created:**
+- `server/src/models/UserProgress.js`
+- `server/src/models/Subject.js`
+
+**Files Modified:**
+- `docs/Phase/Phase_2/TASKDONE.md`
+- `docs/Phase/Phase_2/TIMELINE.md`
+
+**Testing Performed:**
+- Inspected both schemas and confirmed the declared fields, user references, defaults, validation rules, and timestamps.
+
+**Status:**
+🟢 Completed
+
+**Notes / Blockers:**
+- API routes, controllers, services, and frontend integration for these models were not part of this task.
 

@@ -75,4 +75,23 @@
   - [x] Error state card with red warning icon, error title ("Unable to Process Syllabus"), explanation copy, "Upload Different File" secondary button, and "Try Again" primary button
   - [x] Verified full build with `npm run build` (0 errors) and 100% Phase 1 auth protection preservation
 
+  ---
+
+  ### Data Models Added
+
+  - [x] Add `server/src/models/UserProgress.js`
+    - [x] Link progress records to `User` through a required unique `userId`
+    - [x] Add XP, level, streak, question, study-time, and daily-revision fields
+    - [x] Add activity and revision timestamps
+    - [x] Enable `createdAt` and `updatedAt` timestamps
+  - [x] Add `server/src/models/Subject.js`
+    - [x] Link subjects to `User` through a required `userId`
+    - [x] Add subject name and progress fields
+    - [x] Add status enum and mastery range validation
+    - [x] Add unit, topic, and question totals
+    - [x] Enable `createdAt` and `updatedAt` timestamps
+
+  **Scope Note:**
+  Only the two Mongoose model files were added in this task. Subject APIs, progress APIs, dashboard data integration, and CRUD workflows are not marked complete here.
+
 
