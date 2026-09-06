@@ -6,18 +6,6 @@
 
 ---
 
-## 1. Review Information
-
-| Field | Value |
-|---|---|
-| Phase | Phase 2 — Home / Dashboard |
-| Developer(s) | |
-| Reviewer(s) | |
-| Review Date | |
-| Branch | |
-| Commit(s) Reviewed | |
-| Overall Status | Pending |
-
 ### 1. Scope & Screen Coverage (Stitch Project ID: 8356759800152041564)
 - [x] **Page 1 (Desktop Light Home)**: Screen ID `87fc59f988e548d6b4e1537addf162ee`
 - [x] **Page 2 (Mobile Light Home)**: Screen ID `0754e00a78cd43758c6141034291f855`

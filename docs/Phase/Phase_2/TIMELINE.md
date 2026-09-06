@@ -15,6 +15,75 @@
 
 ## Date: 06 September 2026
 
+### Team Member: Bikram Singh Bisht
+
+**Time:** 12:15 PM
+
+**Task Worked On:**
+Phase 2 — Home Dashboard - New User State & Create Subject Modal Flow (Stitch Project ID: 8356759800152041564)
+
+**Changes Made:**
+- Updated `client/src/pages/Home/Home.jsx` and `Home.module.css` implementing the **New User Dashboard** empty state:
+  - Page 1: Home Dashboard - New User (Desktop - Light) - Final Layout (`970828215ece42479db7d0f43233beb1`)
+    - `isNewUser` conditional rendering when `subjects` array is empty.
+    - Empty metrics grid (0/0 revision, 0 streak, 0% readiness, no smart focus).
+    - Empty State Hero card with AI sparkle book icon, dual glow effects, and CTA buttons.
+    - Empty gamification widget (Level 1, Beginner, 0 XP).
+- Created `client/src/components/CreateSubjectModal/` component directory with 4 modal components implementing the full Subject Creation flow:
+  - Page 2: Home - Create Subject Modal (Desktop - Light) (`11b5b5bd95ac40d5bd80d73e3b4abf93`)
+    - Modal with AI Sparkle top border accent (gradient from primary to tertiary).
+    - Form fields: Subject Name (required), Description (optional), Subject Theme color picker (Indigo, Teal, Purple).
+    - Footer with Cancel + Create Subject buttons.
+  - Page 3: Home - AI Processing (Desktop - Light) (`screen for AI Processing`)
+    - Full-screen overlay with pulsing AI sparkle illustration.
+    - 5-step animated checklist (Reading documents → Finding chapters → Identifying topics → Building knowledge map → Preparing revision questions).
+    - Progress bar with gradient fill animation.
+    - Cancel Processing button.
+  - Page 4: Home - Subject Success (Desktop - Light) (`screen for Subject Success`)
+    - Celebratory modal with pulse ring animation and confetti dots.
+    - "🎉 Subject created!" title.
+    - "Upload Study Material" primary CTA and "I'll do this later" secondary action.
+  - Page 5: Home - Subject Error (Desktop - Light) (`screen for Subject Error`)
+    - Error icon in red container with glow shadow.
+    - "Something went wrong" message.
+    - "Try Again" button (reopens create modal) and "Cancel" button.
+- Wired complete modal flow in `Home.jsx`: Create → Processing (simulated 5-step AI) → Success/Error, with state transitions and subject array updates.
+- Verified Phase 1 authentication integrity (100% untouched).
+
+**Files Created:**
+- `client/src/components/CreateSubjectModal/CreateSubjectModal.jsx`
+- `client/src/components/CreateSubjectModal/CreateSubjectModal.module.css`
+- `client/src/components/CreateSubjectModal/SubjectProcessingModal.jsx`
+- `client/src/components/CreateSubjectModal/SubjectProcessingModal.module.css`
+- `client/src/components/CreateSubjectModal/SubjectSuccessModal.jsx`
+- `client/src/components/CreateSubjectModal/SubjectSuccessModal.module.css`
+- `client/src/components/CreateSubjectModal/SubjectErrorModal.jsx`
+- `client/src/components/CreateSubjectModal/SubjectErrorModal.module.css`
+
+**Files Modified:**
+- `client/src/pages/Home/Home.jsx`
+- `client/src/pages/Home/Home.module.css`
+- `docs/Phase/Phase_2/TIMELINE.md`
+
+**Branch:**
+`Phase_2`
+
+**Testing Performed:**
+- Executed frontend production build (`npx vite build` in `client`) → 69 modules transformed, 0 errors, 0 warnings.
+- Verified complete modal flow: Create → Processing animation → Success celebration.
+- Verified error modal retry and cancel actions.
+- Verified new user → active user state transition after subject creation.
+
+**Status:**
+🟢 Completed (All 5 Assigned Home Dashboard Screens Implemented & Verified)
+
+**Notes / Blockers:**
+- None. All 5 Home Dashboard pages (New User, Create Modal, AI Processing, Success, Error) completed in a single session.
+
+---
+
+## Date: 06 September 2026
+
 ### Team Member: Anukool Negi
 
 **Time:** 10:48 AM
