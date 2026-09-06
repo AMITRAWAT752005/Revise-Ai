@@ -45,3 +45,34 @@
   - [x] Verified full responsive seamless switching between Desktop (Page 3) and Mobile (Page 4)
   - [x] Frontend build passed (0 errors) and Phase 1 auth regression passed (14/14 tests)
 
+---
+
+### Syllabus Setup Workflow Screens (Stitch Project: 8356759800152041564)
+
+- [x] **Page 1: Syllabus Setup - Step 1: Upload (Desktop - Light)** (Screen ID: `85ee6716fe0746d3990fc99896bc77cf`)
+  - [x] Created `client/src/pages/SyllabusSetup/SyllabusSetup.jsx` and `SyllabusSetup.module.css`
+  - [x] Onboarding Sidebar Navigation showing Step 1 of 4 (25% progress bar) with active Upload Syllabus state
+  - [x] Drag & drop file upload dropzone, 3D illustration, "Choose File" primary CTA button, and supported format notes
+- [x] **Page 2: Syllabus Setup - Step 1: File Selected (Desktop - Light)** (Screen ID: `7bb60101477943d48a56ebc2fa14949b`)
+  - [x] File preview card (`Engineering_Syllabus_2026.pdf`, 2.4 MB, "Ready to analyze" checkmark badge, remove file button)
+  - [x] Action group with "Choose Another File" secondary action and "Analyze Syllabus →" primary action
+- [x] **Page 3: Syllabus Setup - Step 2: AI Analysis (Desktop - Light)** (Screen ID: `b18d3a7a230b4d1c9789443e49ef35e0`)
+  - [x] Onboarding Sidebar Navigation showing Step 2 of 4 (50% progress bar) with Upload Syllabus marked complete
+  - [x] AI processing visual with glowing sparkle animation and "ReviseAI is reading your syllabus..." heading
+  - [x] Analysis progress bar (72% complete) and live step breakdown checklist box
+- [x] **Page 4: Syllabus Setup - Step 3: Select Subjects (Desktop - Light)** (Screen ID: `21435e05b3db4b6992502f0e0a95d195`)
+  - [x] Onboarding Sidebar Navigation showing Step 3 of 4 (75% progress bar) with previous steps marked complete
+  - [x] Interactive subject selection card grid for DBMS (`CS301`), CN (`CS302`), OS (`CS303`), SE (`CS304`) with topic counts and syllabus coverage badges
+  - [x] Select All / Deselect All toggle button and "Continue to Review →" primary CTA
+- [x] **Page 5: Syllabus Setup - Step 4: Review (Desktop - Light)** (Screen ID: `36805ff88370492d8ee531d97c8ca60c`)
+  - [x] Onboarding Sidebar Navigation showing Step 4 of 4 (100% progress bar) with active Create Dataset state
+  - [x] Workspace Summary card with 3 metric boxes (Selected Subjects count, Total Topics 44, AI Dataset Ready) and included subjects list
+  - [x] Full-width "Confirm & Build Dataset" primary CTA button
+- [x] **Page 6: Syllabus Setup - Step 4: Success (Desktop - Light)** (Screen ID: `e8f72540bdf0479aa675f55681e7631e`)
+  - [x] Celebration graphic icon container with purple badge and "Syllabus Setup Complete! 🎉" title
+  - [x] Summary metrics chips (4 Subjects Added, 44 Topics Curated, Level 1 Unlocked) and "Go to Home Dashboard →" navigation button
+- [x] **Page 7: Syllabus Setup - Error State (Desktop - Light)** (Screen ID: `5a0b825a11cd4621a2f4d669a105df6a`)
+  - [x] Error state card with red warning icon, error title ("Unable to Process Syllabus"), explanation copy, "Upload Different File" secondary button, and "Try Again" primary button
+  - [x] Verified full build with `npm run build` (0 errors) and 100% Phase 1 auth protection preservation
+
+

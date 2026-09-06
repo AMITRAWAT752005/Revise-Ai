@@ -9,6 +9,13 @@
 - [x] **Page 2 (Mobile Light Home)**: Screen ID `0754e00a78cd43758c6141034291f855`
 - [x] **Page 3 (Desktop Revision Commitment Prompt)**: Screen ID `75c8a7bab57847a8a4cc78ac0b83fa75`
 - [x] **Page 4 (Mobile Revision Commitment Prompt)**: Screen ID `658215650ebb4d6abebb5b074c2458d6`
+- [x] **Page 5 (Syllabus Setup - Step 1: Upload)**: Screen ID `85ee6716fe0746d3990fc99896bc77cf`
+- [x] **Page 6 (Syllabus Setup - Step 1: File Selected)**: Screen ID `7bb60101477943d48a56ebc2fa14949b`
+- [x] **Page 7 (Syllabus Setup - Step 2: AI Analysis)**: Screen ID `b18d3a7a230b4d1c9789443e49ef35e0`
+- [x] **Page 8 (Syllabus Setup - Step 3: Select Subjects)**: Screen ID `21435e05b3db4b6992502f0e0a95d195`
+- [x] **Page 9 (Syllabus Setup - Step 4: Review)**: Screen ID `36805ff88370492d8ee531d97c8ca60c`
+- [x] **Page 10 (Syllabus Setup - Step 4: Success)**: Screen ID `e8f72540bdf0479aa675f55681e7631e`
+- [x] **Page 11 (Syllabus Setup - Error State)**: Screen ID `5a0b825a11cd4621a2f4d669a105df6a`
 
 ---
 
