@@ -256,7 +256,7 @@ const SyllabusSetup = () => {
             {activeStep === 'step-1-selected' && (
               <>
                 <div className={styles.pageHeader}>
-                  <div style={{ display: 'inline-flex', padding: '16px', backgroundColor: '#e2dfff', borderRadius: '50%', marginBottom: '16px' }}>
+                  <div className={styles.fileSelectedIconWrapper}>
                     <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#4441cc', fontVariationSettings: "'FILL' 1" }}>
                       description
                     </span>
@@ -267,19 +267,19 @@ const SyllabusSetup = () => {
                   </p>
                 </div>
 
-                <div style={{ width: '100%', backgroundColor: '#ffffff', border: '1px solid #c7c4d7', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 24px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ width: '64px', height: '64px', backgroundColor: '#f0edef', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>
+                <div className={styles.fileCard}>
+                  <div className={styles.fileCardLeft}>
+                    <div className={styles.fileIconBox}>
                       📄
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: '#1b1b1d' }}>
+                      <h3 className={styles.fileName}>
                         {selectedFile?.name || 'Engineering_Syllabus_2026.pdf'}
                       </h3>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', fontSize: '13px', color: '#777586' }}>
+                      <div className={styles.fileMetaRow}>
                         <span>{selectedFile?.size || '2.4 MB'}</span>
                         <span>•</span>
-                        <span style={{ color: '#4441cc', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span className={styles.readyBadge}>
                           <span className="material-symbols-outlined" style={{ fontSize: '16px', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                           Ready to analyze
                         </span>
@@ -288,21 +288,22 @@ const SyllabusSetup = () => {
                   </div>
 
                   <button
+                    className={styles.removeFileBtn}
                     onClick={() => { setSelectedFile(null); setActiveStep('step-1-upload'); }}
-                    style={{ background: 'transparent', border: 'none', color: '#ba1a1a', cursor: 'pointer', padding: '8px', borderRadius: '50%' }}
                     title="Remove file"
+                    aria-label="Remove file"
                   >
                     <span className="material-symbols-outlined">close</span>
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '16px', width: '100%', justifyContent: 'center', marginTop: '16px' }}>
+                <div className={styles.actionGroup}>
                   <button
-                    className={styles.pagePill}
-                    style={{ padding: '14px 28px', fontSize: '15px' }}
+                    className={styles.secondaryActionBtn}
                     onClick={() => setActiveStep('step-1-upload')}
                   >
-                    Choose Another File
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>upload</span>
+                    <span>Choose Another File</span>
                   </button>
                   <button
                     className={styles.chooseFileBtn}
@@ -317,52 +318,52 @@ const SyllabusSetup = () => {
 
             {/* PAGE 3: Step 2: AI Analysis (Desktop - Light) */}
             {activeStep === 'step-2-analysis' && (
-              <div style={{ width: '100%', backgroundColor: '#ffffff', borderRadius: '20px', padding: '40px', border: '1px solid #c7c4d7', boxShadow: '0 4px 24px rgba(94, 92, 230, 0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ width: '140px', height: '140px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#e2dfff', borderRadius: '50%' }}>
+              <div className={styles.aiAnalysisCard}>
+                <div className={styles.aiVisualCircle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '72px', color: '#4441cc', fontVariationSettings: "'FILL' 1" }}>
                     psychology
                   </span>
                 </div>
 
-                <h2 className={styles.mainTitle} style={{ fontSize: '28px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  ReviseAI is reading your syllabus...
-                  <span className="material-symbols-outlined" style={{ color: '#00789a', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                <h2 className={styles.aiHeadingRow}>
+                  <span>ReviseAI is reading your syllabus...</span>
+                  <span className={`material-symbols-outlined ${styles.pulseSparkle}`} style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
                 </h2>
                 <p className={styles.subtitle} style={{ marginBottom: '32px' }}>
                   We're identifying subjects and organizing your curriculum.
                 </p>
 
                 {/* Progress bar */}
-                <div style={{ width: '100%', maxWidth: '480px', marginBottom: '32px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, color: '#4441cc', marginBottom: '8px' }}>
+                <div className={styles.progressSection}>
+                  <div className={styles.progressHeader}>
                     <span>Analysis in progress</span>
                     <span>{analysisProgress}%</span>
                   </div>
-                  <div style={{ width: '100%', height: '12px', backgroundColor: '#c2c1ff', borderRadius: '9999px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${analysisProgress}%`, backgroundColor: '#4441cc', borderRadius: '9999px', transition: 'width 0.5s ease' }}></div>
+                  <div className={styles.progressBarTrack}>
+                    <div className={styles.progressBarFillGradient} style={{ width: `${analysisProgress}%` }}></div>
                   </div>
                 </div>
 
                 {/* Processing Steps Box */}
-                <div style={{ width: '100%', maxWidth: '480px', backgroundColor: '#f6f3f5', borderRadius: '12px', padding: '24px', border: '1px solid #e4e2e4' }}>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'line-through', color: '#777586' }}>
+                <div className={styles.stepsBox}>
+                  <ul className={styles.stepsList}>
+                    <li className={styles.stepCompleted}>
                       <span className="material-symbols-outlined" style={{ color: '#4441cc', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                       <span>Reading syllabus</span>
                     </li>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'line-through', color: '#777586' }}>
+                    <li className={styles.stepCompleted}>
                       <span className="material-symbols-outlined" style={{ color: '#4441cc', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                       <span>Understanding document structure</span>
                     </li>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#4441cc', fontWeight: 700 }}>
-                      <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>radio_button_checked</span>
+                    <li className={styles.stepActive}>
+                      <span className={`material-symbols-outlined ${styles.pulseSparkle}`} style={{ fontVariationSettings: "'FILL' 1" }}>radio_button_checked</span>
                       <span>Finding subjects</span>
                     </li>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: '12px', opacity: 0.5 }}>
+                    <li className={styles.stepPending}>
                       <span className="material-symbols-outlined">radio_button_unchecked</span>
                       <span>Organizing curriculum</span>
                     </li>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: '12px', opacity: 0.5 }}>
+                    <li className={styles.stepPending}>
                       <span className="material-symbols-outlined">radio_button_unchecked</span>
                       <span>Preparing your subject list</span>
                     </li>
@@ -389,49 +390,34 @@ const SyllabusSetup = () => {
                   </p>
                 </div>
 
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div className={styles.subjectSelectionList}>
                   {availableSubjects.map((sub) => {
                     const isSelected = selectedSubjects.includes(sub.id);
                     return (
                       <div
                         key={sub.id}
                         onClick={() => toggleSubject(sub.id)}
-                        style={{
-                          backgroundColor: '#ffffff',
-                          border: isSelected ? '2px solid #4441cc' : '1px solid #c7c4d7',
-                          borderRadius: '16px',
-                          padding: '20px 24px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          boxShadow: isSelected ? '0 4px 16px rgba(68, 65, 204, 0.12)' : 'none',
-                        }}
+                        className={`${styles.subjectCardItem} ${isSelected ? styles.subjectCardItemSelected : ''}`}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div className={styles.subjectLeftGroup}>
                           <span
-                            className="material-symbols-outlined"
-                            style={{
-                              fontSize: '28px',
-                              color: isSelected ? '#4441cc' : '#c7c4d7',
-                              fontVariationSettings: isSelected ? "'FILL' 1" : "'FILL' 0",
-                            }}
+                            className={`material-symbols-outlined ${styles.checkboxIcon} ${isSelected ? styles.checkboxIconSelected : ''}`}
+                            style={{ fontVariationSettings: isSelected ? "'FILL' 1" : "'FILL' 0" }}
                           >
                             {isSelected ? 'check_box' : 'check_box_outline_blank'}
                           </span>
                           <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#1b1b1d' }}>{sub.title}</h3>
-                              <span style={{ fontSize: '12px', fontWeight: 600, backgroundColor: '#f0edef', padding: '2px 8px', borderRadius: '6px', color: '#464554' }}>{sub.code}</span>
+                            <div className={styles.subjectTitleRow}>
+                              <h3 className={styles.subjectTitleText}>{sub.title}</h3>
+                              <span className={styles.subjectCodeBadge}>{sub.code}</span>
                             </div>
-                            <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#464554' }}>
+                            <p className={styles.subjectMetaText}>
                               {sub.topics} Topics • Difficulty: {sub.difficulty}
                             </p>
                           </div>
                         </div>
 
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#005e79', backgroundColor: 'rgba(0,94,121,0.1)', padding: '6px 12px', borderRadius: '20px' }}>
+                        <span className={styles.coverageBadge}>
                           {sub.coverage} Coverage
                         </span>
                       </div>
@@ -439,12 +425,16 @@ const SyllabusSetup = () => {
                   })}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '16px' }}>
+                <div className={styles.subjectActionRow}>
                   <button
                     className={styles.pagePill}
-                    onClick={() => setSelectedSubjects(availableSubjects.map((s) => s.id))}
+                    onClick={() =>
+                      setSelectedSubjects((prev) =>
+                        prev.length === availableSubjects.length ? [] : availableSubjects.map((s) => s.id)
+                      )
+                    }
                   >
-                    Select All ({availableSubjects.length})
+                    {selectedSubjects.length === availableSubjects.length ? 'Deselect All' : `Select All (${availableSubjects.length})`}
                   </button>
                   <button
                     className={styles.chooseFileBtn}
@@ -467,28 +457,28 @@ const SyllabusSetup = () => {
                   </p>
                 </div>
 
-                <div style={{ width: '100%', backgroundColor: '#ffffff', borderRadius: '20px', padding: '32px', border: '1px solid #c7c4d7', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
-                  <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 700, color: '#4441cc' }}>Workspace Summary</h3>
+                <div className={styles.reviewCard}>
+                  <h3 className={styles.reviewTitle}>Workspace Summary</h3>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
-                    <div style={{ backgroundColor: '#f0edef', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
-                      <span style={{ fontSize: '28px', fontWeight: 800, color: '#4441cc' }}>{selectedSubjects.length}</span>
-                      <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#464554' }}>Selected Subjects</p>
+                  <div className={styles.reviewMetricsGrid}>
+                    <div className={styles.metricBox}>
+                      <span className={styles.metricNumberPrimary}>{selectedSubjects.length}</span>
+                      <p className={styles.metricLabel}>Selected Subjects</p>
                     </div>
-                    <div style={{ backgroundColor: '#f0edef', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
-                      <span style={{ fontSize: '28px', fontWeight: 800, color: '#9026c3' }}>44</span>
-                      <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#464554' }}>Total Topics</p>
+                    <div className={styles.metricBox}>
+                      <span className={styles.metricNumberPurple}>44</span>
+                      <p className={styles.metricLabel}>Total Topics</p>
                     </div>
-                    <div style={{ backgroundColor: '#f0edef', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
-                      <span style={{ fontSize: '28px', fontWeight: 800, color: '#005e79' }}>Ready</span>
-                      <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#464554' }}>AI Dataset</p>
+                    <div className={styles.metricBox}>
+                      <span className={styles.metricNumberCyan}>Ready</span>
+                      <p className={styles.metricLabel}>AI Dataset</p>
                     </div>
                   </div>
 
-                  <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: 700 }}>Included Subjects:</h4>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <h4 className={styles.includedSubjectsHeading}>Included Subjects:</h4>
+                  <ul className={styles.includedSubjectsList}>
                     {availableSubjects.filter((s) => selectedSubjects.includes(s.id)).map((sub) => (
-                      <li key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', backgroundColor: '#f6f3f5', borderRadius: '8px', fontSize: '14px', fontWeight: 600 }}>
+                      <li key={sub.id} className={styles.includedSubjectRow}>
                         <span>{sub.title} ({sub.code})</span>
                         <span style={{ color: '#4441cc' }}>{sub.topics} topics</span>
                       </li>
@@ -497,8 +487,7 @@ const SyllabusSetup = () => {
                 </div>
 
                 <button
-                  className={styles.chooseFileBtn}
-                  style={{ width: '100%', justifyContent: 'center', padding: '16px 32px', fontSize: '18px' }}
+                  className={`${styles.chooseFileBtn} ${styles.confirmBtn}`}
                   onClick={() => setActiveStep('step-4-success')}
                 >
                   <span className="material-symbols-outlined">task_alt</span>
@@ -509,28 +498,28 @@ const SyllabusSetup = () => {
 
             {/* PAGE 6: Step 4: Success (Desktop - Light) */}
             {activeStep === 'step-4-success' && (
-              <div style={{ width: '100%', backgroundColor: '#ffffff', borderRadius: '24px', padding: '48px', border: '1px solid #c7c4d7', boxShadow: '0 8px 32px rgba(68,65,204,0.12)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                <div style={{ width: '100px', height: '100px', backgroundColor: '#e2dfff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
+              <div className={styles.successCard}>
+                <div className={styles.celebrationCircle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '64px', color: '#4441cc', fontVariationSettings: "'FILL' 1" }}>
                     celebration
                   </span>
                 </div>
 
-                <h1 className={styles.mainTitle} style={{ fontSize: '36px', color: '#4441cc' }}>
+                <h1 className={styles.successTitle}>
                   Syllabus Setup Complete! 🎉
                 </h1>
                 <p className={styles.subtitle} style={{ marginBottom: '32px' }}>
                   Your workspace is fully initialized. ReviseAI has curated your initial topics and generated smart revision cards.
                 </p>
 
-                <div style={{ display: 'flex', gap: '16px', marginBottom: '36px' }}>
-                  <div style={{ padding: '12px 24px', backgroundColor: '#f0edef', borderRadius: '20px', fontWeight: 700, color: '#4441cc' }}>
+                <div className={styles.chipsRow}>
+                  <div className={styles.chipPrimary}>
                     {selectedSubjects.length} Subjects Added
                   </div>
-                  <div style={{ padding: '12px 24px', backgroundColor: '#f0edef', borderRadius: '20px', fontWeight: 700, color: '#005e79' }}>
+                  <div className={styles.chipCyan}>
                     44 Topics Curated
                   </div>
-                  <div style={{ padding: '12px 24px', backgroundColor: '#f0edef', borderRadius: '20px', fontWeight: 700, color: '#9026c3' }}>
+                  <div className={styles.chipPurple}>
                     Level 1 Unlocked
                   </div>
                 </div>
@@ -547,31 +536,29 @@ const SyllabusSetup = () => {
 
             {/* PAGE 7: Error State (Desktop - Light) */}
             {activeStep === 'error-state' && (
-              <div style={{ width: '100%', backgroundColor: '#ffffff', borderRadius: '24px', padding: '48px', border: '2px solid #ffdad6', boxShadow: '0 8px 32px rgba(186,26,26,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                <div style={{ width: '90px', height: '90px', backgroundColor: '#ffdad6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
+              <div className={styles.errorCard}>
+                <div className={styles.errorCircle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '56px', color: '#ba1a1a' }}>
                     error
                   </span>
                 </div>
 
-                <h1 className={styles.mainTitle} style={{ fontSize: '28px', color: '#ba1a1a' }}>
+                <h1 className={styles.errorTitle}>
                   Unable to Process Syllabus
                 </h1>
                 <p className={styles.subtitle} style={{ marginBottom: '32px', maxWidth: '520px' }}>
                   We couldn't extract subjects from the uploaded file. Please ensure the file is unencrypted and contains clear syllabus text.
                 </p>
 
-                <div style={{ display: 'flex', gap: '16px' }}>
+                <div className={styles.errorActionGroup}>
                   <button
-                    className={styles.pagePill}
-                    style={{ padding: '14px 28px', fontSize: '15px' }}
+                    className={styles.secondaryActionBtn}
                     onClick={() => setActiveStep('step-1-upload')}
                   >
                     Upload Different File
                   </button>
                   <button
-                    className={styles.chooseFileBtn}
-                    style={{ backgroundColor: '#ba1a1a', borderBottomColor: '#93000a' }}
+                    className={`${styles.chooseFileBtn} ${styles.errorRetryBtn}`}
                     onClick={() => setActiveStep('step-1-upload')}
                   >
                     <span className="material-symbols-outlined">refresh</span>
