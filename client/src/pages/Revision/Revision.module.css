@@ -1,0 +1,353 @@
+.revisionContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8f7fb;
+  color: #1b1b1d;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Main Workspace */
+.mainWorkspace {
+  flex: 1;
+  margin-left: 256px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .mainWorkspace {
+    margin-left: 0;
+    padding-bottom: 80px;
+  }
+}
+
+/* Top Bar */
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 40px;
+  background-color: rgba(248, 247, 251, 0.85);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+@media (max-width: 768px) {
+  .topBar {
+    padding: 12px 16px;
+  }
+}
+
+.brandGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobileMenuBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: #464554;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+  .mobileMenuBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.mobileLogoTitle {
+  display: none;
+  font-size: 20px;
+  font-weight: 800;
+  color: #4441cc;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 768px) {
+  .mobileLogoTitle {
+    display: block;
+  }
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #727080;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.iconBtn:hover {
+  background-color: #eeeaf4;
+  color: #1b1b1d;
+}
+
+/* Blurred Skeleton Content in Background */
+.blurredBackground {
+  flex: 1;
+  padding: 40px;
+  max-width: 1040px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  filter: blur(3px);
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .blurredBackground {
+    padding: 20px 16px;
+  }
+}
+
+.placeholderHero {
+  background: #f0edf6;
+  border-radius: 16px;
+  padding: 32px 28px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+.skeletonLineLong {
+  width: 55%;
+  height: 14px;
+  background-color: #ded9e7;
+  border-radius: 6px;
+}
+
+.skeletonLineMedium {
+  width: 65%;
+  height: 12px;
+  background-color: #e6e2ee;
+  border-radius: 6px;
+}
+
+.placeholderGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .placeholderGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.placeholderCard {
+  background: #f0edf6;
+  border-radius: 16px;
+  height: 220px;
+}
+
+/* ========================================== */
+/* OVERLAY MODAL: EXACT SCREEN REPLICATION   */
+/* ========================================== */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: rgba(35, 33, 48, 0.22);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@media (max-width: 768px) {
+  .modalOverlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalCard {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 440px;
+  padding: 38px 36px 32px 36px;
+  border-radius: 24px;
+  box-shadow: 0 24px 48px -12px rgba(25, 20, 50, 0.18), 0 4px 16px rgba(0, 0, 0, 0.04);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Mobile Bottom Sheet Adaptation */
+@media (max-width: 768px) {
+  .modalCard {
+    max-width: 100%;
+    border-radius: 24px 24px 0 0;
+    padding: 16px 24px max(24px, env(safe-area-inset-bottom, 24px)) 24px;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.dragHandle {
+  display: none;
+  width: 44px;
+  height: 5px;
+  background-color: #dcd9e4;
+  border-radius: 9999px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .dragHandle {
+    display: block;
+  }
+}
+
+/* Sparkle Icon Circular Container */
+.iconContainer {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #eeeaff 0%, #e1dcff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 16px rgba(85, 76, 226, 0.12);
+}
+
+.sparkleIcon {
+  font-size: 30px;
+  color: #554ce2;
+}
+
+/* Heading: Serif styling to match image */
+.modalTitle {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+  font-size: 26px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #171520;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.01em;
+}
+
+/* Description */
+.modalDescription {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #5d5b6d;
+  margin: 0 0 28px 0;
+  max-width: 340px;
+}
+
+/* Actions */
+.actionGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.startNowBtn {
+  width: 100%;
+  background-color: #554ce2;
+  color: #ffffff;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(85, 76, 226, 0.25);
+  transition: all 0.15s ease;
+}
+
+.startNowBtn:hover {
+  background-color: #483fd3;
+  box-shadow: 0 6px 18px rgba(85, 76, 226, 0.32);
+  transform: translateY(-1px);
+}
+
+.startNowBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(85, 76, 226, 0.2);
+}
+
+.maybeLaterBtn {
+  background: transparent;
+  color: #554ce2;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.maybeLaterBtn:hover {
+  color: #3b33b8;
+  background-color: rgba(85, 76, 226, 0.06);
+}
+
+.maybeLaterBtn:active {
+  transform: scale(0.98);
+}

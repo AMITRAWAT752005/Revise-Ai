@@ -1,0 +1,66 @@
+.bottomNav {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 68px;
+  background-color: #f0edef;
+  border-top: 1px solid #c7c4d7;
+  box-shadow: 0 -4px 16px rgba(94, 92, 230, 0.08);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  z-index: 50;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 16px max(8px, env(safe-area-inset-bottom, 8px));
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .bottomNav {
+    display: none;
+  }
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-decoration: none;
+  color: #464554;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.navItem:active {
+  transform: scale(0.92);
+}
+
+.navIcon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.navLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.activeItem {
+  background-color: #5e5ce6;
+  color: #f4f1ff;
+  box-shadow: 0 2px 8px rgba(94, 92, 230, 0.25);
+}
+
+.activeItem .navIcon {
+  font-variation-settings: 'FILL' 1;
+}
