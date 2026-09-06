@@ -14,6 +14,52 @@
 
 ## Date: 06 September 2026
 
+### Team Member: Anukool Negi
+
+**Time:** 10:48 AM
+
+**Task Worked On:**
+Phase 2 — Syllabus Setup Workflow Implementation (Stitch Project ID: 8356759800152041564)
+
+**Changes Made:**
+- Created `client/src/pages/SyllabusSetup/SyllabusSetup.jsx` and `client/src/pages/SyllabusSetup/SyllabusSetup.module.css` implementing all 7 assigned Syllabus Setup workflow screens from Google Stitch design reference:
+  - Page 1: Syllabus Setup - Step 1: Upload (Desktop - Light) (`85ee6716fe0746d3990fc99896bc77cf`)
+  - Page 2: Syllabus Setup - Step 1: File Selected (Desktop - Light) (`7bb60101477943d48a56ebc2fa14949b`)
+  - Page 3: Syllabus Setup - Step 2: AI Analysis (Desktop - Light) (`b18d3a7a230b4d1c9789443e49ef35e0`)
+  - Page 4: Syllabus Setup - Step 3: Select Subjects (Desktop - Light) (`21435e05b3db4b6992502f0e0a95d195`)
+  - Page 5: Syllabus Setup - Step 4: Review (Desktop - Light) (`36805ff88370492d8ee531d97c8ca60c`)
+  - Page 6: Syllabus Setup - Step 4: Success (Desktop - Light) (`e8f72540bdf0479aa675f55681e7631e`)
+  - Page 7: Syllabus Setup - Error State (Desktop - Light) (`5a0b825a11cd4621a2f4d669a105df6a`)
+- Registered protected route `/syllabus-setup` in `client/src/App.jsx`.
+- Verified Phase 1 authentication integrity (100% untouched).
+
+**Files Created:**
+- `client/src/pages/SyllabusSetup/SyllabusSetup.jsx`
+- `client/src/pages/SyllabusSetup/SyllabusSetup.module.css`
+
+**Files Modified:**
+- `client/src/App.jsx`
+- `docs/Phase/Phase_2/TASKDONE.md`
+- `docs/Phase/Phase_2/TIMELINE.md`
+- `docs/Phase/Phase_2/REVIEW.md`
+
+**Branch:**
+`Phase_2`
+
+**Testing Performed:**
+- Executed `npm run build` in `client` -> 61 modules transformed, 0 errors, 0 warnings.
+- Verified all 7 page views, state transitions, step navigation, dropzone upload, selection toggles, review breakdown, success celebration, error handling, and dashboard redirects.
+
+**Status:**
+🟢 Completed (All 7 Assigned Syllabus Setup Workflow Screens Implemented & Verified)
+
+**Notes / Blockers:**
+- None. All assigned pages completed step-by-step with explicit user confirmation.
+
+---
+
+## Date: 06 September 2026
+
 ### Team Member: Anshul Gusain
 
 **Time:** 10:45 AM

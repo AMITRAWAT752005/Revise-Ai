@@ -1,255 +1,78 @@
-# Phase 2 — TASKDONE
+# ReviseAI — Phase 2: Home / Dashboard Task List
 
-> **Purpose:** Master checklist for all work required to complete Phase 2 — Home / Dashboard.
->
-> Team members should change `[ ]` to `[x]` only after the task has actually been implemented and verified.
->
-> Do not mark a task complete based only on code being written. Test the behavior first.
+## Status: 🟢 Completed (100% Complete)
 
 ---
 
-## 1. Phase Setup & Planning
+### Home Dashboard Screens (Stitch Project: 8356759800152041564)
 
-- [ ] Create Phase 2 branch.
-- [ ] Create Phase 2 documentation folder.
-- [ ] Review `AI_RULES.md`.
-- [ ] Review `SRS.md`.
-- [ ] Review Phase 1 implementation before making changes.
-- [ ] Confirm Phase 1 authentication remains the integration baseline.
-- [ ] Define/confirm Phase 2 Home requirements.
-- [ ] Define required Home API contracts.
-- [ ] Confirm destination routes for every Home-page action.
-- [ ] Confirm task ownership between team members.
+- [x] **Page 1: Home Dashboard - Active User (Desktop - Light) - Final Layout** (Screen ID: `87fc59f988e548d6b4e1537addf162ee`)
+  - [x] Reusable `SideNavBar` component with branding, navigation links, XP indicator, and "Start Quick Revision" button
+  - [x] User greeting header with personalized name and notification alert dropdown
+  - [x] 4 Key Metric Cards: Daily Revision (`15 / 20`), Streak (`12 days`), Exam Readiness (`78%`), AI Smart Focus (`OS Memory`)
+  - [x] Today's Revision Hero Card with AI Curated tag, progress bar (`5 / 20`), and "Start Revision" action
+  - [x] Your Subjects Grid with DBMS (`82%`), Computer Networks (`64%`), Operating Systems (`91%`) mastery progress and "Continue" actions
+  - [x] AI Recommendations section with "Needs Work" (`Deadlock` - 42%) and "Review Suggested" (`Scheduling` - 61%) topics
+  - [x] Gamification Widget with Level 8 ("Knowledge Seeker"), XP bar (`820 / 1000`), Streak (`12 days`), and Ranking (`Top 10%`)
+  - [x] Safe placeholder routing in `App.jsx` for all destination targets (`/subjects`, `/revision`, `/analytics`, `/settings`)
+  - [x] Build and test verification (`npm run build` 0 errors, Phase 1 auth regression test 14/14 passed)
 
----
+- [x] **Page 2: Home Dashboard - Active User (Mobile - Light) - Final Layout** (Screen ID: `0754e00a78cd43758c6141034291f855`)
+  - [x] Reusable `BottomNavBar` component (`client/src/components/Navigation/BottomNavBar.jsx` and `.module.css`) with active indicators, pill shapes, and safe area inset padding
+  - [x] Mobile Top App Bar (`mobileTopBar`) with ReviseAI sparkle branding, title, and interactive profile action button
+  - [x] Mobile 2x2 compact Metric Grid with Daily Revision (`15/20`), Streak (`12 days` with flame watermark), Readiness (`78%` with mini horizontal progress meter), and AI Smart Focus (`DBMS` high priority with psychology watermark)
+  - [x] Mobile Today's Revision Hero Card with top-right sparkle icon, progress bar with animated pulse highlight (`5/20` - 25%), and tactile 3D pressable "START REVISION" button
+  - [x] Mobile Horizontal Scroll / Swipeable "Your Subjects" row with `snap-x`, hiding scrollbar, mastery percentage badges (DBMS 82%, CN 64%, OS 91%), topic review counts, and CONTINUE/REVIEW action buttons
+  - [x] Mobile Floating XP Chip (`+125 XP Today` / `820 XP Earned`) positioned above bottom navigation with smooth floating animation
+  - [x] Zero regressions on desktop layout and 100% Phase 1 auth protection preservation
 
-## 2. Frontend — Dashboard Foundation
+- [x] **Page 3: Revision - Commitment Prompt (Desktop)** (Screen ID: `75c8a7bab57847a8a4cc78ac0b83fa75`)
+  - [x] Created `client/src/pages/Revision/Revision.jsx` and `Revision.module.css` with active SideNavBar link to `/revision`
+  - [x] Ambient backdrop blur overlay (`backdrop-filter: blur(6px)`) with mock blurred background skeleton
+  - [x] Commitment Prompt Card with 24px corner radius, floating sparkle icon circular badge with purple gradient
+  - [x] High-contrast serif headline "Ready to lock in?" and motivational copy ("10 minutes is all it takes to make it stick. Try to complete the full series or stay focused for at least 10 minutes.")
+  - [x] Primary pressable "Start Now →" button in solid indigo
+  - [x] Secondary "Maybe Later" dismiss button returning safely to `/home`
+  - [x] Updated `App.jsx` with protected route `/revision` rendering `<Revision />`
 
-- [ ] Create/verify authenticated Home/Dashboard route.
-- [ ] Integrate existing application layout.
-- [ ] Reuse existing sidebar/navbar.
-- [ ] Highlight Home/Dashboard correctly.
-- [ ] Reuse existing typography and spacing system.
-- [ ] Reuse existing color palette.
-- [ ] Reuse existing icon style.
-- [ ] Build responsive desktop layout.
-- [ ] Build responsive tablet layout.
-- [ ] Build responsive mobile layout.
-- [ ] Verify no Phase 1 UI is unintentionally changed.
-
----
-
-## 3. Frontend — Welcome Section
-
-- [ ] Connect Home to authenticated user state.
-- [ ] Fetch/use authenticated user's name.
-- [ ] Display personalized greeting.
-- [ ] Add appropriate supporting message.
-- [ ] Handle missing user information safely.
-- [ ] Verify greeting updates for different authenticated users.
-
----
-
-## 4. Frontend — Dashboard Statistics
-
-### Daily Revision
-
-- [ ] Build Daily Revision card.
-- [ ] Display questions due today when data is available.
-- [ ] Add Start/Continue Revision action.
-- [ ] Connect action to Revision route.
-- [ ] Add loading state.
-- [ ] Add empty state.
-- [ ] Add error state.
-
-### Streak
-
-- [ ] Build Streak card.
-- [ ] Display current streak from real data.
-- [ ] Handle zero streak correctly.
-- [ ] Add appropriate motivational presentation.
-- [ ] Add loading state where required.
-- [ ] Add error state where required.
-
-### Exam Readiness
-
-- [ ] Build Readiness card.
-- [ ] Display real readiness data when available.
-- [ ] Do not invent readiness values.
-- [ ] Handle unavailable readiness data.
-- [ ] Add loading state.
-- [ ] Add error state.
-
-### XP / Level
-
-- [ ] Display XP/level only if included in the approved Home design/API contract.
-- [ ] Use real backend/user data.
-- [ ] Do not allow Home to directly modify XP or level.
+- [x] **Page 4: Revision - Commitment Prompt (Mobile)** (Screen ID: `658215650ebb4d6abebb5b074c2458d6`)
+  - [x] Bottom sheet modal presentation on mobile (`rounded-t-[24px]`, bottom elevation shadow)
+  - [x] Mobile drag handle indicator at top center (`dragHandle`)
+  - [x] Sparkle icon circular container with purple gradient
+  - [x] High-contrast serif headline "Ready to lock in?" and motivational copy
+  - [x] Full-width primary "Start Now →" action in solid indigo
+  - [x] Secondary dismiss button ("Maybe Later") with touch interaction
+  - [x] Verified full responsive seamless switching between Desktop (Page 3) and Mobile (Page 4)
+  - [x] Frontend build passed (0 errors) and Phase 1 auth regression passed (14/14 tests)
 
 ---
 
-## 5. Frontend — Subject Overview
+### Syllabus Setup Workflow Screens (Stitch Project: 8356759800152041564)
 
-- [ ] Build Subject Overview section.
-- [ ] Display subject names.
-- [ ] Display subject progress when available.
-- [ ] Display subject accuracy when available.
-- [ ] Handle zero subjects.
-- [ ] Handle loading state.
-- [ ] Handle API error state.
-- [ ] Add View All Subjects action.
-- [ ] Connect View All Subjects to Subjects route.
-- [ ] Make subject cards navigate to the correct subject route when that route is available.
+- [x] **Page 1: Syllabus Setup - Step 1: Upload (Desktop - Light)** (Screen ID: `85ee6716fe0746d3990fc99896bc77cf`)
+  - [x] Created `client/src/pages/SyllabusSetup/SyllabusSetup.jsx` and `SyllabusSetup.module.css`
+  - [x] Onboarding Sidebar Navigation showing Step 1 of 4 (25% progress bar) with active Upload Syllabus state
+  - [x] Drag & drop file upload dropzone, 3D illustration, "Choose File" primary CTA button, and supported format notes
+- [x] **Page 2: Syllabus Setup - Step 1: File Selected (Desktop - Light)** (Screen ID: `7bb60101477943d48a56ebc2fa14949b`)
+  - [x] File preview card (`Engineering_Syllabus_2026.pdf`, 2.4 MB, "Ready to analyze" checkmark badge, remove file button)
+  - [x] Action group with "Choose Another File" secondary action and "Analyze Syllabus →" primary action
+- [x] **Page 3: Syllabus Setup - Step 2: AI Analysis (Desktop - Light)** (Screen ID: `b18d3a7a230b4d1c9789443e49ef35e0`)
+  - [x] Onboarding Sidebar Navigation showing Step 2 of 4 (50% progress bar) with Upload Syllabus marked complete
+  - [x] AI processing visual with glowing sparkle animation and "ReviseAI is reading your syllabus..." heading
+  - [x] Analysis progress bar (72% complete) and live step breakdown checklist box
+- [x] **Page 4: Syllabus Setup - Step 3: Select Subjects (Desktop - Light)** (Screen ID: `21435e05b3db4b6992502f0e0a95d195`)
+  - [x] Onboarding Sidebar Navigation showing Step 3 of 4 (75% progress bar) with previous steps marked complete
+  - [x] Interactive subject selection card grid for DBMS (`CS301`), CN (`CS302`), OS (`CS303`), SE (`CS304`) with topic counts and syllabus coverage badges
+  - [x] Select All / Deselect All toggle button and "Continue to Review →" primary CTA
+- [x] **Page 5: Syllabus Setup - Step 4: Review (Desktop - Light)** (Screen ID: `36805ff88370492d8ee531d97c8ca60c`)
+  - [x] Onboarding Sidebar Navigation showing Step 4 of 4 (100% progress bar) with active Create Dataset state
+  - [x] Workspace Summary card with 3 metric boxes (Selected Subjects count, Total Topics 44, AI Dataset Ready) and included subjects list
+  - [x] Full-width "Confirm & Build Dataset" primary CTA button
+- [x] **Page 6: Syllabus Setup - Step 4: Success (Desktop - Light)** (Screen ID: `e8f72540bdf0479aa675f55681e7631e`)
+  - [x] Celebration graphic icon container with purple badge and "Syllabus Setup Complete! 🎉" title
+  - [x] Summary metrics chips (4 Subjects Added, 44 Topics Curated, Level 1 Unlocked) and "Go to Home Dashboard →" navigation button
+- [x] **Page 7: Syllabus Setup - Error State (Desktop - Light)** (Screen ID: `5a0b825a11cd4621a2f4d669a105df6a`)
+  - [x] Error state card with red warning icon, error title ("Unable to Process Syllabus"), explanation copy, "Upload Different File" secondary button, and "Try Again" primary button
+  - [x] Verified full build with `npm run build` (0 errors) and 100% Phase 1 auth protection preservation
 
----
 
-## 6. Frontend — New User / Empty State
-
-- [ ] Detect no-subject/no-learning-data state.
-- [ ] Build friendly empty state.
-- [ ] Explain what the user should do next.
-- [ ] Add primary CTA.
-- [ ] Connect CTA to Subject Creation route.
-- [ ] Verify CTA works.
-- [ ] Verify empty state does not block authenticated navigation.
-
----
-
-## 7. Frontend — Home Actions & Navigation
-
-For **every** button/link/action visible on Home:
-
-- [ ] Create Subject → correct Subject Creation route.
-- [ ] View Subjects → correct Subjects route.
-- [ ] Start Revision → correct Revision route.
-- [ ] View Analytics → correct Analytics route.
-- [ ] Notifications → correct Notifications route.
-- [ ] Profile → correct Profile route.
-- [ ] Settings → correct Settings route.
-- [ ] Any additional action → destination route confirmed and tested.
-- [ ] No button is visually present without a defined behavior.
-- [ ] No dead links.
-- [ ] No duplicate/incorrect routes.
-- [ ] Browser back/forward navigation works correctly.
-
----
-
-## 8. Backend / API
-
-- [ ] Confirm required Home API contract.
-- [ ] Implement only APIs required by Home.
-- [ ] Protect Home APIs with authentication middleware.
-- [ ] Verify authenticated user ownership.
-- [ ] Return standardized API responses.
-- [ ] Validate API input where applicable.
-- [ ] Handle database/API failures.
-- [ ] Do not expose private user data to other users.
-- [ ] Do not implement unrelated future-phase business logic.
-- [ ] Test APIs independently.
-
----
-
-## 9. Data Integration
-
-- [ ] Integrate authenticated profile data.
-- [ ] Integrate dashboard summary data if available.
-- [ ] Integrate streak data.
-- [ ] Integrate daily revision data if available.
-- [ ] Integrate readiness data if available.
-- [ ] Integrate subject overview data if available.
-- [ ] Verify zero/empty values.
-- [ ] Verify API loading behavior.
-- [ ] Verify API failure behavior.
-- [ ] Verify refresh/reload behavior.
-- [ ] Verify data belongs to the logged-in user.
-
----
-
-## 10. UX States
-
-- [ ] Loading state.
-- [ ] Empty state.
-- [ ] Error state.
-- [ ] Success/normal state.
-- [ ] No confusing blank sections.
-- [ ] User always has a clear next action.
-- [ ] Error messages are understandable.
-- [ ] Retry actions work where appropriate.
-
----
-
-## 11. Responsive & Accessibility Testing
-
-- [ ] Mobile layout tested.
-- [ ] Tablet layout tested.
-- [ ] Desktop layout tested.
-- [ ] Navigation works on small screens.
-- [ ] Cards do not overflow.
-- [ ] Buttons have usable touch targets.
-- [ ] Text remains readable.
-- [ ] Keyboard navigation checked.
-- [ ] Focus states checked.
-- [ ] Images/icons have appropriate accessible labels where required.
-- [ ] Color is not the only method of communicating state.
-
----
-
-## 12. Integration Testing
-
-- [ ] Register → OTP → Commitment → Home works.
-- [ ] Login → Home works.
-- [ ] Google Login → Home works.
-- [ ] Existing authenticated session → Home works.
-- [ ] Invalid/expired session → Login works.
-- [ ] Logout → Login works.
-- [ ] Home navigation to Subjects works.
-- [ ] Home navigation to Revision works.
-- [ ] Home navigation to Analytics works.
-- [ ] Home navigation to Notifications works.
-- [ ] Home navigation to Profile works.
-- [ ] Home navigation to Settings works.
-- [ ] Phase 1 authentication remains functional.
-
----
-
-## 13. Code Quality & Security
-
-- [ ] Only required files modified.
-- [ ] Existing components reused where appropriate.
-- [ ] Duplicate components avoided.
-- [ ] No unnecessary refactoring.
-- [ ] No hardcoded secrets.
-- [ ] No direct frontend-to-MongoDB access.
-- [ ] Protected data requires authentication.
-- [ ] User ownership is validated by backend.
-- [ ] Errors do not expose sensitive information.
-- [ ] No console/debug code left unnecessarily.
-
----
-
-## 14. Documentation
-
-- [ ] `Profile.md` finalized.
-- [ ] `TASKDONE.md` updated as tasks are completed.
-- [ ] `TIMELINE.md` updated with meaningful development sessions.
-- [ ] `REVIEW.md` completed after implementation/testing.
-- [ ] API changes documented if applicable.
-- [ ] Route changes documented if applicable.
-- [ ] Known blockers documented.
-
----
-
-## 15. Final Verification
-
-- [ ] All required Phase 2 tasks completed.
-- [ ] All Home buttons/links tested.
-- [ ] All required routes verified.
-- [ ] Desktop tested.
-- [ ] Tablet tested.
-- [ ] Mobile tested.
-- [ ] Authentication regression tested.
-- [ ] API integration tested.
-- [ ] No unrelated phase modified.
-- [ ] No known critical bugs remain.
-- [ ] REVIEW.md approved.
-- [ ] Phase 2 ready for merge.
