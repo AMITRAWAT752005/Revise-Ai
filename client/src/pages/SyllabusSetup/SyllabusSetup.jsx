@@ -103,7 +103,8 @@ const SyllabusSetup = () => {
               {activeStep.startsWith('step-1') && 'Step 1 of 4'}
               {activeStep === 'step-2-analysis' && 'Step 2 of 4'}
               {activeStep === 'step-3-subjects' && 'Step 3 of 4'}
-              {activeStep.startsWith('step-4') && 'Step 4 of 4'}
+              {activeStep === 'step-4-review' && 'Step 4 of 4'}
+              {activeStep === 'step-4-success' && 'Complete'}
               {activeStep === 'error-state' && 'Error State'}
             </p>
             <div className={styles.sidebarProgressBarTrack}>
@@ -166,7 +167,7 @@ const SyllabusSetup = () => {
                 className={`${styles.pagePill} ${activeStep === 'step-1-upload' ? styles.pagePillActive : ''}`}
                 onClick={() => setActiveStep('step-1-upload')}
               >
-                1. Upload
+                Upload
               </button>
               <button
                 className={`${styles.pagePill} ${activeStep === 'step-1-selected' ? styles.pagePillActive : ''}`}
@@ -175,37 +176,37 @@ const SyllabusSetup = () => {
                   setActiveStep('step-1-selected');
                 }}
               >
-                2. File Selected
+                File Selected
               </button>
               <button
                 className={`${styles.pagePill} ${activeStep === 'step-2-analysis' ? styles.pagePillActive : ''}`}
                 onClick={() => setActiveStep('step-2-analysis')}
               >
-                3. AI Analysis
+                AI Analysis
               </button>
               <button
                 className={`${styles.pagePill} ${activeStep === 'step-3-subjects' ? styles.pagePillActive : ''}`}
                 onClick={() => setActiveStep('step-3-subjects')}
               >
-                4. Select Subjects
+                Select Subjects
               </button>
               <button
                 className={`${styles.pagePill} ${activeStep === 'step-4-review' ? styles.pagePillActive : ''}`}
                 onClick={() => setActiveStep('step-4-review')}
               >
-                5. Review
+                Review
               </button>
               <button
                 className={`${styles.pagePill} ${activeStep === 'step-4-success' ? styles.pagePillActive : ''}`}
                 onClick={() => setActiveStep('step-4-success')}
               >
-                6. Success
+                Success
               </button>
               <button
                 className={`${styles.pagePill} ${activeStep === 'error-state' ? styles.pagePillActive : ''}`}
                 onClick={() => setActiveStep('error-state')}
               >
-                7. Error State
+                Error State
               </button>
             </div>
           </div>

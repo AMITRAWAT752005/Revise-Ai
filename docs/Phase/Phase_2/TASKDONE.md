@@ -68,10 +68,10 @@
   - [x] Onboarding Sidebar Navigation showing Step 4 of 4 (100% progress bar) with active Create Dataset state
   - [x] Workspace Summary card with 3 metric boxes (Selected Subjects count, Total Topics 44, AI Dataset Ready) and included subjects list
   - [x] Full-width "Confirm & Build Dataset" primary CTA button
-- [x] **Page 6: Syllabus Setup - Step 4: Success (Desktop - Light)** (Screen ID: `e8f72540bdf0479aa675f55681e7631e`)
+- [x] **Outcome A: Syllabus Setup - Success (Desktop - Light)** (Screen ID: `e8f72540bdf0479aa675f55681e7631e`)
   - [x] Celebration graphic icon container with purple badge and "Syllabus Setup Complete! 🎉" title
   - [x] Summary metrics chips (4 Subjects Added, 44 Topics Curated, Level 1 Unlocked) and "Go to Home Dashboard →" navigation button
-- [x] **Page 7: Syllabus Setup - Error State (Desktop - Light)** (Screen ID: `5a0b825a11cd4621a2f4d669a105df6a`)
+- [x] **Outcome B: Syllabus Setup - Error State (Desktop - Light)** (Screen ID: `5a0b825a11cd4621a2f4d669a105df6a`)
   - [x] Error state card with red warning icon, error title ("Unable to Process Syllabus"), explanation copy, "Upload Different File" secondary button, and "Try Again" primary button
   - [x] Verified full build with `npm run build` (0 errors) and 100% Phase 1 auth protection preservation
 

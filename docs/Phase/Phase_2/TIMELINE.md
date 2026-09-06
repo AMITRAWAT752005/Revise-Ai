@@ -39,11 +39,11 @@ Phase 2 — Home Dashboard - New User State & Create Subject Modal Flow (Stitch 
     - 5-step animated checklist (Reading documents → Finding chapters → Identifying topics → Building knowledge map → Preparing revision questions).
     - Progress bar with gradient fill animation.
     - Cancel Processing button.
-  - Page 4: Home - Subject Success (Desktop - Light) (`screen for Subject Success`)
+  - **Outcome A:** Home - Subject Success (Desktop - Light) (`screen for Subject Success`)
     - Celebratory modal with pulse ring animation and confetti dots.
     - "🎉 Subject created!" title.
     - "Upload Study Material" primary CTA and "I'll do this later" secondary action.
-  - Page 5: Home - Subject Error (Desktop - Light) (`screen for Subject Error`)
+  - **Outcome B:** Home - Subject Error (Desktop - Light) (`screen for Subject Error`)
     - Error icon in red container with glow shadow.
     - "Something went wrong" message.
     - "Try Again" button (reopens create modal) and "Cancel" button.

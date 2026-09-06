@@ -20,6 +20,11 @@ const subjectSchema = new mongoose.Schema(
       default: "not_started",
     },
 
+    colour: {
+      type: String,
+      default: "indigo", // could be indigo, teal, purple based on UI theme
+    },
+
     mastery: {
       type: Number,
       default: 0,
