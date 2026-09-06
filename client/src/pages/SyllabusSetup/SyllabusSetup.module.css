@@ -1,0 +1,373 @@
+/* SyllabusSetup.module.css */
+
+.container {
+  min-height: 100vh;
+  background-color: #f6f3f5;
+  color: #1b1b1d;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.topHeader {
+  width: 100%;
+  height: 72px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  border-bottom: 1px solid #e4e2e4;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.brandGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.brandLogo {
+  height: 36px;
+  width: auto;
+}
+
+.brandTitle {
+  font-size: 24px;
+  font-weight: 900;
+  color: #4441cc;
+  letter-spacing: -0.02em;
+}
+
+.headerTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #464554;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #4441cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.iconBtn:hover {
+  background-color: rgba(68, 65, 204, 0.08);
+}
+
+.iconBtn:active {
+  transform: scale(0.95);
+}
+
+/* Layout Body */
+.bodyLayout {
+  display: flex;
+  flex: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: calc(100vh - 72px);
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  width: 256px;
+  background-color: #ffffff;
+  border-right: 1px solid #c7c4d7;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 72px;
+  height: calc(100vh - 72px);
+}
+
+.sidebarHeader {
+  margin-bottom: 8px;
+}
+
+.sidebarTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4441cc;
+  margin: 0 0 4px 0;
+}
+
+.sidebarStepLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #464554;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.sidebarProgressBarTrack {
+  width: 100%;
+  height: 8px;
+  background-color: #e4e2e4;
+  border-radius: 9999px;
+  margin-top: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebarProgressBarFill {
+  height: 100%;
+  background-color: #4441cc;
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #464554;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navItem:hover {
+  background-color: #f0edef;
+  color: #1b1b1d;
+}
+
+.navItemActive {
+  background-color: #5e5ce6;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.navItemActive:hover {
+  background-color: #4441cc;
+  color: #ffffff;
+}
+
+.navItemCompleted {
+  color: #4441cc;
+}
+
+.navItemCompletedIcon {
+  color: #4441cc;
+}
+
+/* Main Content Area */
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px;
+  overflow-y: auto;
+}
+
+.contentWrapper {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.pageHeader {
+  text-align: center;
+}
+
+.mainTitle {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1b1b1d;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #464554;
+  margin: 0;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+/* Upload Card (Step 1 Upload) */
+.uploadCard {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 20px;
+  border: 2px dashed #c7c4d7;
+  box-shadow: 0 4px 24px rgba(94, 92, 230, 0.08);
+  padding: 48px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.uploadCard:hover {
+  border-color: #4441cc;
+  background-color: rgba(68, 65, 204, 0.03);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(68, 65, 204, 0.15);
+}
+
+.illustrationBox {
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.illustrationImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(68, 65, 204, 0.15));
+}
+
+.dropTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1b1b1d;
+  margin: 0;
+  text-align: center;
+}
+
+.dropSubtitle {
+  font-size: 16px;
+  color: #464554;
+  margin: 0;
+  text-align: center;
+}
+
+.chooseFileBtn {
+  margin-top: 8px;
+  background-color: #4441cc;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 9999px;
+  border: none;
+  border-bottom: 3px solid #0c006b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(68, 65, 204, 0.35);
+}
+
+.chooseFileBtn:hover {
+  background-color: #3b38b8;
+  transform: translateY(-2px);
+}
+
+.chooseFileBtn:active {
+  transform: translateY(2px);
+  border-bottom-width: 0px;
+}
+
+.formatNote {
+  font-size: 13px;
+  color: #777586;
+  margin-top: 8px;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+/* Screen Switcher Controls */
+.pageSelectorBar {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #c7c4d7;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pageSelectorTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4441cc;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pageSelectorPills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pagePill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #c7c4d7;
+  background: #ffffff;
+  color: #464554;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagePill:hover {
+  border-color: #4441cc;
+  color: #4441cc;
+}
+
+.pagePillActive {
+  background-color: #4441cc;
+  color: #ffffff;
+  border-color: #4441cc;
+}
