@@ -14,6 +14,46 @@
 
 ## Date: 07 September 2026
 
+### Time: 02:45 PM
+
+### Team Member: Anukool Negi
+
+**Task Worked On:**
+Phase 2 Backend Integration — Home Dashboard API Integration, Dynamic User State & Routing (Tasks 11, 12, 13, 14)
+
+**Changes Made:**
+- Integrated `GET /api/dashboard` API in `client/src/pages/Home/Home.jsx` using authenticated session (`credentials: 'include'`).
+- Handled dynamic user state (`dashboardData`, `loading`, `error`) and rendered New User (`dashboardType === 'new_user'`) vs. Active User (`dashboardType === 'active_user'`) Home states directly based on backend authority.
+- Replaced hardcoded values with real MongoDB data for user name, XP, level, streak, subject count, and dynamic subject cards.
+- Connected all Home navigation actions (`/syllabus-setup`, `/subjects`, `/revision`, `/analytics`, `/settings`) using React Router `navigate()`.
+- Added styles for loading spinner, error message with retry button, and empty subject notice in `client/src/pages/Home/Home.module.css`.
+
+**Files Modified:**
+- `client/src/pages/Home/Home.jsx`
+- `client/src/pages/Home/Home.module.css`
+- `docs/Phase/Phase_2/TASKDONE.md`
+- `docs/Phase/Phase_2/TIMELINE.md`
+
+**Branch:**
+`Phase_2`
+
+**Testing Performed:**
+- Ran client production build (`npm run build` in `client`) -> 69 modules transformed, 0 errors, 0 warnings.
+- Ran backend auth & security test suite (`npm test` in `server`) -> 14 passed, 0 failed, 100% Phase 1 auth regression test passed.
+- Verified dynamic rendering of user name, XP, level, streak, and subjects list from API.
+- Verified loading skeleton, error retry state, and `dashboardType` authority switching.
+- Verified all click actions route cleanly without console errors or fake functionality.
+
+**Status:**
+🟢 Completed and verified
+
+**Notes / Blockers:**
+- None. Phase 1 authentication remains 100% untouched and functional.
+
+---
+
+## Date: 07 September 2026
+
 ### Time: 12:06 PM
 
 ### Team Member: Amit Rawat

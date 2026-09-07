@@ -151,5 +151,37 @@
   - Existing authentication tests passed: 14 passed, 0 failed.
   - Existing subject API tests passed: 5 passed, 0 failed.
 
+  ### Home Dashboard Frontend Integration (Tasks 11-14)
+
+  - [x] **Task 11 — Integrate Home with Dashboard API**
+    - [x] Call `GET /api/dashboard` when Home page loads using authenticated session (`credentials: 'include'`)
+    - [x] Store returned dashboard payload in React state (`dashboardData`)
+    - [x] Display real values from API for user name, level, XP, streak, subject count, and subjects
+    - [x] Handle loading spinner, error state with retry button, and empty states
+    - [x] Dashboard backend remained 100% untouched
+
+  - [x] **Task 12 — Render New User / Active User Home Dynamically**
+    - [x] Render appropriate Home layout using `dashboardType` returned by backend (`"new_user"` vs `"active_user"`)
+    - [x] Frontend does NOT independently calculate new/active status; backend is sole authority
+    - [x] Render New User Home state when `dashboardType === "new_user"`
+    - [x] Render Active User Home state when `dashboardType === "active_user"`
+    - [x] Display loading indicator during fetch and error card with Retry action on API failure
+
+  - [x] **Task 13 — Dynamic Subject Overview**
+    - [x] Render user's actual subjects dynamically from `dashboardData.subjects`
+    - [x] Display real subject names, IDs, and progress indicators
+    - [x] Seamlessly handle 0 subjects, 1 subject, and multiple subjects
+    - [x] Subject backend remained 100% untouched
+
+  - [x] **Task 14 — Make Home Navigation Functional**
+    - [x] Every clickable Home action navigates to its defined route via React Router `navigate()`
+    - [x] "Create Your First Subject" / "Upload Syllabus" → `/syllabus-setup`
+    - [x] "View all subjects" / Subject cards → `/subjects`
+    - [x] "Start Revision" / "Quick Revision" → `/revision`
+    - [x] "Analytics" → `/analytics`
+    - [x] "Settings" / Profile button → `/settings`
+    - [x] Reused existing routing system without creating fake functionality
+
+
 
 
