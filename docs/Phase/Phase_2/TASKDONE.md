@@ -134,5 +134,22 @@
     - [x] Execute operations inside Mongoose transaction sessions where supported
     - [x] Ensure `Subject` collection remains ultimate source of truth with recount fallback
 
+  ### Dashboard Backend (Tasks 4-7)
+
+  - [x] Create `dashboardService.js` to load the authenticated user's profile, progress, and subjects.
+  - [x] Create `dashboardController.js` with a thin authenticated-user service call.
+  - [x] Create protected `GET /api/dashboard` route through `dashboardRoutes.js`.
+  - [x] Return the stable dashboard contract: `success`, `dashboardType`, `user`, `progress`, and `subjects`.
+  - [x] Determine `new_user` versus `active_user` from whether the authenticated user has subjects.
+  - [x] Enforce user ownership by querying progress and subjects with the authenticated user ID.
+  - [x] Exclude passwords, timestamps, `__v`, and unrelated database fields from the dashboard response.
+
+  **Verification:**
+
+  - Dashboard service contract test passed.
+  - Unauthenticated `GET /api/dashboard` returned `401`.
+  - Existing authentication tests passed: 14 passed, 0 failed.
+  - Existing subject API tests passed: 5 passed, 0 failed.
+
 
 

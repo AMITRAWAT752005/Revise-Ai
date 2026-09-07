@@ -3,6 +3,7 @@ import express from 'express';
 import helmet from 'helmet';
 
 import authRoutes from './routes/authRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 import subjectRoutes from './routes/subjectRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
@@ -31,6 +32,7 @@ app.get('/health', (req, res) => {
 
 // Authentication routes
 app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/subjects', subjectRoutes);
 
 // Global Error Handler Middleware

@@ -14,6 +14,50 @@
 
 ## Date: 07 September 2026
 
+### Time: 12:06 PM
+
+### Team Member: Amit Rawat
+
+**Task Worked On:**
+Phase 2 — Dashboard Service, Protected Dashboard API, Response Contract, and New/Active User Determination (Tasks 4-7)
+
+**Changes Made:**
+- Created `dashboardService.js` to fetch the authenticated user's selected profile fields, `UserProgress`, and own subjects.
+- Added `dashboardType` classification from subject ownership: `new_user` when no subjects exist, otherwise `active_user`.
+- Shaped the response to expose only `dashboardType`, `user`, `progress`, and selected subject `_id`/`name` fields.
+- Created a thin `dashboardController.js` that reads `req.user.id` and delegates to the service.
+- Created protected `GET /api/dashboard` routing through the existing authentication middleware.
+- Registered the dashboard route in `server/src/app.js` with the approved minimal shared-file change.
+
+**Files Created:**
+- `server/src/services/dashboardService.js`
+- `server/src/controllers/dashboardController.js`
+- `server/src/routes/dashboardRoutes.js`
+
+**Files Modified:**
+- `server/src/app.js`
+- `docs/Phase/Phase_2/TASKDONE.md`
+- `docs/Phase/Phase_2/TIMELINE.md`
+
+**Branch:**
+`Phase_2`
+
+**Testing Performed:**
+- Dashboard service contract test passed, including user-scoped queries and response shaping.
+- Unauthenticated `GET /api/dashboard` returned `401`.
+- Dashboard modules passed syntax checks and workspace diagnostics.
+- Express app import passed with the dashboard route registered.
+- Existing authentication regression suite passed: 14 passed, 0 failed.
+- Existing subject API suite passed: 5 passed, 0 failed.
+
+**Status:**
+🟢 Completed and verified
+
+**Notes / Blockers:**
+- No dashboard model or frontend integration was added in this task.
+
+## Date: 07 September 2026
+
 ### Team Member: Anshul Gusain
 
 **Time:** 10:00 AM
