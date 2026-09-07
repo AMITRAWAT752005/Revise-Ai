@@ -110,4 +110,29 @@
   **Scope Note:**
   Only the two Mongoose model files were added in this task. Subject APIs, progress APIs, dashboard data integration, and CRUD workflows are not marked complete here.
 
+  ### Subject APIs & UserProgress Synchronization (Tasks 8, 9, 10)
+
+  - [x] **Task 8 — Subject Creation API (`POST /api/subjects`)**
+    - [x] Protect route using `authenticateToken` middleware
+    - [x] Enforce ownership via `req.userId` (never accept `userId` from request body)
+    - [x] Validate required fields (`name` trimmed, non-empty)
+    - [x] Apply case-insensitive duplicate subject name rule per user
+    - [x] Create Subject and update `UserProgress.subjectCount` atomically via Mongoose transactions (with fallback recount)
+    - [x] Return standardized API response (`{ success: true, message, subject, progress }`)
+
+  - [x] **Task 9 — Subject Retrieval API (`GET /api/subjects`)**
+    - [x] Protect route using `authenticateToken` middleware
+    - [x] Query strictly by `Subject.find({ userId: req.userId })`
+    - [x] Disallow `userId` query/body parameters for ownership determination
+    - [x] Return empty array `[]` if user has no subjects
+    - [x] Use standardized API response format (`{ success: true, message, subjects, progress }`)
+
+  - [x] **Task 10 — Subject & UserProgress Synchronization**
+    - [x] Maintain strict consistency between `Subject` collection and `UserProgress.subjectCount`
+    - [x] Increment/synchronize `subjectCount` on subject creation
+    - [x] Decrement/synchronize `subjectCount` on subject deletion
+    - [x] Execute operations inside Mongoose transaction sessions where supported
+    - [x] Ensure `Subject` collection remains ultimate source of truth with recount fallback
+
+
 

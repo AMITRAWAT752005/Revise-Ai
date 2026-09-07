@@ -14,6 +14,47 @@
 
 ## Date: 07 September 2026
 
+### Team Member: Anshul Gusain
+
+**Time:** 10:00 AM
+
+**Task Worked On:**
+Phase 2 — Subject Creation, Retrieval APIs & UserProgress Synchronization (Tasks 8, 9, 10)
+
+**Changes Made:**
+- Implemented `POST /api/subjects` (Task 8) with input validation (trimmed name), `req.userId` ownership enforcement, and case-insensitive duplicate subject name checking per user.
+- Implemented `GET /api/subjects` (Task 9) returning strictly the authenticated user's subjects (`Subject.find({ userId: req.userId })`) in standard response format.
+- Implemented atomic `Subject` ↕ `UserProgress.subjectCount` synchronization (Task 10) using Mongoose transactions (`startSession`/`startTransaction`) with fallback recount from `Subject` collection (ultimate source of truth).
+- Enhanced `userProgressService.js` with optional session parameters for transaction support and helper methods (`incrementSubjectCount`, `decrementSubjectCount`).
+- Created automated test suite `server/tests/subject_api.test.js` verifying input validation, duplicate rules, user isolation, and synchronization.
+
+**Files Created:**
+- `server/tests/subject_api.test.js`
+
+**Files Modified:**
+- `server/src/controllers/subjectController.js`
+- `server/src/services/userProgressService.js`
+- `server/package.json`
+- `docs/Phase/Phase_2/TASKDONE.md`
+- `docs/Phase/Phase_2/TIMELINE.md`
+
+**Branch:**
+`Phase_2`
+
+**Testing Performed:**
+- Executed `npm test` in `server`: 14 passed, 0 failed (100% Phase 1 Auth security regression passed).
+- Executed `npm run test:subjects` in `server`: 5 passed, 0 failed (100% Subject API & UserProgress sync passed).
+
+**Status:**
+🟢 Completed and verified
+
+**Notes / Blockers:**
+- Zero Phase 1 files were modified. All Phase 1 authentication features remain fully functional and protected.
+
+---
+
+## Date: 07 September 2026
+
 ### Team Member: Bikram Singh Bisht
 
 **Time:** 08:12 AM
