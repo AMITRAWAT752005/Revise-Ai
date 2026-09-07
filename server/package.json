@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "node tests/auth_security.test.js"
+    "test": "node tests/auth_security.test.js",
+    "migrate:user-progress": "node src/scripts/migrateUserProgress.js"
   },
   "keywords": [],
   "author": "",

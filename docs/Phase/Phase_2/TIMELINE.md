@@ -12,6 +12,56 @@
 
 # Timeline Entries
 
+## Date: 07 September 2026
+
+### Team Member: Bikram Singh Bisht
+
+**Time:** 08:12 AM
+
+**Task Worked On:**
+Phase 2 — Backend UserProgress Integration
+
+**Changes Made:**
+- Integrated idempotent `UserProgress` creation into local user registration.
+- Added shared progress helpers for initialization, subject-count synchronization, and activity progress fields.
+- Added authenticated subject create, list, and delete endpoints with user ownership enforcement.
+- Added a repeatable migration script for Phase 1 users missing `UserProgress` records.
+- Registered the subject routes under `/api/subjects`.
+
+**Files Created:**
+- `server/src/services/userProgressService.js`
+- `server/src/controllers/subjectController.js`
+- `server/src/routes/subjectRoutes.js`
+- `server/src/scripts/migrateUserProgress.js`
+
+**Files Modified:**
+- `server/src/models/UserProgress.js`
+- `server/src/models/Subject.js`
+- `server/src/controllers/authController.js`
+- `server/src/app.js`
+- `server/package.json`
+- `docs/Phase/Phase_2/TASKDONE.md`
+
+**Branch:**
+`Phase_2`
+
+**Testing Performed:**
+- Passed Node syntax checks for all changed backend modules.
+- Verified `UserProgress` and `Subject` model imports at runtime.
+- Verified Express app import with the new subject route.
+- Ran `npm test` in `server`: 14 passed, 0 failed.
+- Ran `npm run migrate:user-progress`: created 2 missing records.
+- Re-ran `npm run migrate:user-progress`: created 0 duplicate records.
+- Added the migration DNS resolver configuration required by the local network.
+
+**Status:**
+🟢 Completed and verified
+
+**Notes / Blockers:**
+- No Phase 1 authentication behavior was intentionally changed beyond initializing the required progress record during registration.
+
+---
+
 
 ## Date: 06 September 2026
 

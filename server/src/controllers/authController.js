@@ -17,6 +17,7 @@ import {
   setResetCookie,
 } from '../utils/authCookie.js';
 import User from '../models/User.js';
+import { ensureUserProgress } from '../services/userProgressService.js';
 
 /**
  * Controller to handle sending OTP requests
@@ -177,6 +178,13 @@ export const registerController = async (req, res) => {
       isVerified: false,
       commitmentPending: true,
     });
+
+    try {
+      await ensureUserProgress(newUser._id);
+    } catch (progressError) {
+      await User.deleteOne({ _id: newUser._id });
+      throw progressError;
+    }
 
     // Automatically send OTP for account verification
     await sendOtp(normalizedEmail, 'ACCOUNT_VERIFICATION');

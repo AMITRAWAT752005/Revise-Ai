@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 const subjectSchema = new mongoose.Schema(
   {
@@ -10,19 +10,19 @@ const subjectSchema = new mongoose.Schema(
 
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
 
     status: {
       type: String,
-      enum: ["not_started", "in_progress", "completed"],
-      default: "not_started",
+      enum: ['not_started', 'in_progress', 'completed'],
+      default: 'not_started',
     },
 
     colour: {
       type: String,
-      default: "indigo", // could be indigo, teal, purple based on UI theme
+      default: 'indigo', // could be indigo, teal, purple based on UI theme
     },
 
     mastery: {
@@ -52,4 +52,7 @@ const subjectSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Subject", subjectSchema);
+const Subject = mongoose.model('Subject', subjectSchema);
+
+export { Subject };
+export default Subject;

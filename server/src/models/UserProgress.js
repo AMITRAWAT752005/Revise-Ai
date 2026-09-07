@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 const userProgressSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
       unique: true,
     },
@@ -69,7 +69,10 @@ const userProgressSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-module.exports = mongoose.model("UserProgress", userProgressSchema);
+const UserProgress = mongoose.model('UserProgress', userProgressSchema);
+
+export { UserProgress };
+export default UserProgress;

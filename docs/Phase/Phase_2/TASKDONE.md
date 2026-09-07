@@ -77,6 +77,22 @@
 
   ---
 
+### UserProgress Backend Integration
+
+- [x] Converted `UserProgress` and `Subject` models to the server's ES module convention.
+- [x] Added idempotent `UserProgress` initialization during local registration.
+- [x] Added shared progress helpers for initialization, subject-count synchronization, and activity-field updates.
+- [x] Added authenticated subject create, list, and delete operations with ownership checks.
+- [x] Subject create/delete operations synchronize `UserProgress.subjectCount` from the database.
+- [x] Added a repeatable one-time migration script for users missing `UserProgress` records.
+- [x] Execute and verify the migration against the Phase 1 MongoDB data; first run created 2 records and the repeat run created 0 duplicates.
+
+**Verification:**
+
+- Server syntax checks passed for all changed backend modules.
+- Express app import passed with the new subject route registered.
+- Existing authentication security suite passed: 14 tests passed, 0 failed.
+
   ### Data Models Added
 
   - [x] Add `server/src/models/UserProgress.js`
