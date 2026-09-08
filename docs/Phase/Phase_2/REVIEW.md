@@ -27,11 +27,11 @@
 - [ ] No unrelated future-phase feature was implemented.
 - [ ] Future modules are reached through navigation rather than being implemented inside Home.
 - [ ] Phase 1 authentication was not unnecessarily modified.
-- [ ] Any shared-file changes were necessary and reviewed.
+- [x] Any shared-file changes were necessary and reviewed.
 
 **Review Notes:**
 
-> 
+> Changes required. The current branch includes Revision, Syllabus Setup, Subject API, and UserProgress work in addition to Home/Dashboard. `authController.js` was modified for the explicitly approved UserProgress registration integration; this is a documented Phase 1 integration exception.
 
 ---
 
@@ -39,31 +39,31 @@
 
 ### Dashboard Structure
 
-- [ ] Dashboard has a clear visual hierarchy.
-- [ ] Welcome section is present.
-- [ ] Daily Revision section is present.
-- [ ] Streak section is present.
+- [x] Dashboard has a clear visual hierarchy.
+- [x] Welcome section is present.
+- [x] Daily Revision section is present.
+- [x] Streak section is present.
 - [ ] Readiness section is present or clearly handled as unavailable.
-- [ ] Subject Overview is present.
-- [ ] Empty state is present.
-- [ ] User's next action is obvious.
+- [x] Subject Overview is present.
+- [x] Empty state is present.
+- [x] User's next action is obvious.
 
 ### Design System
 
-- [ ] Existing ReviseAI design system is followed.
-- [ ] Sidebar is consistent with the rest of the application.
-- [ ] Home navigation item is highlighted correctly.
-- [ ] Existing color palette is followed.
-- [ ] Existing icon style is followed.
-- [ ] Typography is consistent.
-- [ ] Spacing is consistent.
-- [ ] Cards/components are visually consistent with Phase 1.
-- [ ] Animations are useful and not excessive.
-- [ ] UI is not unnecessarily cluttered.
+- [x] Existing ReviseAI design system is followed.
+- [x] Sidebar is consistent with the rest of the application.
+- [x] Home navigation item is highlighted correctly.
+- [x] Existing color palette is followed.
+- [x] Existing icon style is followed.
+- [x] Typography is consistent.
+- [x] Spacing is consistent.
+- [x] Cards/components are visually consistent with Phase 1.
+- [x] Animations are useful and not excessive.
+- [x] UI is not unnecessarily cluttered.
 
 **Review Notes:**
 
-> 
+> Static implementation review passed. Responsive behavior and visual fidelity still require browser verification at desktop, tablet, and mobile sizes.
 
 ---
 
@@ -73,14 +73,14 @@ Every actionable Home element must be tested.
 
 | Action | Expected Route | Tested | Result |
 |---|---|---|---|
-| Create Subject | Subject Creation | [ ] | |
-| View Subjects | Subjects | [ ] | |
-| Start Revision | Revision | [ ] | |
-| View Analytics | Analytics | [ ] | |
-| Notifications | Notifications | [ ] | |
-| Profile | Profile | [ ] | |
-| Settings | Settings | [ ] | |
-| Other Home Action | Confirm route | [ ] | |
+| Create Subject | Subject creation/API flow | [ ] | Opens modal, but persistence is not connected to `POST /api/subjects`. |
+| View Subjects | `/subjects` | [ ] | Protected placeholder route. Browser verification pending. |
+| Start Revision | `/revision` | [ ] | Protected route exists. Browser verification pending. |
+| View Analytics | `/analytics` | [ ] | Protected placeholder route. Browser verification pending. |
+| Notifications | Notification panel | [ ] | Local panel exists; no notification route/backend. |
+| Profile | `/settings` | [ ] | Profile button currently navigates to settings. |
+| Settings | `/settings` | [ ] | Protected placeholder route. Browser verification pending. |
+| Other Home Action | `/syllabus-setup` | [ ] | Frontend workflow exists; backend upload is not implemented. |
 
 ### Navigation Checks
 
@@ -90,32 +90,32 @@ Every actionable Home element must be tested.
 - [ ] Route loads successfully.
 - [ ] Browser back works.
 - [ ] Browser forward works.
-- [ ] Protected routes remain protected.
+- [x] Protected routes remain protected.
 - [ ] Mobile navigation works.
 
 **Review Notes:**
 
-> 
+> Route definitions and handlers were inspected. End-to-end click testing was not performed in this review session.
 
 ---
 
 ## 5. Functional Review
 
 - [ ] Authenticated user can load Home.
-- [ ] User information is displayed correctly.
+- [x] User information is displayed from dashboard API data when available.
 - [ ] Daily revision data is displayed correctly when available.
-- [ ] Streak data is displayed correctly.
+- [x] Streak data is read from UserProgress when available.
 - [ ] Readiness data is displayed correctly when available.
-- [ ] Subject information is displayed correctly when available.
-- [ ] New-user empty state appears correctly.
-- [ ] Home refresh works.
-- [ ] API failures are handled.
-- [ ] Loading states are handled.
+- [x] Subject information is loaded from the authenticated dashboard query.
+- [x] New-user empty state appears in the implementation.
+- [x] Home refresh has a retry handler.
+- [x] API failures are handled with an error state and retry action.
+- [x] Loading states are handled.
 - [ ] No fake learning data is presented as real data.
 
 **Review Notes:**
 
-> 
+> The dashboard still contains fallback/demo values for revision counts, readiness, mastery, recommendations, accuracy, XP progress, and ranking. Create Subject currently simulates processing instead of persisting through the Subject API.
 
 ---
 
@@ -125,32 +125,32 @@ Every actionable Home element must be tested.
 - [ ] Valid JWT/session allows Home access.
 - [ ] Invalid/expired JWT/session redirects to Login.
 - [ ] User profile is fetched securely.
-- [ ] Home APIs require authentication.
-- [ ] Backend validates user ownership where applicable.
-- [ ] One user cannot access another user's dashboard data.
+- [x] Home APIs require authentication.
+- [x] Backend validates user ownership where applicable.
+- [x] One user cannot access another user's dashboard data.
 - [ ] Logout clears the authenticated state correctly.
 - [ ] Phase 1 registration/login/OTP flows still work.
 
 **Review Notes:**
 
-> 
+> `npm test` passed 14/14 security and rate-limiting tests. Full browser regression coverage for registration, OTP, login, Google Login, password reset, and logout was not executed in this review.
 
 ---
 
 ## 7. API / Backend Review
 
 - [ ] API contracts match frontend expectations.
-- [ ] Standard API response structure is followed.
-- [ ] Input validation exists where required.
-- [ ] Authentication middleware is used where required.
-- [ ] Authorization/ownership checks exist where required.
-- [ ] Database errors are handled safely.
-- [ ] API does not expose sensitive information.
+- [x] Standard API response structure is followed by dashboard and subject endpoints.
+- [x] Input validation exists where required.
+- [x] Authentication middleware is used where required.
+- [x] Authorization/ownership checks exist where required.
+- [x] Database errors are returned without stack traces in production responses.
+- [x] API does not expose passwords or sensitive session data.
 - [ ] No unnecessary backend refactoring was introduced.
 
 **Review Notes:**
 
-> 
+> Backend syntax checks passed. Contract integration remains incomplete because Home's Create Subject flow does not call the Subject API and several dashboard fields are not returned by `dashboardService.js`.
 
 ---
 
@@ -180,7 +180,7 @@ Every actionable Home element must be tested.
 
 **Review Notes:**
 
-> 
+> No automated visual or viewport test was run. Browser verification remains required for mobile, tablet, and desktop layouts.
 
 ---
 
@@ -197,23 +197,23 @@ Every actionable Home element must be tested.
 
 **Review Notes:**
 
-> 
+> Static accessibility review found several meaningful labels and form labels. Keyboard traversal, focus visibility, contrast, and screen-reader behavior were not formally tested.
 
 ---
 
 ## 10. Error / Empty / Loading / Success Review
 
-- [ ] Loading state reviewed.
-- [ ] Empty state reviewed.
-- [ ] Error state reviewed.
-- [ ] Success/normal state reviewed.
-- [ ] API failure does not produce a blank screen.
-- [ ] User receives a clear next action.
-- [ ] Retry behavior works where applicable.
+- [x] Loading state reviewed.
+- [x] Empty state reviewed.
+- [x] Error state reviewed.
+- [x] Success/normal state reviewed.
+- [x] API failure does not produce a blank screen.
+- [x] User receives a clear next action.
+- [x] Retry behavior works where applicable.
 
 **Review Notes:**
 
-> 
+> Implementation paths exist for loading, empty, error, and success states. Runtime browser verification remains pending.
 
 ---
 
@@ -233,25 +233,25 @@ Every actionable Home element must be tested.
 
 **Review Notes:**
 
-> 
+> The server regression suite passed 14/14. This is not a complete Phase 1 flow test, so final regression sign-off remains open.
 
 ---
 
 ## 12. Code Review
 
 - [ ] Only relevant files were changed.
-- [ ] Existing components were reused.
+- [x] Existing components were reused.
 - [ ] No unnecessary duplication.
 - [ ] No unnecessary refactoring.
-- [ ] Code follows existing project conventions.
-- [ ] No hardcoded secrets.
-- [ ] No debug code left unnecessarily.
+- [x] Code follows existing project conventions in the reviewed paths.
+- [x] No hardcoded secrets.
+- [x] No debug code left unnecessarily.
 - [ ] No TODO that blocks Phase 2 completion.
-- [ ] Comments are useful and accurate.
+- [x] Comments are useful and accurate.
 
 **Review Notes:**
 
-> 
+> Scope and data-completeness issues remain. The frontend build passed; backend syntax checks passed; the existing server test suite passed 14/14.
 
 ---
 
@@ -260,15 +260,15 @@ Every actionable Home element must be tested.
 - [ ] Home/Dashboard is fully implemented.
 - [ ] Every Home-page action is functional.
 - [ ] Every Home-page action redirects to its correct route.
-- [ ] Loading state works.
-- [ ] Empty state works.
-- [ ] Error state works.
-- [ ] Authenticated user data works.
+- [x] Loading state works in the implementation.
+- [x] Empty state works in the implementation.
+- [x] Error state works in the implementation.
+- [x] Authenticated user data works when returned by the API.
 - [ ] Responsive layouts work.
-- [ ] Authentication regression testing passed.
-- [ ] API integration testing passed.
+- [x] Authentication security regression testing passed.
+- [ ] API integration testing passed end to end.
 - [ ] No unrelated phase was modified.
-- [ ] Documentation is updated.
+- [x] Documentation is updated.
 - [ ] No critical blocker remains.
 
 ---
@@ -277,7 +277,10 @@ Every actionable Home element must be tested.
 
 | ID | Issue | Severity | Owner | Status |
 |---|---|---|---|---|
-| | | | | |
+| P2-001 | Create Subject UI does not call `POST /api/subjects`; success is simulated and data may disappear after refresh. | High | Phase 2 developer | Open |
+| P2-002 | Dashboard uses hardcoded/fallback revision, readiness, mastery, recommendation, accuracy, ranking, and XP values. | High | Phase 2 developer | Open |
+| P2-003 | Syllabus Setup file selection and AI processing are frontend-only mock states. | Medium | Future phase owner | Open / out of Phase 2 scope |
+| P2-004 | Browser responsive, accessibility, navigation, and full authentication regression checks are not recorded. | Medium | Reviewer | Open |
 
 ---
 
@@ -287,16 +290,18 @@ Every actionable Home element must be tested.
 
 - [ ] Approved
 - [ ] Approved with minor fixes
-- [ ] Changes required
+- [x] Changes required
 - [ ] Blocked
 
 ### Reviewer Comments
 
-> 
+> Phase 2 has a substantial Home/Dashboard implementation and the available automated checks pass, but it is not ready for final approval. Persist subject creation, remove misleading dashboard fallbacks, and complete browser verification before sign-off.
 
 ### Required Follow-up
 
-> 
+> 1. Connect the Create Subject modal to `POST /api/subjects` and handle API failure.
+> 2. Return real dashboard metrics or show unavailable states instead of demo values.
+> 3. Run and record desktop, tablet, mobile, navigation, accessibility, and full authentication regression checks.
 
 ---
 
@@ -304,6 +309,6 @@ Every actionable Home element must be tested.
 
 | Role | Name | Date | Status |
 |---|---|---|---|
-| Developer | | | |
+| Developer | Bikram Singh Bisht | 08 September 2026 | Changes required |
 | Reviewer | | | |
 | Team Lead | | | |
