@@ -395,7 +395,7 @@ const Home = () => {
                     Create your first subject or upload a syllabus to build your personalized revision system.
                   </p>
                   <div className={styles.emptyStateActions}>
-                    <button className={styles.emptyStateCreateBtn} onClick={() => setIsCreateModalOpen(true)}>
+                    <button className={styles.emptyStateCreateBtn} onClick={() => navigate('/subjects/create')}>
                       <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                         add
                       </span>
@@ -472,7 +472,7 @@ const Home = () => {
                           <div className={styles.emptySubjectsNotice}>
                             <p style={{ margin: '0 0 12px 0' }}>No subjects available yet.</p>
                             <button
-                              onClick={() => navigate('/syllabus-setup')}
+                              onClick={() => navigate('/subjects/create')}
                               className={styles.emptyStateCreateBtn}
                               style={{ padding: '8px 16px', fontSize: '13px', margin: '0 auto' }}
                             >
@@ -485,9 +485,15 @@ const Home = () => {
                             const icons = ['database', 'router', 'memory'];
                             const themeColor = colors[idx % colors.length];
                             const iconName = icons[idx % icons.length];
+                            const targetSubId = subject._id || subject.id || 'dbms';
 
                             return (
-                              <div key={subject._id || subject.id || idx} className={styles.subjectCard}>
+                              <div
+                                key={targetSubId}
+                                className={styles.subjectCard}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => navigate(`/subjects/${targetSubId}`)}
+                              >
                                 <div className={styles.subjectHeader}>
                                   <div className={styles.subjectIconBox} style={{ backgroundColor: themeColor + '20', color: themeColor }}>
                                     <span className="material-symbols-outlined">{iconName}</span>
@@ -506,9 +512,12 @@ const Home = () => {
                                 </div>
                                 <button
                                   className={styles.continueBtn}
-                                  onClick={() => handleStartRevision(`subject=${encodeURIComponent(subject.name)}`)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/subjects/${targetSubId}`);
+                                  }}
                                 >
-                                  CONTINUE
+                                  WORKSPACE
                                 </button>
                               </div>
                             );

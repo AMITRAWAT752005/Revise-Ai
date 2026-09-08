@@ -12,6 +12,38 @@
 
 # Timeline Entries
 
+### Entry 6
+- **Date:** 2026-09-08
+- **Time:** 05:45 PM IST
+- **Team Member Name:** Anukool Negi
+- **Task Worked On:**
+  - Tasks 12, 13, 14, 15: Subject UX Integration (Basic Subject Workspace UI, Subject Navigation & Routing, Home -> Create Subject Integration, Home -> Upload Syllabus Integration)
+- **Changes Made:**
+  - Implemented dynamic Subject Workspace UI (`client/src/pages/SubjectWorkspace/SubjectWorkspace.jsx`) fetching real subject detail data from `GET /api/subjects/:subjectId`.
+  - Added loading spinner and error/404 handling state with retry and navigation fallback in `SubjectWorkspace.jsx` and `SubjectWorkspace.module.css`.
+  - Added `/subjects/create` protected route in `App.jsx` pointing to `Subjects` with pre-opened Create Subject modal and clean route replacement on modal dismiss/completion.
+  - Connected new-user and active-user Home creation actions ("Create Your First Subject", "+ Add First Subject") to `/subjects/create`.
+  - Connected Home syllabus upload actions to `/syllabus-setup`.
+  - Connected Home and Subjects cards to navigate directly to individual Subject Workspace at `/subjects/:subjectId`.
+- **Files Modified:**
+  - `client/src/App.jsx`
+  - `client/src/pages/Home/Home.jsx`
+  - `client/src/pages/Subjects/Subjects.jsx`
+  - `client/src/pages/SubjectWorkspace/SubjectWorkspace.jsx`
+  - `client/src/pages/SubjectWorkspace/SubjectWorkspace.module.css`
+  - `docs/Phase/Phase_3/TASKDONE.md`
+  - `docs/Phase/Phase_3/TIMELINE.md`
+- **Notes:**
+  - Phase 1 Authentication and Phase 2 backend functionality remain 100% untouched and functional.
+  - Workspace structure prepared for Phase 4 extensions without early implementation of Phase 4 flashcards/questions logic.
+- **Blockers / Risks:**
+  - None.
+- **Testing Performed & Step-by-Step Method:**
+  1. *Client Production Build Verification:* Executed `npm run build` in `client/`. Result: 79 modules transformed, 0 errors, 0 warnings.
+  2. *Subject API & UserProgress Unit Tests:* Executed `npm run test:subjects` in `server/`. Result: 5/5 tests passed.
+  3. *Phase 1 Auth Security & Throttling Regression:* Executed `npm test` in `server/`. Result: 14/14 tests passed.
+  4. *Routing & Workspace State Verification:* Verified navigation flows (`/home` -> `/subjects/create`, `/home` -> `/syllabus-setup`, `/home` -> `/subjects/:id`, `/subjects` -> `/subjects/:id`), 404/error state handling for invalid subject IDs, loading skeleton, and dynamic rendering from backend `GET /api/subjects/:id`.
+
 ### Entry 5
 - **Date:** 2026-09-08
 - **Time:** Current verification session

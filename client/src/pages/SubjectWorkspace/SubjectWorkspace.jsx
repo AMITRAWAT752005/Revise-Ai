@@ -14,9 +14,51 @@ const SubjectWorkspace = () => {
   const { subjectId } = useParams();
   const navigate = useNavigate();
   const [subjectData, setSubjectData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [expandedUnit, setExpandedUnit] = useState('u1');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [user, setUser] = useState(null);
+
+  const fetchSubject = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (!subjectId) {
+        throw new Error('No subject ID provided');
+      }
+
+      // Fetch subject details from API
+      const res = await fetch(`/api/subjects/${subjectId}`, { credentials: 'include' });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || data.error || 'Subject not found');
+      }
+
+      setSubjectData(data.subject);
+    } catch (err) {
+      console.error('Error loading subject workspace:', err);
+      // Fallback for mock dbms string if present in development
+      if (subjectId === 'dbms') {
+        setSubjectData({
+          _id: 'dbms',
+          name: 'Database Management Systems',
+          description: 'Fundamental database concepts, relational algebra, SQL, and normalization.',
+          mastery: 82,
+          totalUnits: 4,
+          totalTopics: 12,
+          totalQuestions: 150,
+          status: 'in_progress',
+        });
+        setError(null);
+      } else {
+        setError(err.message || 'Unable to load subject workspace');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -26,19 +68,6 @@ const SubjectWorkspace = () => {
       console.error(e);
     }
 
-    const fetchSubject = async () => {
-      try {
-        if (subjectId && subjectId !== 'dbms' && subjectId.length === 24) {
-          const res = await fetch(`/api/subjects/${subjectId}`, { credentials: 'include' });
-          const data = await res.json();
-          if (res.ok && data.success) {
-            setSubjectData(data.subject);
-          }
-        }
-      } catch (err) {
-        console.error('Error loading subject', err);
-      }
-    };
     fetchSubject();
   }, [subjectId]);
 
@@ -167,245 +196,286 @@ const SubjectWorkspace = () => {
         </header>
 
         <div className={styles.contentWrapper}>
-          {/* Subject Header Banner */}
-          <section className={styles.subjectBanner}>
-            <div className={styles.bannerLeft}>
-              <div className={styles.subjectBigIconBox}>
-                <span>🗄️</span>
-              </div>
-              <div>
-                <h1 className={styles.bannerTitle}>{subjectName}</h1>
-                <p className={styles.bannerSubtitle}>
-                  Your personalized {shortSubjectName} learning workspace.
-                </p>
+          {/* Loading State */}
+          {loading && (
+            <div className={styles.loadingContainer}>
+              <div className={styles.spinner}></div>
+              <p className={styles.loadingText}>Loading subject workspace...</p>
+            </div>
+          )}
+
+          {/* Error / Not Found State */}
+          {error && !loading && (
+            <div className={styles.errorContainer}>
+              <span className="material-symbols-outlined" style={{ fontSize: '56px', color: '#ba1a1a' }}>
+                cloud_off
+              </span>
+              <h2 className={styles.errorTitle}>Subject Not Found</h2>
+              <p className={styles.errorMessage}>{error}</p>
+              <div className={styles.errorActionGroup}>
+                <button className={styles.retryBtn} onClick={fetchSubject}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                    refresh
+                  </span>
+                  <span>Retry</span>
+                </button>
+                <button className={styles.backBtn} onClick={() => navigate('/subjects')}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                    arrow_back
+                  </span>
+                  <span>Back to Subjects</span>
+                </button>
               </div>
             </div>
-            <div className={styles.bannerActions}>
-              <button
-                className={styles.uploadMaterialBtn}
-                onClick={() => setIsUploadModalOpen(true)}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                  upload
-                </span>
-                <span>Upload Material</span>
-              </button>
-              <button className={styles.startRevisionBtn} onClick={handleStartRevision}>
-                <span>Start Revision</span>
-                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                  arrow_forward
-                </span>
-              </button>
-            </div>
-          </section>
+          )}
 
-          {/* Stats Row */}
-          <section className={styles.statsRow}>
-            {/* Mastery Stat */}
-            <div className={styles.statCard}>
-              <div className={styles.statCardHeader}>
-                <span className={styles.statCardLabel}>Mastery</span>
-                <span
-                  className={`material-symbols-outlined ${styles.statCardIcon}`}
-                  style={{ color: '#ffcc00', fontVariationSettings: "'FILL' 1" }}
-                >
-                  workspace_premium
-                </span>
-              </div>
-              <div className={styles.statCardNumber}>82%</div>
-              <div className={styles.xpTrack}>
-                <div className={styles.xpFill} style={{ width: '82%' }}></div>
-              </div>
-            </div>
-
-            {/* Units Stat */}
-            <div className={styles.statCard}>
-              <div className={styles.statCardHeader}>
-                <span className={styles.statCardLabel}>Units</span>
-                <span className={`material-symbols-outlined ${styles.statCardIcon}`} style={{ color: '#2a22b5' }}>
-                  view_module
-                </span>
-              </div>
-              <div className={styles.statCardNumber}>5</div>
-            </div>
-
-            {/* Topics Stat */}
-            <div className={styles.statCard}>
-              <div className={styles.statCardHeader}>
-                <span className={styles.statCardLabel}>Topics</span>
-                <span className={`material-symbols-outlined ${styles.statCardIcon}`} style={{ color: '#9026c3' }}>
-                  list_alt
-                </span>
-              </div>
-              <div className={styles.statCardNumber}>12</div>
-            </div>
-
-            {/* Revision Due Stat */}
-            <div className={`${styles.statCard} ${styles.statCardOrangeBorder}`}>
-              <div className={styles.statCardHeader}>
-                <span className={styles.statCardLabel}>Revision Due</span>
-                <span className={`material-symbols-outlined ${styles.statCardIcon}`} style={{ color: '#ff9500' }}>
-                  event_repeat
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                <span className={styles.statCardNumber}>4</span>
-                <span className={styles.statSubLabel}>Topics</span>
-              </div>
-            </div>
-          </section>
-
-          {/* Main 2-Column Layout */}
-          <div className={styles.workspaceColumns}>
-            {/* Left Column: Syllabus (60%) */}
-            <div className={styles.leftColumn}>
-              <h2 className={styles.sectionHeading}>Your Syllabus</h2>
-
-              {unitsList.map((unit) => {
-                const isExpanded = expandedUnit === unit.id;
-
-                return (
-                  <div key={unit.id} className={styles.unitCard}>
-                    <div
-                      className={styles.unitCardHeader}
-                      onClick={() => {
-                        if (unit.navPath) {
-                          navigate(unit.navPath);
-                        } else {
-                          toggleUnit(unit.id);
-                        }
-                      }}
-                    >
-                      <div className={styles.unitHeaderLeft}>
-                        <div
-                          className={`${styles.unitBadge} ${!unit.isMastered && unit.mastery === 0 ? styles.unitBadgeMuted : ''}`}
-                        >
-                          {unit.badge}
-                        </div>
-                        <div>
-                          <h3 className={styles.unitTitle}>{unit.title}</h3>
-                          <div className={styles.unitMetaRow}>
-                            <span>{unit.topicsCount} Topics</span>
-                            <div className={styles.unitProgressTrack}>
-                              <div
-                                className={styles.unitProgressFill}
-                                style={{ width: `${unit.mastery}%` }}
-                              ></div>
-                            </div>
-                            {unit.isMastered ? (
-                              <span className={styles.unitMasteredTag}>Mastered</span>
-                            ) : (
-                              <span style={{ fontWeight: 700, color: '#4441cc' }}>
-                                {unit.mastery}%
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <span className="material-symbols-outlined" style={{ color: '#464554' }}>
-                        {isExpanded ? 'expand_less' : 'expand_more'}
-                      </span>
-                    </div>
-
-                    {isExpanded && unit.topics && (
-                      <div className={styles.unitTopicsList}>
-                        {unit.topics.map((topic) => (
-                          <div
-                            key={topic.id}
-                            className={styles.topicItemRow}
-                            onClick={() =>
-                              navigate(
-                                `/subjects/${subjectId || 'dbms'}/units/normalization/topics/3nf`
-                              )
-                            }
-                          >
-                            <div className={styles.topicItemLeft}>
-                              <span
-                                className={`material-symbols-outlined ${styles.topicCheckIcon}`}
-                                style={{ fontVariationSettings: "'FILL' 1" }}
-                              >
-                                check_circle
-                              </span>
-                              <span className={styles.topicName}>{topic.name}</span>
-                            </div>
-                            <button
-                              className={styles.reviseTopicBtn}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(
-                                  `/revision?topic=${encodeURIComponent(topic.name)}`
-                                );
-                              }}
-                            >
-                              Revise
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Right Column: Smart Insights & Materials (40%) */}
-            <div className={styles.rightColumn}>
-              {/* Smart Insights Card */}
-              <div>
-                <h2 className={styles.sectionHeading}>Smart Insights</h2>
-                <div className={styles.smartInsightCard}>
-                  <div className={styles.insightHeader}>
-                    <div className={styles.insightIconCircle}>
-                      <span
-                        className="material-symbols-outlined"
-                        style={{ fontVariationSettings: "'FILL' 1", fontSize: '20px' }}
-                      >
-                        auto_awesome
-                      </span>
-                    </div>
-                    <h3 className={styles.insightTitle}>AI Study Insight</h3>
-                  </div>
-                  <p className={styles.insightBody}>
-                    You struggled with <strong>Normalization</strong> during the last quiz. I
-                    recommend reviewing the 3NF and BCNF flashcards before starting a new unit.
-                  </p>
-                  <button
-                    className={styles.reviewUnitBtn}
-                    onClick={() =>
-                      navigate(`/subjects/${subjectId || 'dbms'}/units/normalization`)
-                    }
+          {/* Workspace Loaded State */}
+          {!loading && !error && (
+            <>
+              {/* Subject Header Banner */}
+              <section className={styles.subjectBanner}>
+                <div className={styles.bannerLeft}>
+                  <div
+                    className={styles.subjectBigIconBox}
+                    style={{ backgroundColor: subjectData?.colour ? subjectData.colour + '20' : '#f5f2fe' }}
                   >
-                    Review Normalization
+                    <span>📚</span>
+                  </div>
+                  <div>
+                    <h1 className={styles.bannerTitle}>{subjectName}</h1>
+                    <p className={styles.bannerSubtitle}>
+                      {subjectData?.description || `Your personalized ${shortSubjectName} learning workspace.`}
+                    </p>
+                  </div>
+                </div>
+                <div className={styles.bannerActions}>
+                  <button
+                    className={styles.uploadMaterialBtn}
+                    onClick={() => setIsUploadModalOpen(true)}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                      upload
+                    </span>
+                    <span>Upload Material</span>
+                  </button>
+                  <button className={styles.startRevisionBtn} onClick={handleStartRevision}>
+                    <span>Start Revision</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                      arrow_forward
+                    </span>
                   </button>
                 </div>
-              </div>
+              </section>
 
-              {/* Study Materials */}
-              <div>
-                <h2 className={styles.sectionHeading}>Study Materials</h2>
-                <div className={styles.materialsGrid}>
-                  {studyMaterials.map((mat) => (
-                    <div
-                      key={mat.id}
-                      className={styles.materialCard}
-                      onClick={() => setIsUploadModalOpen(true)}
+              {/* Stats Row */}
+              <section className={styles.statsRow}>
+                {/* Mastery Stat */}
+                <div className={styles.statCard}>
+                  <div className={styles.statCardHeader}>
+                    <span className={styles.statCardLabel}>Mastery</span>
+                    <span
+                      className={`material-symbols-outlined ${styles.statCardIcon}`}
+                      style={{ color: '#ffcc00', fontVariationSettings: "'FILL' 1" }}
                     >
-                      <div className={styles.materialCardTop}>
-                        <div className={`${styles.materialIconBadge} ${mat.iconClass}`}>
-                          <span className="material-symbols-outlined">{mat.icon}</span>
+                      workspace_premium
+                    </span>
+                  </div>
+                  <div className={styles.statCardNumber}>{subjectData?.mastery ?? 0}%</div>
+                  <div className={styles.xpTrack}>
+                    <div className={styles.xpFill} style={{ width: `${subjectData?.mastery ?? 0}%` }}></div>
+                  </div>
+                </div>
+
+                {/* Units Stat */}
+                <div className={styles.statCard}>
+                  <div className={styles.statCardHeader}>
+                    <span className={styles.statCardLabel}>Units</span>
+                    <span className={`material-symbols-outlined ${styles.statCardIcon}`} style={{ color: '#2a22b5' }}>
+                      view_module
+                    </span>
+                  </div>
+                  <div className={styles.statCardNumber}>{subjectData?.totalUnits ?? 4}</div>
+                </div>
+
+                {/* Topics Stat */}
+                <div className={styles.statCard}>
+                  <div className={styles.statCardHeader}>
+                    <span className={styles.statCardLabel}>Topics</span>
+                    <span className={`material-symbols-outlined ${styles.statCardIcon}`} style={{ color: '#9026c3' }}>
+                      list_alt
+                    </span>
+                  </div>
+                  <div className={styles.statCardNumber}>{subjectData?.totalTopics ?? 12}</div>
+                </div>
+
+                {/* Questions Stat */}
+                <div className={`${styles.statCard} ${styles.statCardOrangeBorder}`}>
+                  <div className={styles.statCardHeader}>
+                    <span className={styles.statCardLabel}>Questions</span>
+                    <span className={`material-symbols-outlined ${styles.statCardIcon}`} style={{ color: '#ff9500' }}>
+                      quiz
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                    <span className={styles.statCardNumber}>{subjectData?.totalQuestions ?? 150}</span>
+                    <span className={styles.statSubLabel}>Qs</span>
+                  </div>
+                </div>
+              </section>
+
+              {/* Main 2-Column Layout */}
+              <div className={styles.workspaceColumns}>
+                {/* Left Column: Syllabus (60%) */}
+                <div className={styles.leftColumn}>
+                  <h2 className={styles.sectionHeading}>Your Syllabus</h2>
+
+                  {unitsList.map((unit) => {
+                    const isExpanded = expandedUnit === unit.id;
+
+                    return (
+                      <div key={unit.id} className={styles.unitCard}>
+                        <div
+                          className={styles.unitCardHeader}
+                          onClick={() => {
+                            if (unit.navPath) {
+                              navigate(unit.navPath);
+                            } else {
+                              toggleUnit(unit.id);
+                            }
+                          }}
+                        >
+                          <div className={styles.unitHeaderLeft}>
+                            <div
+                              className={`${styles.unitBadge} ${!unit.isMastered && unit.mastery === 0 ? styles.unitBadgeMuted : ''}`}
+                            >
+                              {unit.badge}
+                            </div>
+                            <div>
+                              <h3 className={styles.unitTitle}>{unit.title}</h3>
+                              <div className={styles.unitMetaRow}>
+                                <span>{unit.topicsCount} Topics</span>
+                                <div className={styles.unitProgressTrack}>
+                                  <div
+                                    className={styles.unitProgressFill}
+                                    style={{ width: `${unit.mastery}%` }}
+                                  ></div>
+                                </div>
+                                {unit.isMastered ? (
+                                  <span className={styles.unitMasteredTag}>Mastered</span>
+                                ) : (
+                                  <span style={{ fontWeight: 700, color: '#4441cc' }}>
+                                    {unit.mastery}%
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <span className="material-symbols-outlined" style={{ color: '#464554' }}>
+                            {isExpanded ? 'expand_less' : 'expand_more'}
+                          </span>
                         </div>
-                        <span className="material-symbols-outlined" style={{ color: '#777586' }}>
-                          more_vert
-                        </span>
+
+                        {isExpanded && unit.topics && (
+                          <div className={styles.unitTopicsList}>
+                            {unit.topics.map((topic) => (
+                              <div
+                                key={topic.id}
+                                className={styles.topicItemRow}
+                                onClick={() =>
+                                  navigate(
+                                    `/subjects/${subjectId || 'dbms'}/units/normalization/topics/3nf`
+                                  )
+                                }
+                              >
+                                <div className={styles.topicItemLeft}>
+                                  <span
+                                    className={`material-symbols-outlined ${styles.topicCheckIcon}`}
+                                    style={{ fontVariationSettings: "'FILL' 1" }}
+                                  >
+                                    check_circle
+                                  </span>
+                                  <span className={styles.topicName}>{topic.name}</span>
+                                </div>
+                                <button
+                                  className={styles.reviseTopicBtn}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(
+                                      `/revision?topic=${encodeURIComponent(topic.name)}`
+                                    );
+                                  }}
+                                >
+                                  Revise
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <h4 className={styles.materialTitle}>{mat.title}</h4>
-                      <p className={styles.materialSub}>{mat.sub}</p>
+                    );
+                  })}
+                </div>
+
+                {/* Right Column: Smart Insights & Materials (40%) */}
+                <div className={styles.rightColumn}>
+                  {/* Smart Insights Card */}
+                  <div>
+                    <h2 className={styles.sectionHeading}>Smart Insights</h2>
+                    <div className={styles.smartInsightCard}>
+                      <div className={styles.insightHeader}>
+                        <div className={styles.insightIconCircle}>
+                          <span
+                            className="material-symbols-outlined"
+                            style={{ fontVariationSettings: "'FILL' 1", fontSize: '20px' }}
+                          >
+                            auto_awesome
+                          </span>
+                        </div>
+                        <h3 className={styles.insightTitle}>AI Study Insight</h3>
+                      </div>
+                      <p className={styles.insightBody}>
+                        You struggled with <strong>Normalization</strong> during the last quiz. I
+                        recommend reviewing the 3NF and BCNF flashcards before starting a new unit.
+                      </p>
+                      <button
+                        className={styles.reviewUnitBtn}
+                        onClick={() =>
+                          navigate(`/subjects/${subjectId || 'dbms'}/units/normalization`)
+                        }
+                      >
+                        Review Normalization
+                      </button>
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Study Materials */}
+                  <div>
+                    <h2 className={styles.sectionHeading}>Study Materials</h2>
+                    <div className={styles.materialsGrid}>
+                      {studyMaterials.map((mat) => (
+                        <div
+                          key={mat.id}
+                          className={styles.materialCard}
+                          onClick={() => setIsUploadModalOpen(true)}
+                        >
+                          <div className={styles.materialCardTop}>
+                            <div className={`${styles.materialIconBadge} ${mat.iconClass}`}>
+                              <span className="material-symbols-outlined">{mat.icon}</span>
+                            </div>
+                            <span className="material-symbols-outlined" style={{ color: '#777586' }}>
+                              more_vert
+                            </span>
+                          </div>
+                          <h4 className={styles.materialTitle}>{mat.title}</h4>
+                          <p className={styles.materialSub}>{mat.sub}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </main>
 

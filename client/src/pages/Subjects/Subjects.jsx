@@ -11,7 +11,7 @@ import styles from './Subjects.module.css';
  * - Task 12: Subjects - Populated State
  * - Task 16: Mobile Views
  */
-const Subjects = () => {
+const Subjects = ({ initialCreateModalOpen = false }) => {
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,13 @@ const Subjects = () => {
   const [activeFilter, setActiveFilter] = useState('all');
 
   // Modals
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(initialCreateModalOpen);
+
+  useEffect(() => {
+    if (initialCreateModalOpen) {
+      setIsCreateModalOpen(true);
+    }
+  }, [initialCreateModalOpen]);
 
   // Fetch subjects from backend
   const fetchSubjects = async () => {
@@ -499,8 +505,18 @@ const Subjects = () => {
       {/* Modals */}
       <CreateSubjectModal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateSubjectSubmit}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          if (window.location.pathname === '/subjects/create') {
+            navigate('/subjects', { replace: true });
+          }
+        }}
+        onSubmit={async (formData) => {
+          await handleCreateSubjectSubmit(formData);
+          if (window.location.pathname === '/subjects/create') {
+            navigate('/subjects', { replace: true });
+          }
+        }}
       />
     </div>
   );

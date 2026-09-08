@@ -30,6 +30,7 @@ function App() {
           <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/syllabus-setup" element={<ProtectedRoute><SyllabusSetup /></ProtectedRoute>} />
           <Route path="/subjects" element={<ProtectedRoute><Subjects /></ProtectedRoute>} />
+          <Route path="/subjects/create" element={<ProtectedRoute><Subjects initialCreateModalOpen={true} /></ProtectedRoute>} />
           <Route path="/subjects/:subjectId" element={<ProtectedRoute><SubjectWorkspace /></ProtectedRoute>} />
           <Route path="/subjects/:subjectId/units/:unitId" element={<ProtectedRoute><UnitDetail /></ProtectedRoute>} />
           <Route path="/subjects/:subjectId/units/:unitId/topics/:topicId" element={<ProtectedRoute><TopicDetail /></ProtectedRoute>} />

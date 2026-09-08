@@ -727,3 +727,104 @@
     display: none;
   }
 }
+
+/* Loading & Error States */
+.loadingContainer {
+  padding: 80px 20px;
+  text-align: center;
+  color: #464554;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #e4e1ed;
+  border-top-color: #5e5ce6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.loadingText {
+  font-size: 15px;
+  font-weight: 500;
+  color: #464554;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.errorContainer {
+  padding: 60px 20px;
+  text-align: center;
+  background-color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #c7c4d7;
+  box-shadow: 0 4px 20px rgba(94, 92, 230, 0.05);
+  max-width: 540px;
+  margin: 40px auto;
+}
+
+.errorTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1b1b23;
+  margin: 12px 0 8px 0;
+}
+
+.errorMessage {
+  font-size: 14px;
+  color: #464554;
+  margin-bottom: 24px;
+}
+
+.errorActionGroup {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.retryBtn {
+  background-color: #5e5ce6;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.retryBtn:hover {
+  background-color: #4441cc;
+}
+
+.backBtn {
+  background-color: #eae6f2;
+  color: #1b1b23;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background-color: #c7c4d7;
+}
