@@ -174,3 +174,30 @@ export const deleteSubjectController = async (req, res) => {
   }
 };
 
+export const getSubjectByIdController = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { subjectId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(subjectId)) {
+      return res.status(400).json({ success: false, error: 'Invalid subject ID format.' });
+    }
+
+    const subject = await Subject.findOne({ _id: subjectId, userId });
+    if (!subject) {
+      return res.status(404).json({ success: false, error: 'Subject not found.' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Subject fetched successfully',
+      subject,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Server error retrieving subject.',
+    });
+  }
+};
+
