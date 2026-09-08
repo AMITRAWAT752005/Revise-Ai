@@ -8,14 +8,6 @@ import {
 
 const getUserId = (req) => req.user.id;
 
-const handleControllerError = (res, next, error) => {
-  if (next) return next(error);
-  return res.status(error.statusCode || 500).json({
-    success: false,
-    error: error.message || 'Subject operation failed.',
-  });
-};
-
 export const createSubjectController = async (req, res, next) => {
   try {
     const result = await createSubject(getUserId(req), req.body);
@@ -26,7 +18,7 @@ export const createSubjectController = async (req, res, next) => {
       progress: result.progress,
     });
   } catch (error) {
-    return handleControllerError(res, next, error);
+    return next(error);
   }
 };
 
@@ -40,7 +32,7 @@ export const listSubjectsController = async (req, res, next) => {
       progress: result.progress,
     });
   } catch (error) {
-    return handleControllerError(res, next, error);
+    return next(error);
   }
 };
 
@@ -49,7 +41,7 @@ export const getSubjectByIdController = async (req, res, next) => {
     const subject = await getSubject(getUserId(req), req.params.subjectId);
     return res.status(200).json({ success: true, subject });
   } catch (error) {
-    return handleControllerError(res, next, error);
+    return next(error);
   }
 };
 
@@ -62,7 +54,7 @@ export const updateSubjectController = async (req, res, next) => {
       subject,
     });
   } catch (error) {
-    return handleControllerError(res, next, error);
+    return next(error);
   }
 };
 
@@ -75,7 +67,7 @@ export const deleteSubjectController = async (req, res, next) => {
       progress: result.progress,
     });
   } catch (error) {
-    return handleControllerError(res, next, error);
+    return next(error);
   }
 };
 

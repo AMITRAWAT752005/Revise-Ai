@@ -51,6 +51,7 @@ Home
 - [x] Added `{ userId: 1 }` and unique case-insensitive `{ userId: 1, name: 1 }` indexes.
 - [x] Verified invalid IDs, duplicate names, ownership isolation, update allowlists, and sanitized responses.
 - [x] Verified delete operations synchronize `UserProgress.subjectCount`.
+- [x] Verified validation, duplicate, ownership, and CastError responses use the required 400/404 statuses.
 
 ---
 
@@ -139,7 +140,7 @@ Home
 - [x] Test manual subject creation.
 - [x] Test subject retrieval.
 - [x] Test subject detail access.
-- [ ] Test subject update.
+- [x] Test subject update.
 - [x] Test subject delete/archive.
 - [x] Test ownership isolation between users.
 - [x] Test empty and populated Subjects dashboard states.

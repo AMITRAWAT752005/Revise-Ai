@@ -12,6 +12,36 @@
 
 # Timeline Entries
 
+### Entry 3
+- **Date:** 2026-09-08
+- **Time:** 12:10 PM IST
+- **Team Member Name:** Amit Rawat
+- **Task Worked On:**
+  - Error Handling Fix for Subject Module
+- **Changes Made:**
+  - Fixed global error middleware to respect `error.statusCode` instead of returning all errors as 500.
+  - Added 400 handling for Mongoose `CastError` cases.
+  - Ensured Subject controllers forward errors through `next(error)`.
+  - Returned structured `{ success: false, message }` error responses without stack traces or internal 500 details.
+- **Files Modified:**
+  - `server/src/middleware/errorMiddleware.js`
+  - `server/src/controllers/subjectController.js`
+- **Notes:**
+  - Fixed incorrect 500 responses for validation and authorization errors.
+  - No Subject business logic, authentication logic, database schema, or API success contracts were changed.
+- **Blockers / Risks:**
+  - The legacy direct-controller subject test mock does not provide Express `next(error)` and reports two harness failures; production HTTP tests pass.
+- **Testing Performed:**
+  1. Retested empty subject-name validation: 400.
+  2. Retested duplicate subject creation: 400.
+  3. Retested cross-user subject detail access: 404.
+  4. Retested cross-user subject update: 404.
+  5. Retested invalid ObjectId handling: 400.
+  6. Verified structured error responses and no stack traces in responses.
+  7. Ran authentication regression tests: 14/14 passed.
+  8. Ran syntax checks and workspace diagnostics: passed.
+  9. All previously failing API tests now pass.
+
 ### Entry 2
 - **Date:** 2026-09-08
 - **Time:** 11:29 AM IST
