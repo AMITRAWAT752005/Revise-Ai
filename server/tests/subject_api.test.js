@@ -13,7 +13,7 @@ import { ensureUserProgress, syncSubjectCount } from '../src/services/userProgre
 const createMockReqRes = ({ userId, body = {}, params = {}, query = {} } = {}) => {
   const req = {
     userId,
-    user: { _id: userId },
+    user: { _id: userId, id: userId },
     body,
     params,
     query,
@@ -32,7 +32,14 @@ const createMockReqRes = ({ userId, body = {}, params = {}, query = {} } = {}) =
     },
   };
 
-  return { req, res };
+  const next = (error) => {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      error: error.message,
+    });
+  };
+
+  return { req, res, next };
 };
 
 let passed = 0;
@@ -61,16 +68,16 @@ const mockUserB = new mongoose.Types.ObjectId().toString();
 console.log('--- Suite 1: Input Validation & Duplicate Enforcement (Task 8) ---');
 
 await runTest('Rejects subject creation with missing name (400)', async () => {
-  const { req, res } = createMockReqRes({ userId: mockUserA, body: {} });
-  await createSubjectController(req, res);
+  const { req, res, next } = createMockReqRes({ userId: mockUserA, body: {} });
+  await createSubjectController(req, res, next);
   assert.strictEqual(res.statusCode, 400);
   assert.strictEqual(res.body.success, false);
   assert.strictEqual(res.body.error, 'Subject name is required.');
 });
 
 await runTest('Rejects subject creation with empty whitespace name (400)', async () => {
-  const { req, res } = createMockReqRes({ userId: mockUserA, body: { name: '   ' } });
-  await createSubjectController(req, res);
+  const { req, res, next } = createMockReqRes({ userId: mockUserA, body: { name: '   ' } });
+  await createSubjectController(req, res, next);
   assert.strictEqual(res.statusCode, 400);
   assert.strictEqual(res.body.success, false);
   assert.strictEqual(res.body.error, 'Subject name is required.');

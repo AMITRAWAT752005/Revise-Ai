@@ -3,9 +3,9 @@
 
 ## Phase Status
 
-🟡 **Planned**
+🟡 **In Progress**
 
-> No Phase 3 implementation work has been completed yet. Tasks must be marked `[x]` only after implementation and verification.
+> Subject management was completed earlier. Syllabus processing and confirmed-subject creation are implemented in part; unchecked items still require environment-backed verification.
 
 ---
 
@@ -98,7 +98,7 @@ Home
 - [ ] Associate uploaded syllabus processing with the authenticated user.
 - [ ] Support digital PDF syllabus text extraction.
 - [ ] Support DOCX text extraction where required by the design.
-- [ ] Support TXT text extraction where required by the design.
+- [x] Support TXT text extraction where required by the design.
 - [ ] Add OCR fallback when a syllabus contains no usable text.
 - [ ] Track syllabus processing states: uploaded, processing, completed, and failed.
 - [ ] Provide clear frontend feedback for processing states and failures.
@@ -109,10 +109,10 @@ Home
 
 - [ ] Analyze extracted syllabus text with the approved AI/LLM pipeline.
 - [ ] Restrict AI responsibility to identifying academic subjects.
-- [ ] Require structured subject output.
-- [ ] Validate structured AI output before use.
-- [ ] Remove invalid subjects.
-- [ ] Deduplicate detected subjects.
+- [x] Require structured subject output.
+- [x] Validate structured AI output before use.
+- [x] Remove invalid subjects.
+- [x] Deduplicate detected subjects.
 - [ ] Prevent malformed AI output from being stored.
 - [ ] Show detected subjects to the user for confirmation.
 - [ ] Allow users to select, deselect, or review detected subjects.
@@ -147,9 +147,9 @@ Home
 - [x] Test syllabus upload validation.
 - [ ] Test PDF, DOCX, and TXT extraction where supported.
 - [ ] Test OCR fallback.
-- [ ] Test AI structured-output validation and deduplication.
-- [x] Test detected-subject confirmation flow.
-- [x] Test processing success and failure states.
+- [x] Test AI structured-output validation and deduplication.
+- [ ] Test detected-subject confirmation flow.
+- [ ] Test processing success and failure states.
 - [x] Test desktop, tablet, and mobile layouts.
 - [x] Test keyboard and accessibility behavior.
 - [x] Verify Phase 1 authentication remains intact.

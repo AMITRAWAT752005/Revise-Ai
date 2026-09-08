@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import SideNavBar from '../../components/Navigation/SideNavBar';
 import BottomNavBar from '../../components/Navigation/BottomNavBar';
 import CreateSubjectModal from '../../components/CreateSubjectModal/CreateSubjectModal';
-import UploadSyllabusModal from '../../components/UploadSyllabusModal/UploadSyllabusModal';
 import styles from './Subjects.module.css';
 
 /**
@@ -25,7 +24,6 @@ const Subjects = () => {
 
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   // Fetch subjects from backend
   const fetchSubjects = async () => {
@@ -240,7 +238,7 @@ const Subjects = () => {
                 </button>
                 <button
                   className={styles.uploadSyllabusBtn}
-                  onClick={() => setIsUploadModalOpen(true)}
+                  onClick={() => navigate('/syllabus-setup')}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                     upload_file
@@ -265,7 +263,7 @@ const Subjects = () => {
                 <div className={styles.heroActionGroup}>
                   <button
                     className={styles.uploadSyllabusBtn}
-                    onClick={() => setIsUploadModalOpen(true)}
+                    onClick={() => navigate('/syllabus-setup')}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                       upload
@@ -503,11 +501,6 @@ const Subjects = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreateSubjectSubmit}
-      />
-      <UploadSyllabusModal
-        isOpen={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
-        onUploadComplete={() => fetchSubjects()}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import authRoutes from './routes/authRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import subjectRoutes from './routes/subjectRoutes.js';
+import syllabusRoutes from './routes/syllabusRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
@@ -34,6 +35,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/subjects', subjectRoutes);
+app.use('/api/syllabus', syllabusRoutes);
 
 // Global Error Handler Middleware
 app.use(errorHandler);

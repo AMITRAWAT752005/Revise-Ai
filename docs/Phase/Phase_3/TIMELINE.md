@@ -12,6 +12,75 @@
 
 # Timeline Entries
 
+### Entry 5
+- **Date:** 2026-09-08
+- **Time:** Current verification session
+- **Team Member Name:** Bikram Singh
+- **Task Worked On:**
+  - Phase 3 syllabus and subject-management verification
+- **Testing Performed:**
+  1. Ran `npm test`: 14/14 Phase 1 authentication tests passed.
+  2. Ran `npm run test:subjects`: 5/5 Subject API tests passed after correcting the legacy Express test mock.
+  3. Ran `npm run test:syllabus`: focused syllabus tests passed.
+  4. Ran the client production build successfully.
+  5. Ran server syntax checks and workspace diagnostics successfully.
+  6. Sent a minimal request to Groq; HTTP 200 confirmed the configured `openai/gpt-oss-120b` model and key are accepted.
+  7. Ran the real subject-extraction prompt against Groq; validation returned 2 subjects successfully.
+  8. Attempted MongoDB ping; it failed with `querySrv ECONNREFUSED` while resolving the configured Atlas SRV hostname.
+- **Files Modified:**
+  - `server/tests/subject_api.test.js`
+  - `server/src/services/aiSubjectService.js`
+- **Notes:**
+  - AI provider configuration and subject extraction are verified independently.
+  - Full authenticated upload, import persistence, confirmation, and UserProgress verification cannot pass until MongoDB DNS/network access is restored.
+- **Blockers / Risks:**
+  - MongoDB Atlas SRV DNS resolution is currently unavailable from this environment; do not mark end-to-end syllabus tasks complete yet.
+
+### Entry 4
+- **Date:** 2026-09-08
+- **Time:** 12:51 PM IST
+- **Team Member Name:** Bikram Singh
+- **Task Worked On:**
+  - Tasks 1–7: Syllabus upload, extraction, OCR fallback, AI subject validation, and pipeline integration
+  - Task 22: Confirmed Subject Creation
+- **Changes Made:**
+  - Added the authenticated `SyllabusImport` model with lifecycle state, file metadata, temporary detected subjects, errors, timestamps, and user indexes.
+  - Added protected upload, import-status, and confirmation endpoints under `/api/syllabus`.
+  - Added PDF, DOCX, and TXT extraction services with usable-text checks and scanned-PDF OCR fallback.
+  - Added server-side, configurable structured AI subject extraction with schema validation and case-insensitive deduplication.
+  - Added confirmation validation that accepts only subjects detected for the authenticated import, then reuses the existing Subject creation service and UserProgress synchronization.
+  - Connected the Phase 3 Syllabus Setup screen to upload, processing status, detected-subject selection, and confirmation APIs.
+- **Files Created:**
+  - `server/src/models/SyllabusImport.js`
+  - `server/src/services/syllabusExtractionService.js`
+  - `server/src/services/aiSubjectService.js`
+  - `server/src/services/syllabusService.js`
+  - `server/src/controllers/syllabusController.js`
+  - `server/src/routes/syllabusRoutes.js`
+  - `server/tests/syllabus_pipeline.test.js`
+  - `server/uploads/syllabus/.gitkeep`
+- **Files Modified:**
+  - `server/src/app.js`
+  - `server/package.json`
+  - `server/package-lock.json`
+  - `server/.env.example`
+  - `.gitignore`
+  - `client/src/pages/SyllabusSetup/SyllabusSetup.jsx`
+  - `docs/Phase/Phase_3/TASKDONE.md`
+- **Notes:**
+  - Phase 1 authentication and Phase 2 dashboard/UserProgress implementation files were not modified.
+  - Uploaded files are stored temporarily and removed after processing; AI credentials remain server-side.
+- **Blockers / Risks:**
+  - Live MongoDB-backed API verification and live AI-provider verification require environment credentials/configuration.
+  - PDF/DOCX/OCR integration tests were not marked complete because representative files and an OCR runtime test were not available in this session.
+  - Existing `test:subjects` still has two legacy direct-controller harness failures because its mocks omit Express `next(error)`.
+- **Testing Performed:**
+  1. Ran `npm run test:syllabus`; focused extraction, schema, AI structured-output, invalid-output, and deduplication checks passed.
+  2. Ran server syntax checks for all new model, service, controller, route, and app files.
+  3. Ran the client production build; Vite completed with 0 errors.
+  4. Ran `npm test`; all 14 Phase 1 authentication security tests passed.
+  5. Ran workspace diagnostics on the changed source files; no errors were reported.
+
 ### Entry 3
 - **Date:** 2026-09-08
 - **Time:** 12:10 PM IST

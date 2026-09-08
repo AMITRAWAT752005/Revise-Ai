@@ -1,3 +1,5 @@
+server/uploads/syllabus/*
+!server/uploads/syllabus/.gitkeep
 node_modules/
 .env
 dist/

@@ -11,7 +11,10 @@ const SyllabusSetup = () => {
   const [activeStep, setActiveStep] = useState('step-1-upload');
   const [selectedFile, setSelectedFile] = useState(null);
   const [analysisProgress, setAnalysisProgress] = useState(72);
-  const [selectedSubjects, setSelectedSubjects] = useState(['dbms', 'cn', 'os', 'se']);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [detectedSubjects, setDetectedSubjects] = useState([]);
+  const [importId, setImportId] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
@@ -40,13 +43,74 @@ const SyllabusSetup = () => {
     }
   };
 
-  // Mock subject dataset matching Stitch design
-  const availableSubjects = [
-    { id: 'dbms', title: 'Database Management Systems', code: 'CS301', topics: 12, difficulty: 'Medium', coverage: '85%' },
-    { id: 'cn', title: 'Computer Networks', code: 'CS302', topics: 14, difficulty: 'Hard', coverage: '90%' },
-    { id: 'os', title: 'Operating Systems', code: 'CS303', topics: 10, difficulty: 'Medium', coverage: '80%' },
-    { id: 'se', title: 'Software Engineering', code: 'CS304', topics: 8, difficulty: 'Easy', coverage: '75%' },
-  ];
+  const availableSubjects = detectedSubjects;
+
+  const handleAnalyze = async () => {
+    if (!selectedFile) return;
+    setActiveStep('step-2-analysis');
+    setErrorMessage('');
+    setAnalysisProgress(10);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      const uploadResponse = await fetch('/api/syllabus/upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      const uploadData = await uploadResponse.json();
+      if (!uploadResponse.ok) throw new Error(uploadData.message || 'Unable to upload syllabus.');
+
+      setImportId(uploadData.importId);
+      setAnalysisProgress(35);
+      let completedImport;
+      for (let attempt = 0; attempt < 60; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const statusResponse = await fetch(`/api/syllabus/${uploadData.importId}`, { credentials: 'include' });
+        const statusData = await statusResponse.json();
+        if (!statusResponse.ok) throw new Error(statusData.message || 'Unable to read syllabus status.');
+        if (statusData.syllabusImport.status === 'completed') {
+          completedImport = statusData.syllabusImport;
+          break;
+        }
+        if (statusData.syllabusImport.status === 'failed') {
+          throw new Error(statusData.syllabusImport.error || 'Unable to process syllabus.');
+        }
+        setAnalysisProgress(Math.min(90, 35 + attempt));
+      }
+
+      if (!completedImport) throw new Error('Syllabus processing timed out.');
+      setDetectedSubjects(completedImport.detectedSubjects || []);
+      setSelectedSubjects((completedImport.detectedSubjects || []).map((subject) => subject.name));
+      setAnalysisProgress(100);
+      setActiveStep('step-3-subjects');
+    } catch (error) {
+      setErrorMessage(error.message);
+      setActiveStep('error-state');
+    }
+  };
+
+  const handleConfirm = async () => {
+    try {
+      const response = await fetch(`/api/syllabus/${importId}/confirm`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subjects: availableSubjects
+            .filter((subject) => selectedSubjects.includes(subject.name))
+            .map(({ name, code }) => ({ name, code })),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to create confirmed subjects.');
+      setActiveStep('step-4-success');
+    } catch (error) {
+      setErrorMessage(error.message);
+      setActiveStep('error-state');
+    }
+  };
 
   const toggleSubject = (id) => {
     setSelectedSubjects((prev) =>
@@ -233,7 +297,7 @@ const SyllabusSetup = () => {
                     ref={fileInputRef}
                     className={styles.hiddenFileInput}
                     onChange={handleFileSelect}
-                    accept=".pdf,.docx,.pptx"
+                    accept=".pdf,.docx,.txt"
                   />
                   <div className={styles.illustrationBox}>
                     <span className="material-symbols-outlined" style={{ fontSize: '96px', color: '#4441cc' }}>
@@ -248,7 +312,7 @@ const SyllabusSetup = () => {
                     <span>Choose File</span>
                   </button>
 
-                  <p className={styles.formatNote}>Supported formats: PDF, DOCX, PPTX (Max 10MB)</p>
+                  <p className={styles.formatNote}>Supported formats: PDF, DOCX, TXT (Max 10MB)</p>
                 </div>
               </>
             )}
@@ -308,7 +372,7 @@ const SyllabusSetup = () => {
                   </button>
                   <button
                     className={styles.chooseFileBtn}
-                    onClick={() => setActiveStep('step-2-analysis')}
+                    onClick={handleAnalyze}
                   >
                     <span className="material-symbols-outlined">auto_awesome</span>
                     <span>Analyze Syllabus →</span>
@@ -387,17 +451,17 @@ const SyllabusSetup = () => {
                 <div className={styles.pageHeader}>
                   <h1 className={styles.mainTitle}>Select Your Subjects 📋</h1>
                   <p className={styles.subtitle}>
-                    We found 4 subjects in your syllabus. Choose which subjects you want to add to your ReviseAI workspace.
+                    We found {availableSubjects.length} subjects in your syllabus. Choose which subjects you want to add to your ReviseAI workspace.
                   </p>
                 </div>
 
                 <div className={styles.subjectSelectionList}>
                   {availableSubjects.map((sub) => {
-                    const isSelected = selectedSubjects.includes(sub.id);
+                    const isSelected = selectedSubjects.includes(sub.name);
                     return (
                       <div
-                        key={sub.id}
-                        onClick={() => toggleSubject(sub.id)}
+                        key={sub.name}
+                        onClick={() => toggleSubject(sub.name)}
                         className={`${styles.subjectCardItem} ${isSelected ? styles.subjectCardItemSelected : ''}`}
                       >
                         <div className={styles.subjectLeftGroup}>
@@ -409,17 +473,17 @@ const SyllabusSetup = () => {
                           </span>
                           <div>
                             <div className={styles.subjectTitleRow}>
-                              <h3 className={styles.subjectTitleText}>{sub.title}</h3>
-                              <span className={styles.subjectCodeBadge}>{sub.code}</span>
+                              <h3 className={styles.subjectTitleText}>{sub.name}</h3>
+                              {sub.code && <span className={styles.subjectCodeBadge}>{sub.code}</span>}
                             </div>
                             <p className={styles.subjectMetaText}>
-                              {sub.topics} Topics • Difficulty: {sub.difficulty}
+                              {sub.category || 'Academic subject'}
                             </p>
                           </div>
                         </div>
 
                         <span className={styles.coverageBadge}>
-                          {sub.coverage} Coverage
+                          Detected
                         </span>
                       </div>
                     );
@@ -431,7 +495,7 @@ const SyllabusSetup = () => {
                     className={styles.pagePill}
                     onClick={() =>
                       setSelectedSubjects((prev) =>
-                        prev.length === availableSubjects.length ? [] : availableSubjects.map((s) => s.id)
+                        prev.length === availableSubjects.length ? [] : availableSubjects.map((s) => s.name)
                       )
                     }
                   >
@@ -478,10 +542,10 @@ const SyllabusSetup = () => {
 
                   <h4 className={styles.includedSubjectsHeading}>Included Subjects:</h4>
                   <ul className={styles.includedSubjectsList}>
-                    {availableSubjects.filter((s) => selectedSubjects.includes(s.id)).map((sub) => (
-                      <li key={sub.id} className={styles.includedSubjectRow}>
-                        <span>{sub.title} ({sub.code})</span>
-                        <span style={{ color: '#4441cc' }}>{sub.topics} topics</span>
+                    {availableSubjects.filter((s) => selectedSubjects.includes(s.name)).map((sub) => (
+                      <li key={sub.name} className={styles.includedSubjectRow}>
+                        <span>{sub.name}{sub.code ? ` (${sub.code})` : ''}</span>
+                        <span style={{ color: '#4441cc' }}>Confirmed</span>
                       </li>
                     ))}
                   </ul>
@@ -489,7 +553,7 @@ const SyllabusSetup = () => {
 
                 <button
                   className={`${styles.chooseFileBtn} ${styles.confirmBtn}`}
-                  onClick={() => setActiveStep('step-4-success')}
+                  onClick={handleConfirm}
                 >
                   <span className="material-symbols-outlined">task_alt</span>
                   <span>Confirm & Build Dataset</span>
@@ -548,7 +612,7 @@ const SyllabusSetup = () => {
                   Unable to Process Syllabus
                 </h1>
                 <p className={styles.subtitle} style={{ marginBottom: '32px', maxWidth: '520px' }}>
-                  We couldn't extract subjects from the uploaded file. Please ensure the file is unencrypted and contains clear syllabus text.
+                  {errorMessage || "We couldn't extract subjects from the uploaded file. Please ensure the file is unencrypted and contains clear syllabus text."}
                 </p>
 
                 <div className={styles.errorActionGroup}>
