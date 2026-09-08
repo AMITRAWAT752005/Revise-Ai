@@ -35,16 +35,22 @@ Home
 
 # 2. Subject Model & Backend
 
-- [ ] Enhance the existing `Subject` model only where required, such as adding description support.
-- [ ] Reuse the existing `Subject` model instead of creating a duplicate model.
-- [ ] Implement manual subject creation for authenticated users.
-- [ ] Implement retrieval of the authenticated user's subjects.
-- [ ] Implement individual subject detail retrieval.
-- [ ] Implement supported subject updates: name, description, colour, and status.
-- [ ] Implement subject delete or archive according to the chosen lifecycle.
-- [ ] Enforce subject ownership on every read and mutation operation.
-- [ ] Never trust `userId` supplied by the frontend.
-- [ ] Synchronize `UserProgress` where subject operations require it.
+- [x] Enhance the existing `Subject` model with trimmed, maximum-200-character description support and minimum-length name validation.
+- [x] Reuse the existing `Subject` model instead of creating a duplicate model.
+- [x] Implement manual subject creation for authenticated users through `createSubject(userId, data)`.
+- [x] Implement retrieval of the authenticated user's subjects.
+- [x] Implement individual subject detail retrieval.
+- [x] Implement supported subject updates for name, description, and colour.
+- [x] Implement subject deletion with UserProgress synchronization.
+- [x] Enforce subject ownership on every read and mutation operation.
+- [x] Never trust `userId` supplied by the frontend.
+- [x] Synchronize `UserProgress` where subject operations require it.
+
+**Backend Verification:**
+
+- [x] Added `{ userId: 1 }` and unique case-insensitive `{ userId: 1, name: 1 }` indexes.
+- [x] Verified invalid IDs, duplicate names, ownership isolation, update allowlists, and sanitized responses.
+- [x] Verified delete operations synchronize `UserProgress.subjectCount`.
 
 ---
 
