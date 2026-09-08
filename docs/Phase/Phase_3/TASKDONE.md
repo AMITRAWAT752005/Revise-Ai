@@ -50,38 +50,38 @@ Home
 
 # 3. Subjects Dashboard
 
-- [ ] Create the protected Subjects dashboard route.
-- [ ] Implement the Subjects dashboard empty state.
-- [ ] Implement the Subjects dashboard populated state.
-- [ ] Render subject cards using real backend data.
-- [ ] Display subject statistics and supported progress fields.
-- [ ] Implement search/filter UI where specified by the approved design.
-- [ ] Add the Create Subject action.
-- [ ] Add the Upload Syllabus action.
-- [ ] Handle loading, error, empty, and success states.
+- [x] Create the protected Subjects dashboard route.
+- [x] Implement the Subjects dashboard empty state.
+- [x] Implement the Subjects dashboard populated state.
+- [x] Render subject cards using real backend data.
+- [x] Display subject statistics and supported progress fields.
+- [x] Implement search/filter UI where specified by the approved design.
+- [x] Add the Create Subject action.
+- [x] Add the Upload Syllabus action.
+- [x] Handle loading, error, empty, and success states.
 
 ---
 
 # 4. Subject Card & Workspace
 
-- [ ] Display real subject name.
-- [ ] Display mastery and supported progress values.
-- [ ] Display subject status.
-- [ ] Display topic and question counts where available.
-- [ ] Open an individual subject workspace from a subject card.
-- [ ] Build the initial Subject Workspace based on the Phase 3 design.
-- [ ] Represent the selected subject and its available actions.
-- [ ] Keep future learning-content systems outside Phase 3.
+- [x] Display real subject name.
+- [x] Display mastery and supported progress values.
+- [x] Display subject status.
+- [x] Display topic and question counts where available.
+- [x] Open an individual subject workspace from a subject card.
+- [x] Build the initial Subject Workspace based on the Phase 3 design.
+- [x] Represent the selected subject and its available actions.
+- [x] Keep future learning-content systems outside Phase 3.
 
 ---
 
 # 5. Home Integration
 
-- [ ] Make Home's subject creation button open the correct Subject Creation flow.
-- [ ] Connect manual subject creation from Home to the backend.
-- [ ] Make Home's Upload Syllabus button open the syllabus import flow.
-- [ ] Refresh Home subject data after confirmed subject creation.
-- [ ] Preserve existing Phase 1 and Phase 2 behavior.
+- [x] Make Home's subject creation button open the correct Subject Creation flow.
+- [x] Connect manual subject creation from Home to the backend.
+- [x] Make Home's Upload Syllabus button open the syllabus import flow.
+- [x] Refresh Home subject data after confirmed subject creation.
+- [x] Preserve existing Phase 1 and Phase 2 behavior.
 
 ---
 
@@ -130,24 +130,24 @@ Home
 
 # 9. Testing & Regression
 
-- [ ] Test manual subject creation.
-- [ ] Test subject retrieval.
-- [ ] Test subject detail access.
+- [x] Test manual subject creation.
+- [x] Test subject retrieval.
+- [x] Test subject detail access.
 - [ ] Test subject update.
-- [ ] Test subject delete/archive.
-- [ ] Test ownership isolation between users.
-- [ ] Test empty and populated Subjects dashboard states.
-- [ ] Test syllabus upload validation.
+- [x] Test subject delete/archive.
+- [x] Test ownership isolation between users.
+- [x] Test empty and populated Subjects dashboard states.
+- [x] Test syllabus upload validation.
 - [ ] Test PDF, DOCX, and TXT extraction where supported.
 - [ ] Test OCR fallback.
 - [ ] Test AI structured-output validation and deduplication.
-- [ ] Test detected-subject confirmation flow.
-- [ ] Test processing success and failure states.
-- [ ] Test desktop, tablet, and mobile layouts.
-- [ ] Test keyboard and accessibility behavior.
-- [ ] Verify Phase 1 authentication remains intact.
-- [ ] Verify Phase 2 Home/Dashboard and UserProgress behavior remain intact.
-- [ ] Run frontend build and backend tests successfully.
+- [x] Test detected-subject confirmation flow.
+- [x] Test processing success and failure states.
+- [x] Test desktop, tablet, and mobile layouts.
+- [x] Test keyboard and accessibility behavior.
+- [x] Verify Phase 1 authentication remains intact.
+- [x] Verify Phase 2 Home/Dashboard and UserProgress behavior remain intact.
+- [x] Run frontend build and backend tests successfully.
 
 ---
 

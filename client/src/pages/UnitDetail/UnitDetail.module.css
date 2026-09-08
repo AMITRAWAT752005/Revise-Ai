@@ -1,0 +1,587 @@
+/* ReviseAI — Unit Detail Styles */
+
+.unitLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #fcf8ff;
+  color: #1b1b23;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Mobile Top Bar */
+.mobileTopBar {
+  display: none;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #c7c4d7;
+  padding: 0 16px;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 40;
+}
+
+.mobileBrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.mobileBrandTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a22b5;
+}
+
+.mobileProfileBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Main Container */
+.mainContainer {
+  flex: 1;
+  margin-left: 256px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Top Header */
+.topHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 40px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(8px);
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #464554;
+}
+
+.breadcrumbLink {
+  color: #464554;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.breadcrumbLink:hover {
+  color: #2a22b5;
+}
+
+.breadcrumbCurrent {
+  color: #1b1b23;
+  font-weight: 700;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  color: #464554;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.iconBtn:hover {
+  background-color: #eae6f2;
+}
+
+.userAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #e2dfff;
+  border: 1px solid #c7c4d7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2a22b5;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.contentWrapper {
+  padding: 0 40px 80px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+}
+
+/* Unit Header Bento */
+.unitBentoGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+@media (min-width: 1024px) {
+  .unitBentoGrid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.unitHeroCard {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  border: 1px solid rgba(199, 196, 215, 0.4);
+  box-shadow: 0 8px 32px rgba(94, 92, 230, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.unitTagPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background-color: rgba(68, 65, 204, 0.1);
+  color: #2a22b5;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  align-self: flex-start;
+}
+
+.unitTitle {
+  font-size: 36px;
+  font-weight: 800;
+  color: #1b1b23;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+
+.unitDesc {
+  font-size: 16px;
+  color: #464554;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 600px;
+}
+
+.unitHeroActions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.startUnitRevisionBtn {
+  background-color: #5e5ce6;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.startUnitRevisionBtn:hover {
+  background-color: #2a22b5;
+  transform: translateY(-2px);
+}
+
+.downloadNotesBtn {
+  background-color: #f0edef;
+  color: #1b1b23;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1px solid #c7c4d7;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.downloadNotesBtn:hover {
+  background-color: #e4e1ed;
+}
+
+/* Stats Stack */
+.statsStack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.masteryCard {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(199, 196, 215, 0.4);
+  box-shadow: 0 8px 32px rgba(94, 92, 230, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.masteryCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.masteryLabel {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #464554;
+}
+
+.masteryNumber {
+  font-size: 40px;
+  font-weight: 800;
+  color: #2a22b5;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.sparkTrack {
+  width: 100%;
+  height: 10px;
+  background-color: #e4e1ed;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sparkFill {
+  height: 100%;
+  background: linear-gradient(135deg, #4441cc 0%, #64d2ff 100%);
+  border-radius: 9999px;
+  box-shadow: 0 0 10px rgba(100, 210, 255, 0.5);
+}
+
+.masterySubNote {
+  font-size: 12px;
+  color: #464554;
+  margin-top: 10px;
+  text-align: right;
+}
+
+.metaStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.metaCard {
+  background-color: #f5f2fe;
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid #c7c4d7;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metaCardError {
+  background-color: rgba(186, 26, 26, 0.08);
+  border-color: rgba(186, 26, 26, 0.2);
+}
+
+.metaCardVal {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1b1b23;
+}
+
+.metaCardValError {
+  color: #ba1a1a;
+}
+
+.metaCardLabel {
+  font-size: 12px;
+  color: #464554;
+}
+
+/* Topics Bento Section */
+.topicsSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.topicsSectionTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1b1b23;
+  letter-spacing: -0.01em;
+}
+
+.topicsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+}
+
+@media (min-width: 680px) {
+  .topicsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1080px) {
+  .topicsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.topicCard {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(199, 196, 215, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 230px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.topicCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(94, 92, 230, 0.12);
+}
+
+.topicCardAttention {
+  background-color: rgba(255, 218, 214, 0.25);
+  border-color: rgba(186, 26, 26, 0.3);
+}
+
+.topicTopRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.badgeStrong {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: rgba(255, 204, 0, 0.2);
+  color: #ff9500;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badgeGood {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: rgba(68, 65, 204, 0.15);
+  color: #2a22b5;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badgeProgress {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: #eae6f2;
+  color: #464554;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badgeAttention {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: #ffdad6;
+  color: #ba1a1a;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badgeStarted {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: #e4e1ed;
+  color: #464554;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.topicMasteryNumber {
+  font-size: 14px;
+  font-weight: 700;
+  color: #464554;
+}
+
+.topicMasteryNumberError {
+  color: #ba1a1a;
+}
+
+.topicCardTitle {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1b1b23;
+  margin-bottom: 8px;
+}
+
+.topicCardDesc {
+  font-size: 14px;
+  color: #464554;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.topicCardProgressTrack {
+  width: 100%;
+  height: 6px;
+  background-color: #e4e1ed;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.topicCardProgressFill {
+  height: 100%;
+  border-radius: 9999px;
+}
+
+.reviewTopicBtn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #f5f2fe;
+  color: #1b1b23;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid rgba(199, 196, 215, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.reviewTopicBtn:hover {
+  background-color: #2a22b5;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.reviewTopicBtnAttention {
+  background-color: #ba1a1a;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.reviewTopicBtnAttention:hover {
+  background-color: #93000a;
+}
+
+/* =========================================================
+   TASK 16: MOBILE RESPONSIVENESS
+   ========================================================= */
+@media (max-width: 768px) {
+  .mainContainer {
+    margin-left: 0;
+  }
+
+  .mobileTopBar {
+    display: flex;
+  }
+
+  .topHeader {
+    display: none;
+  }
+
+  .contentWrapper {
+    padding: 20px 16px 90px 16px;
+  }
+
+  .unitTitle {
+    font-size: 26px;
+  }
+
+  .unitHeroActions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .startUnitRevisionBtn,
+  .downloadNotesBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
