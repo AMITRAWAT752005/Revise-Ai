@@ -6,6 +6,13 @@ const subjectSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      minlength: 2,
+    },
+
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 200,
     },
 
     userId: {
@@ -50,6 +57,12 @@ const subjectSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
+);
+
+subjectSchema.index({ userId: 1 });
+subjectSchema.index(
+  { userId: 1, name: 1 },
+  { unique: true, collation: { locale: 'en', strength: 2 } },
 );
 
 const Subject = mongoose.model('Subject', subjectSchema);

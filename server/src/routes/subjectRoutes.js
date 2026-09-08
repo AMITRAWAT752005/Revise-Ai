@@ -4,6 +4,7 @@ import {
   createSubjectController,
   listSubjectsController,
   getSubjectByIdController,
+  updateSubjectController,
   deleteSubjectController,
 } from '../controllers/subjectController.js';
 
@@ -13,6 +14,7 @@ router.use(authenticateToken);
 router.get('/', listSubjectsController);
 router.get('/:subjectId', getSubjectByIdController);
 router.post('/', createSubjectController);
+router.put('/:subjectId', updateSubjectController);
 router.delete('/:subjectId', deleteSubjectController);
 
 export default router;
