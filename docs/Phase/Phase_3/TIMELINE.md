@@ -14,6 +14,43 @@
 
 ## Date: 09 September 2026
 
+### Time: 10:15 AM IST
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Task 25 & 26 Completion — Unit & Topic Module
+
+**Changes Made:**
+
+- Implemented Unit and Topic models.
+- Implemented the Unit and Topic retrieval APIs.
+- Ensured ownership validation through `Unit -> Subject -> userId` and `Topic -> Unit -> Subject -> userId`.
+- Integrated the protected routes and shared service layer.
+
+**Files Modified:**
+
+- `server/src/models/Unit.js`
+- `server/src/models/Topic.js`
+- `server/src/controllers/unitController.js`
+- `server/src/controllers/topicController.js`
+- `server/src/services/unitTopicService.js`
+- `server/src/routes/unitRoutes.js`
+- `server/src/routes/topicRoutes.js`
+
+**Notes:**
+
+- Implementation completed earlier; this entry reflects final documentation sync after audit.
+- Earlier database testing was partially blocked due to the MongoDB Atlas DNS issue; the later connected database verification passed.
+
+**Testing Performed:**
+
+- Authentication checks: all four unauthenticated API requests returned `401`.
+- Structure validation: required references, indexes, timestamps, status enum, and absence of `userId` passed.
+- Database testing: authenticated User A API checks returned `200`; User B ownership checks returned `404` with no data leak; invalid IDs returned `400`.
+
+## Date: 09 September 2026
+
 ### Time: 10:01 AM IST
 
 ### Team Member Name: Amit Rawat
@@ -26,6 +63,8 @@ Audit & Recovery — Unit & Topic Module
 - Completed the interrupted implementation audit for Unit and Topic models, services, controllers, and routes.
 - Fixed no code because the existing implementation was complete for the defined read APIs and ownership chain.
 - Validated required references, indexes, timestamps, status enum, absence of `userId`, thin controllers, and protected route registration.
+- Task 25 audit: Unit schema, Unit service operations, Unit controllers, protected routes, and `Unit -> Subject -> userId` ownership checks are implemented.
+- Task 26 audit: Topic schema, Topic service operations, Topic controllers, protected routes, and `Topic -> Unit -> Subject -> userId` ownership checks are implemented.
 - Updated Task 25 and Task 26 status without falsely marking blocked authenticated integration verification as complete.
 
 **Files Modified:**

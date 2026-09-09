@@ -186,9 +186,9 @@ Syllabus → Identify Subjects
 
 ## Audit Status
 
-Implementation is complete, but authenticated database-backed verification remains blocked by the unavailable MongoDB Atlas DNS connection. These tasks are therefore not marked fully complete.
+The Unit and Topic models and read APIs are fully implemented. Structural, authentication, ownership, invalid-ID, and database-backed API checks passed.
 
-### Task 25 - Unit APIs
+### Task 25 - Unit APIs [X]
 
 - [x] Add `Unit` schema with required `subjectId` reference.
 - [x] Add `subjectId` indexes, including ordering support.
@@ -199,11 +199,11 @@ Implementation is complete, but authenticated database-backed verification remai
 - [x] Protect routes with `authenticateToken`.
 - [x] Enforce `Unit -> Subject -> userId` ownership checks.
 - [x] Verify module syntax, imports, schema metadata, and unauthenticated `401` responses.
-- [ ] Verify authenticated success responses and ownership behavior against MongoDB.
+- [x] Verify authenticated success responses and ownership behavior against MongoDB.
 
-**Classification:** Partially verified; no incomplete code was found during recovery.
+**Classification:** Fully implemented and verified.
 
-### Task 26 - Topic APIs
+### Task 26 - Topic APIs [X]
 
 - [x] Add `Topic` schema with required `unitId` reference.
 - [x] Add `unitId` indexes, including ordering support.
@@ -215,6 +215,6 @@ Implementation is complete, but authenticated database-backed verification remai
 - [x] Protect routes with `authenticateToken`.
 - [x] Enforce `Topic -> Unit -> Subject -> userId` ownership checks.
 - [x] Verify module syntax, imports, schema metadata, and unauthenticated `401` responses.
-- [ ] Verify authenticated success responses and ownership behavior against MongoDB.
+- [x] Verify authenticated success responses and ownership behavior against MongoDB.
 
-**Classification:** Partially verified; no incomplete code was found during recovery.
+**Classification:** Fully implemented and verified.
