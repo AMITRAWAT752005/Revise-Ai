@@ -7,6 +7,8 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import subjectRoutes from './routes/subjectRoutes.js';
 import syllabusRoutes from './routes/syllabusRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
+import topicRoutes from './routes/topicRoutes.js';
+import unitRoutes from './routes/unitRoutes.js';
 
 const app = express();
 
@@ -36,6 +38,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/syllabus', syllabusRoutes);
+app.use('/api', unitRoutes);
+app.use('/api', topicRoutes);
 
 // Global Error Handler Middleware
 app.use(errorHandler);

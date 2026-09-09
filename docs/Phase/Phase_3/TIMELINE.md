@@ -12,6 +12,42 @@
 
 # Timeline Entries
 
+## Date: 09 September 2026
+
+### Time: 10:01 AM IST
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Audit & Recovery — Unit & Topic Module
+
+**Changes Made:**
+
+- Completed the interrupted implementation audit for Unit and Topic models, services, controllers, and routes.
+- Fixed no code because the existing implementation was complete for the defined read APIs and ownership chain.
+- Validated required references, indexes, timestamps, status enum, absence of `userId`, thin controllers, and protected route registration.
+- Updated Task 25 and Task 26 status without falsely marking blocked authenticated integration verification as complete.
+
+**Files Modified:**
+
+- `docs/Phase/Phase_3/TASKDONE.md`
+- `docs/Phase/Phase_3/TIMELINE.md`
+
+**Notes:**
+
+- Recovery after interrupted execution.
+- Existing uncommitted Unit/Topic source changes were preserved.
+- Authenticated MongoDB-backed success and ownership checks remain blocked by the configured Atlas SRV DNS resolution failure.
+
+**Testing Performed:**
+
+1. Ran `node --check` for both models, the shared service, both controllers, and both route modules.
+2. Imported the Unit/Topic models and route modules and verified required references, indexes, timestamps, status values, and no `userId` fields.
+3. Started the Express app on an ephemeral local port and requested all four APIs without credentials; each returned `401`.
+4. Ran `npm test`; all 14 Phase 1 authentication tests passed.
+5. Ran `npm run test:subjects`; all 5 subject/UserProgress tests passed.
+6. Authenticated success and cross-user ownership checks could not be executed because MongoDB Atlas DNS was unavailable.
+
 ### Entry 6
 - **Date:** 2026-09-08
 - **Time:** 05:45 PM IST

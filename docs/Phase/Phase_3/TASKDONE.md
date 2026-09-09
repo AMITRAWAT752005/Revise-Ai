@@ -179,3 +179,42 @@ The Phase 3 AI scope is strictly:
 ```text
 Syllabus → Identify Subjects
 ```
+
+---
+
+# 11. Tasks 25 and 26 - Unit and Topic Read APIs
+
+## Audit Status
+
+Implementation is complete, but authenticated database-backed verification remains blocked by the unavailable MongoDB Atlas DNS connection. These tasks are therefore not marked fully complete.
+
+### Task 25 - Unit APIs
+
+- [x] Add `Unit` schema with required `subjectId` reference.
+- [x] Add `subjectId` indexes, including ordering support.
+- [x] Enable timestamps and omit `userId` from the schema.
+- [x] Implement `GET /api/subjects/:subjectId/units`.
+- [x] Implement `GET /api/units/:unitId`.
+- [x] Keep controllers thin and delegate database/business logic to the service.
+- [x] Protect routes with `authenticateToken`.
+- [x] Enforce `Unit -> Subject -> userId` ownership checks.
+- [x] Verify module syntax, imports, schema metadata, and unauthenticated `401` responses.
+- [ ] Verify authenticated success responses and ownership behavior against MongoDB.
+
+**Classification:** Partially verified; no incomplete code was found during recovery.
+
+### Task 26 - Topic APIs
+
+- [x] Add `Topic` schema with required `unitId` reference.
+- [x] Add `unitId` indexes, including ordering support.
+- [x] Use the `not_started`, `in_progress`, and `completed` status enum.
+- [x] Enable timestamps and omit `userId` from the schema.
+- [x] Implement `GET /api/units/:unitId/topics`.
+- [x] Implement `GET /api/topics/:topicId`.
+- [x] Keep controllers thin and delegate database/business logic to the service.
+- [x] Protect routes with `authenticateToken`.
+- [x] Enforce `Topic -> Unit -> Subject -> userId` ownership checks.
+- [x] Verify module syntax, imports, schema metadata, and unauthenticated `401` responses.
+- [ ] Verify authenticated success responses and ownership behavior against MongoDB.
+
+**Classification:** Partially verified; no incomplete code was found during recovery.
