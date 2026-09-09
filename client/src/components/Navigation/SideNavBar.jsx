@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './SideNavBar.module.css';
-import bookLogo from '../../assets/images/book-logo.png';
+import bookLogo from '../../assets/images/book-logo-small.png';
 
 const SideNavBar = ({ user, xpEarned = 0, onQuickRevision }) => {
   const navigate = useNavigate();
@@ -11,6 +11,16 @@ const SideNavBar = ({ user, xpEarned = 0, onQuickRevision }) => {
       onQuickRevision();
     } else {
       navigate('/revision');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } finally {
+      localStorage.removeItem('user');
+      localStorage.removeItem('commitmentPending');
+      navigate('/login', { replace: true });
     }
   };
 
@@ -106,17 +116,10 @@ const SideNavBar = ({ user, xpEarned = 0, onQuickRevision }) => {
             </NavLink>
           </li>
           <li>
-            <a
-              href="#support"
-              onClick={(e) => {
-                e.preventDefault();
-                alert('ReviseAI Support: Contact support@reviseai.com for assistance.');
-              }}
-              className={styles.navLink}
-            >
-              <span className={`material-symbols-outlined ${styles.navIcon}`}>help</span>
-              <span>Support</span>
-            </a>
+            <button type="button" onClick={handleLogout} className={`${styles.navLink} ${styles.navLinkButton} ${styles.logoutButton}`}>
+              <span className={`material-symbols-outlined ${styles.navIcon}`}>logout</span>
+              <span>Logout</span>
+            </button>
           </li>
         </ul>
       </div>

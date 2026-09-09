@@ -468,9 +468,84 @@
   box-shadow: 0 12px 28px rgba(94, 92, 230, 0.12);
 }
 
-.cardHeaderRow {
+.subjectCardActions {
   display: flex;
-  justify-content: space-between;
+  gap: 4px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.cardIconBtn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #5e5ce6;
+  cursor: pointer;
+}
+
+.cardIconBtn:hover { background: #eae6f2; }
+.deleteIconBtn { color: #ba1a1a; }
+.deleteIconBtn:hover { background: #ffdad6; }
+
+.operationSuccess,
+.operationError {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.operationSuccess { color: #166534; background: #dcfce7; }
+.operationError { color: #991b1b; background: #fee2e2; }
+.operationSuccess button,
+.operationError button { margin-left: auto; border: 0; background: transparent; cursor: pointer; color: inherit; }
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(27, 27, 29, 0.35);
+  backdrop-filter: blur(4px);
+}
+
+.operationModal {
+  width: min(100%, 480px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  border: 1px solid #c7c4d7;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(27, 27, 29, 0.2);
+}
+
+.operationModalHeader { display: flex; justify-content: space-between; gap: 16px; }
+.operationModalHeader h2 { margin: 0 0 6px; color: #1b1b23; }
+.operationModalHeader p { margin: 0; color: #464554; }
+.modalCloseBtn { border: 0; background: transparent; color: #464554; cursor: pointer; }
+.operationModal label { display: flex; flex-direction: column; gap: 6px; color: #1b1b23; font-weight: 600; }
+.operationModal input,
+.operationModal textarea { width: 100%; box-sizing: border-box; padding: 11px 12px; border: 1px solid #c7c4d7; border-radius: 8px; font: inherit; resize: vertical; }
+.modalError { margin: 0; color: #ba1a1a; font-size: 13px; font-weight: 600; }
+.operationModalActions { display: flex; justify-content: flex-end; gap: 10px; }
+.operationModalActions button { padding: 10px 16px; border: 1px solid #c7c4d7; border-radius: 8px; background: #ffffff; cursor: pointer; font-weight: 600; }
+.primaryModalBtn { color: #ffffff; background: #4441cc !important; border-color: #4441cc !important; }
+.dangerModalBtn { color: #ffffff; background: #ba1a1a !important; border-color: #ba1a1a !important; }
+
+.cardHeaderRow {
   align-items: flex-start;
   margin-bottom: 20px;
 }
@@ -479,6 +554,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  padding-right: 76px;
 }
 
 .subjectIconBox {
@@ -504,12 +580,21 @@
 }
 
 .statusTag {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.cardStatusRow {
+  display: flex;
+  width: 100%;
+  margin: -8px 0 16px;
 }
 
 .statusStrong {

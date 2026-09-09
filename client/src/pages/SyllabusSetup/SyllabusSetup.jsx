@@ -15,6 +15,7 @@ const SyllabusSetup = () => {
   const [detectedSubjects, setDetectedSubjects] = useState([]);
   const [importId, setImportId] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
@@ -65,7 +66,7 @@ const SyllabusSetup = () => {
       setImportId(uploadData.importId);
       setAnalysisProgress(35);
       let completedImport;
-      for (let attempt = 0; attempt < 60; attempt += 1) {
+      for (let attempt = 0; attempt < 180; attempt += 1) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const statusResponse = await fetch(`/api/syllabus/${uploadData.importId}`, { credentials: 'include' });
         const statusData = await statusResponse.json();
@@ -92,6 +93,8 @@ const SyllabusSetup = () => {
   };
 
   const handleConfirm = async () => {
+    if (isConfirming) return;
+    setIsConfirming(true);
     try {
       const response = await fetch(`/api/syllabus/${importId}/confirm`, {
         method: 'POST',
@@ -109,6 +112,7 @@ const SyllabusSetup = () => {
     } catch (error) {
       setErrorMessage(error.message);
       setActiveStep('error-state');
+      setIsConfirming(false);
     }
   };
 
@@ -554,9 +558,15 @@ const SyllabusSetup = () => {
                 <button
                   className={`${styles.chooseFileBtn} ${styles.confirmBtn}`}
                   onClick={handleConfirm}
+                  disabled={isConfirming}
+                  aria-busy={isConfirming}
                 >
-                  <span className="material-symbols-outlined">task_alt</span>
-                  <span>Confirm & Build Dataset</span>
+                  {isConfirming ? (
+                    <span className={styles.confirmSpinner} aria-hidden="true" />
+                  ) : (
+                    <span className="material-symbols-outlined">task_alt</span>
+                  )}
+                  <span>{isConfirming ? 'Building Dataset...' : 'Confirm & Build Dataset'}</span>
                 </button>
               </>
             )}

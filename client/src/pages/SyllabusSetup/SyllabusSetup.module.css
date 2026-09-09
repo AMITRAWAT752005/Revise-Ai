@@ -795,6 +795,21 @@
   font-size: 18px;
 }
 
+.confirmSpinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: confirmSpinnerRotation 0.8s linear infinite;
+}
+
+@keyframes confirmSpinnerRotation {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Page 6: Step 4 Success Specific Styles */
 .successCard {
   width: 100%;

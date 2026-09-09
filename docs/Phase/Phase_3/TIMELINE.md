@@ -14,6 +14,100 @@
 
 ## Date: 09 September 2026
 
+### Time: Current verification session
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+`/subjects` Lighthouse performance and SEO improvements
+
+**Changes Made:**
+- Lazy-loaded route pages so the Subjects page does not eagerly download unrelated authentication, revision, syllabus, or detail-page code.
+- Added a lightweight route loading fallback for lazy-loaded screens.
+- Added font preconnect hints and a document meta description.
+- Added a valid `robots.txt` that prevents indexing of the authenticated application.
+- Resized the sidebar logo from the original 1024px asset to a 128px asset, reducing its payload from approximately 461 KB to 24 KB.
+
+**Files Modified:**
+- `client/src/App.jsx`
+- `client/index.html`
+- `client/src/components/Navigation/SideNavBar.jsx`
+- `client/public/robots.txt`
+- `client/src/assets/images/book-logo-small.png`
+- `docs/Phase/Phase_3/TIMELINE.md`
+
+**Testing Performed:**
+- Client production build passed with 0 errors.
+- Verified production output includes a 235 KB shared JavaScript bundle and a separate approximately 20 KB Subjects route chunk.
+- Verified the Subjects sidebar uses the 24 KB optimized logo asset.
+
+## Date: 09 September 2026
+
+### Time: Current verification session
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Subject management controls and authentication logout UI
+
+**Changes Made:**
+- Added Logout below Settings in the desktop side navigation and connected it to `POST /api/auth/logout`.
+- Removed the Support navigation item.
+- Added edit and delete icon controls to populated Subject cards.
+- Added responsive edit-subject dialog and delete confirmation dialog.
+- Added duplicate-subject error feedback using the existing backend validation response.
+- Added success and failure feedback for subject creation, update, and deletion.
+- Added loading states that disable create, update, and delete actions while requests are in progress.
+- Updated the Subjects list immediately after successful create, update, or delete operations.
+
+**Files Modified:**
+- `client/src/components/Navigation/SideNavBar.jsx`
+- `client/src/components/Navigation/SideNavBar.module.css`
+- `client/src/components/CreateSubjectModal/CreateSubjectModal.jsx`
+- `client/src/components/CreateSubjectModal/CreateSubjectModal.module.css`
+- `client/src/pages/Subjects/Subjects.jsx`
+- `client/src/pages/Subjects/Subjects.module.css`
+- `docs/Phase/Phase_3/TIMELINE.md`
+
+**Testing Performed:**
+- Client production build passed with 0 errors.
+- Authentication security tests passed: 14/14.
+- Subject and UserProgress tests passed: 5/5.
+- Workspace diagnostics reported no errors in the changed UI files.
+
+## Date: 09 September 2026
+
+### Time: Current verification session
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Hybrid PDF syllabus subject extraction improvement
+
+**Changes Made:**
+- Added stronger PDF text-quality validation using minimum character and word thresholds before sending extracted text to AI.
+- Preserved local Tesseract OCR fallback for scanned or low-text PDFs and applied the same quality validation to OCR output.
+- Added a conservative deterministic subject parser for explicit `Subject:`, `Course:`, `Module:`, `Paper:`, and course-code lines.
+- Added local fallback behavior when the AI provider returns an HTTP error, malformed JSON, or schema-invalid subject data.
+- Retained structured AI validation, deduplication, user review, and confirmation before subject creation.
+
+**Files Modified:**
+- `server/src/services/syllabusExtractionService.js`
+- `server/src/services/aiSubjectService.js`
+- `server/tests/syllabus_pipeline.test.js`
+- `docs/Phase/Phase_3/TIMELINE.md`
+
+**Testing Performed:**
+- Added and passed regression coverage for deterministic subject extraction from labelled and course-code lines.
+- Existing syllabus pipeline extraction, AI schema validation, and deduplication tests passed.
+- Verified no diagnostics in the modified server files.
+
+**Notes:**
+- OCR remains local to the server; no external OCR service was introduced.
+- Subject documents are still created only after user confirmation.
+
+## Date: 09 September 2026
+
 ### Time: 11:15 AM IST
 
 ### Team Member Name: Anukool Negi

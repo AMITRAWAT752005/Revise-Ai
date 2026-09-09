@@ -84,6 +84,28 @@
   color: #1b1b1d;
 }
 
+.navLinkButton {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.logoutButton {
+  margin-top: 4px;
+  background-color: #ba1a1a;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(186, 26, 26, 0.2);
+}
+
+.logoutButton:hover {
+  background-color: #8f1515;
+  color: #ffffff;
+}
+
 .activeLink {
   background-color: #eae7ea;
   color: #4441cc;

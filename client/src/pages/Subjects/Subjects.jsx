@@ -24,6 +24,15 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
 
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(initialCreateModalOpen);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createError, setCreateError] = useState('');
+  const [operationMessage, setOperationMessage] = useState('');
+  const [operationError, setOperationError] = useState('');
+  const [editingSubject, setEditingSubject] = useState(null);
+  const [deletingSubject, setDeletingSubject] = useState(null);
+  const [editForm, setEditForm] = useState({ name: '', description: '' });
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (initialCreateModalOpen) {
@@ -63,6 +72,8 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
   }, []);
 
   const handleCreateSubjectSubmit = async (formData) => {
+    setIsSubmitting(true);
+    setCreateError('');
     try {
       const response = await fetch('/api/subjects', {
         method: 'POST',
@@ -72,13 +83,67 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
       });
       const data = await response.json();
       if (!response.ok || !data.success) {
-        alert(data.error || 'Failed to create subject');
-        return;
+        setCreateError(data.error || data.message || 'Failed to create subject');
+        return false;
       }
       setIsCreateModalOpen(false);
-      fetchSubjects();
+      setSubjects((current) => [...current, data.subject]);
+      setOperationMessage('Subject created successfully.');
+      return true;
     } catch (err) {
-      alert(err.message || 'Failed to connect to server');
+      setCreateError(err.message || 'Failed to connect to server');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openEditSubject = (subject) => {
+    setOperationError('');
+    setEditingSubject(subject);
+    setEditForm({ name: subject.name || '', description: subject.description || '' });
+  };
+
+  const handleEditSubject = async (event) => {
+    event.preventDefault();
+    setIsEditing(true);
+    setOperationError('');
+    try {
+      const response = await fetch(`/api/subjects/${editingSubject._id || editingSubject.id}`, {
+        method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || data.message || 'Unable to update subject.');
+      setSubjects((current) => current.map((subject) => (
+        (subject._id || subject.id) === (editingSubject._id || editingSubject.id) ? { ...subject, ...data.subject } : subject
+      )));
+      setEditingSubject(null);
+      setOperationMessage('Subject updated successfully.');
+    } catch (err) {
+      setOperationError(err.message);
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
+  const handleDeleteSubject = async () => {
+    setIsDeleting(true);
+    setOperationError('');
+    try {
+      const response = await fetch(`/api/subjects/${deletingSubject._id || deletingSubject.id}`, {
+        method: 'DELETE', credentials: 'include',
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || data.message || 'Unable to delete subject.');
+      const deletedId = deletingSubject._id || deletingSubject.id;
+      setSubjects((current) => current.filter((subject) => (subject._id || subject.id) !== deletedId));
+      setDeletingSubject(null);
+      setOperationMessage('Subject deleted successfully.');
+    } catch (err) {
+      setOperationError(err.message);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -177,6 +242,15 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
         </header>
 
         <div className={styles.contentWrapper}>
+          {(operationMessage || operationError) && (
+            <div className={operationError ? styles.operationError : styles.operationSuccess} role="status">
+              <span className="material-symbols-outlined">{operationError ? 'error' : 'check_circle'}</span>
+              <span>{operationError || operationMessage}</span>
+              <button type="button" onClick={() => { setOperationMessage(''); setOperationError(''); }} aria-label="Dismiss message">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          )}
           {/* LOADING STATE */}
           {loading && (
             <div style={{ padding: '60px 0', textAlign: 'center', color: '#464554' }}>
@@ -427,9 +501,14 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
                             </p>
                           </div>
                         </div>
-                        <span className={`${styles.statusTag} ${status.className}`}>
-                          {status.label}
-                        </span>
+                        <div className={styles.subjectCardActions}>
+                          <button type="button" className={styles.cardIconBtn} onClick={() => openEditSubject(subject)} aria-label={`Edit ${subject.name}`} title="Edit subject">
+                            <span className="material-symbols-outlined">edit</span>
+                          </button>
+                          <button type="button" className={`${styles.cardIconBtn} ${styles.deleteIconBtn}`} onClick={() => setDeletingSubject(subject)} aria-label={`Delete ${subject.name}`} title="Delete subject">
+                            <span className="material-symbols-outlined">delete</span>
+                          </button>
+                        </div>
                       </div>
 
                       <div className={styles.cardBody}>
@@ -451,6 +530,10 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
                           </span>
                           <span>{subject.updatedAt ? `Last active ${new Date(subject.updatedAt).toLocaleDateString()}` : 'Not revised yet'}</span>
                         </div>
+                      </div>
+
+                      <div className={styles.cardStatusRow}>
+                        <span className={`${styles.statusTag} ${status.className}`}>{status.label}</span>
                       </div>
 
                       <button
@@ -523,12 +606,40 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
           }
         }}
         onSubmit={async (formData) => {
-          await handleCreateSubjectSubmit(formData);
-          if (window.location.pathname === '/subjects/create') {
+          const succeeded = await handleCreateSubjectSubmit(formData);
+          if (succeeded && window.location.pathname === '/subjects/create') {
             navigate('/subjects', { replace: true });
           }
+          return succeeded;
         }}
+        errorMessage={createError}
+        isSubmitting={isSubmitting}
       />
+
+      {editingSubject && (
+        <div className={styles.modalOverlay} role="presentation">
+          <form className={styles.operationModal} onSubmit={handleEditSubject} role="dialog" aria-modal="true" aria-labelledby="edit-subject-title">
+            <div className={styles.operationModalHeader}>
+              <div><h2 id="edit-subject-title">Edit Subject</h2><p>Update your subject details.</p></div>
+              <button type="button" className={styles.modalCloseBtn} onClick={() => setEditingSubject(null)} aria-label="Close edit subject dialog"><span className="material-symbols-outlined">close</span></button>
+            </div>
+            <label>Subject Name<input value={editForm.name} onChange={(event) => setEditForm({ ...editForm, name: event.target.value })} required maxLength={200} /></label>
+            <label>Description<textarea value={editForm.description} onChange={(event) => setEditForm({ ...editForm, description: event.target.value })} maxLength={200} rows={4} /></label>
+            {operationError && <p className={styles.modalError}>{operationError}</p>}
+            <div className={styles.operationModalActions}><button type="button" onClick={() => setEditingSubject(null)}>Cancel</button><button type="submit" className={styles.primaryModalBtn} disabled={isEditing}>{isEditing ? 'Saving...' : 'Save Changes'}</button></div>
+          </form>
+        </div>
+      )}
+
+      {deletingSubject && (
+        <div className={styles.modalOverlay} role="presentation">
+          <div className={styles.operationModal} role="alertdialog" aria-modal="true" aria-labelledby="delete-subject-title">
+            <div className={styles.operationModalHeader}><div><h2 id="delete-subject-title">Delete Subject?</h2><p>This will permanently remove <strong>{deletingSubject.name}</strong>.</p></div><button type="button" className={styles.modalCloseBtn} onClick={() => setDeletingSubject(null)} aria-label="Close delete subject dialog"><span className="material-symbols-outlined">close</span></button></div>
+            {operationError && <p className={styles.modalError}>{operationError}</p>}
+            <div className={styles.operationModalActions}><button type="button" onClick={() => setDeletingSubject(null)}>Cancel</button><button type="button" className={styles.dangerModalBtn} onClick={handleDeleteSubject} disabled={isDeleting}>{isDeleting ? 'Deleting...' : 'Delete Subject'}</button></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

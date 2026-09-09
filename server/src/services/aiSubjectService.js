@@ -5,9 +5,18 @@ const MAX_AI_INPUT_CHARS = 20_000;
 
 const getAiInput = (text) => {
   if (text.length <= MAX_AI_INPUT_CHARS) return text;
-  const leadingChars = 16_000;
-  const trailingChars = MAX_AI_INPUT_CHARS - leadingChars;
-  return `${text.slice(0, leadingChars)}\n[Middle of syllabus omitted for provider size limits.]\n${text.slice(-trailingChars)}`;
+  const leadingChars = 8_000;
+  const middleChars = 8_000;
+  const trailingChars = MAX_AI_INPUT_CHARS - leadingChars - middleChars;
+  const middleStart = Math.floor((text.length - middleChars) / 2);
+
+  return [
+    text.slice(0, leadingChars),
+    '[Middle section sample]',
+    text.slice(middleStart, middleStart + middleChars),
+    '[End section sample]',
+    text.slice(-trailingChars),
+  ].join('\n');
 };
 
 const subjectResultSchema = z.object({
@@ -19,6 +28,38 @@ const subjectResultSchema = z.object({
 }).strict();
 
 const normalizeName = (name) => name.replace(/\s+/g, ' ').trim();
+
+const cleanCandidateName = (value) => normalizeName(
+  value
+    .replace(/^[\s\d.)-]+/, '')
+    .replace(/[|;,.]+$/, '')
+    .replace(/\s*\([^)]*credits?\)\s*$/i, ''),
+);
+
+export const extractSubjectsFromText = (text) => {
+  const candidates = [];
+  const seen = new Set();
+  const addCandidate = (value) => {
+    const name = cleanCandidateName(value);
+    const key = name.toLocaleLowerCase();
+    if (name.length < 2 || name.length > 200 || seen.has(key)) return;
+    seen.add(key);
+    candidates.push({ name });
+  };
+
+  for (const rawLine of String(text || '').split('\n')) {
+    const line = rawLine.trim().replace(/\s+/g, ' ');
+    if (!line || line.length > 220) continue;
+
+    const labelledMatch = line.match(/^(?:subject|course|module|paper)\s*(?:name)?\s*[:\-]\s*(.+)$/i);
+    if (labelledMatch) addCandidate(labelledMatch[1]);
+
+    const codedMatch = line.match(/^(?:[\d.)-]+\s*)?([A-Z]{2,}[\s-]?\d{2,4})\s*[:\-]\s*(.+)$/i);
+    if (codedMatch) addCandidate(codedMatch[2]);
+  }
+
+  return { subjects: candidates.slice(0, 20) };
+};
 
 export const validateAndDeduplicateSubjects = (payload) => {
   const parsed = subjectResultSchema.safeParse(payload);
@@ -71,7 +112,7 @@ export const extractSubjectsWithAI = async (text) => {
   if (!apiKey) throw new Error('AI subject extraction is not configured.');
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), Number(process.env.AI_TIMEOUT_MS || 30_000));
+  const timeout = setTimeout(() => controller.abort(), Number(process.env.AI_TIMEOUT_MS || 120_000));
   try {
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -83,11 +124,12 @@ export const extractSubjectsWithAI = async (text) => {
       body: JSON.stringify({
         model,
         temperature: 0,
-        max_tokens: 1_000,
+        response_format: { type: 'json_object' },
+        max_tokens: 2_000,
         messages: [
           {
             role: 'system',
-            content: 'Return valid JSON only, with no markdown or explanation. Return at most 30 subjects and omit code/category unless clearly known. Use exactly this compact shape: {"subjects":[{"name":"Subject Name"}]}. Identify actual academic subjects only. Exclude units, topics, concepts, technologies, and invented subjects.'
+            content: 'Output only one compact valid JSON object, with no markdown, explanation, or reasoning. Use exactly {"subjects":[{"name":"Subject Name"}]} and return at most 20 subjects. Identify academic courses explicitly listed in the syllabus, including computer science and technology courses. Ignore units, topics, concepts, learning outcomes, and tools mentioned only as examples. Prefer official names from the title page, contents, course list, and repeated headings. Do not invent subjects.'
           },
           { role: 'user', content: getAiInput(text) },
         ],
@@ -104,6 +146,10 @@ export const extractSubjectsWithAI = async (text) => {
     const content = body.choices?.[0]?.message?.content;
     if (typeof content !== 'string') throw new Error('AI provider returned no subject data.');
     return validateAndDeduplicateSubjects(parseJsonResponse(content));
+  } catch (error) {
+    const fallback = extractSubjectsFromText(text);
+    if (fallback.subjects.length > 0) return fallback;
+    throw error;
   } finally {
     clearTimeout(timeout);
   }

@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import styles from './CreateSubjectModal.module.css';
 
-const CreateSubjectModal = ({ isOpen, onClose, onSubmit }) => {
+const CreateSubjectModal = ({ isOpen, onClose, onSubmit, errorMessage = '', isSubmitting = false }) => {
   const [subjectName, setSubjectName] = useState('');
   const [description, setDescription] = useState('');
   const [theme, setTheme] = useState('indigo');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (onSubmit) {
-      onSubmit({ name: subjectName, description, theme });
-    }
+    const succeeded = onSubmit ? await onSubmit({ name: subjectName, description, theme }) : true;
+    if (succeeded === false) return;
     // Reset state after submission
     setSubjectName('');
     setDescription('');
@@ -114,6 +113,7 @@ const CreateSubjectModal = ({ isOpen, onClose, onSubmit }) => {
                 ></button>
               </div>
             </div>
+            {errorMessage && <p className={styles.formError}>{errorMessage}</p>}
           </form>
         </div>
 
@@ -121,9 +121,9 @@ const CreateSubjectModal = ({ isOpen, onClose, onSubmit }) => {
           <button type="button" className={styles.cancelBtn} onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className={styles.submitBtn} onClick={handleSubmit}>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
-            Create Subject
+          <button type="submit" className={styles.submitBtn} onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? <span className={styles.spinner} /> : <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>}
+            {isSubmitting ? 'Creating...' : 'Create Subject'}
           </button>
         </div>
       </div>

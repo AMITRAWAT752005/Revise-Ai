@@ -6,7 +6,11 @@ import { pdf } from 'pdf-to-img';
 import { createWorker } from 'tesseract.js';
 
 const MIN_USABLE_TEXT_LENGTH = 80;
+const MIN_PDF_TEXT_LENGTH = 250;
+const MIN_PDF_TEXT_WORDS = 40;
 const MAX_TEXT_LENGTH = 2_000_000;
+
+const countWords = (value) => value.split(/\s+/).filter(Boolean).length;
 
 export const cleanExtractedText = (value) => String(value || '')
   .replace(/\u0000/g, ' ')
@@ -56,7 +60,8 @@ const extractPdfWithOcr = async (filePath) => {
 
 export const extractSyllabusText = async (filePath, fileType) => {
   const nativeText = cleanExtractedText(await extractNativeText(filePath, fileType));
-  if (nativeText.length >= MIN_USABLE_TEXT_LENGTH || fileType !== 'pdf') {
+  const hasUsablePdfText = nativeText.length >= MIN_PDF_TEXT_LENGTH && countWords(nativeText) >= MIN_PDF_TEXT_WORDS;
+  if (hasUsablePdfText || fileType !== 'pdf') {
     if (nativeText.length < MIN_USABLE_TEXT_LENGTH) {
       throw new Error('The document does not contain enough usable syllabus text.');
     }
@@ -64,7 +69,7 @@ export const extractSyllabusText = async (filePath, fileType) => {
   }
 
   const ocrText = cleanExtractedText(await extractPdfWithOcr(filePath));
-  if (ocrText.length < MIN_USABLE_TEXT_LENGTH) {
+  if (ocrText.length < MIN_PDF_TEXT_LENGTH || countWords(ocrText) < MIN_PDF_TEXT_WORDS) {
     throw new Error('The document does not contain usable text after OCR.');
   }
   return { text: ocrText, usedOcr: true };
