@@ -9,18 +9,22 @@ import styles from './SubjectWorkspace.module.css';
  * SubjectWorkspace Page handles:
  * - Task 13: DBMS Subject Workspace - Redesign
  * - Task 16: Mobile Views
+ * - Task 24: Dynamic Data Integration
  */
 const SubjectWorkspace = () => {
   const { subjectId } = useParams();
   const navigate = useNavigate();
   const [subjectData, setSubjectData] = useState(null);
+  const [units, setUnits] = useState([]);
+  const [unitTopicsMap, setUnitTopicsMap] = useState({});
+  const [loadingTopics, setLoadingTopics] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedUnit, setExpandedUnit] = useState('u1');
+  const [expandedUnit, setExpandedUnit] = useState(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [user, setUser] = useState(null);
 
-  const fetchSubject = async () => {
+  const fetchSubjectAndUnits = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -28,35 +32,59 @@ const SubjectWorkspace = () => {
         throw new Error('No subject ID provided');
       }
 
-      // Fetch subject details from API
-      const res = await fetch(`/api/subjects/${subjectId}`, { credentials: 'include' });
-      const data = await res.json();
+      // 1. Fetch Subject Details
+      const subjectRes = await fetch(`/api/subjects/${subjectId}`, { credentials: 'include' });
+      const subjectJson = await subjectRes.json();
 
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || data.error || 'Subject not found');
+      if (!subjectRes.ok || !subjectJson.success) {
+        throw new Error(subjectJson.message || subjectJson.error || 'Subject not found');
       }
 
-      setSubjectData(data.subject);
+      const fetchedSubject = subjectJson.subject;
+      setSubjectData(fetchedSubject);
+
+      // 2. Fetch Subject Units
+      try {
+        const unitsRes = await fetch(`/api/subjects/${subjectId}/units`, { credentials: 'include' });
+        const unitsJson = await unitsRes.json();
+        if (unitsRes.ok && unitsJson.success && Array.isArray(unitsJson.data)) {
+          setUnits(unitsJson.data);
+          if (unitsJson.data.length > 0) {
+            setExpandedUnit(unitsJson.data[0]._id);
+            fetchTopicsForUnit(unitsJson.data[0]._id);
+          }
+        } else {
+          setUnits([]);
+        }
+      } catch (unitErr) {
+        console.warn('Could not fetch units for subject:', unitErr);
+        setUnits([]);
+      }
     } catch (err) {
       console.error('Error loading subject workspace:', err);
-      // Fallback for mock dbms string if present in development
-      if (subjectId === 'dbms') {
-        setSubjectData({
-          _id: 'dbms',
-          name: 'Database Management Systems',
-          description: 'Fundamental database concepts, relational algebra, SQL, and normalization.',
-          mastery: 82,
-          totalUnits: 4,
-          totalTopics: 12,
-          totalQuestions: 150,
-          status: 'in_progress',
-        });
-        setError(null);
-      } else {
-        setError(err.message || 'Unable to load subject workspace');
-      }
+      setError(err.message || 'Unable to load subject workspace');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTopicsForUnit = async (unitId) => {
+    if (!unitId || unitTopicsMap[unitId] || loadingTopics[unitId]) return;
+
+    setLoadingTopics((prev) => ({ ...prev, [unitId]: true }));
+    try {
+      const res = await fetch(`/api/units/${unitId}/topics`, { credentials: 'include' });
+      const json = await res.json();
+      if (res.ok && json.success && Array.isArray(json.data)) {
+        setUnitTopicsMap((prev) => ({ ...prev, [unitId]: json.data }));
+      } else {
+        setUnitTopicsMap((prev) => ({ ...prev, [unitId]: [] }));
+      }
+    } catch (err) {
+      console.error(`Error fetching topics for unit ${unitId}:`, err);
+      setUnitTopicsMap((prev) => ({ ...prev, [unitId]: [] }));
+    } finally {
+      setLoadingTopics((prev) => ({ ...prev, [unitId]: false }));
     }
   };
 
@@ -68,84 +96,45 @@ const SubjectWorkspace = () => {
       console.error(e);
     }
 
-    fetchSubject();
+    fetchSubjectAndUnits();
   }, [subjectId]);
 
-  const subjectName = subjectData?.name || 'Database Management Systems';
-  const shortSubjectName =
-    subjectName.toLowerCase().includes('database') || subjectName.toLowerCase().includes('dbms')
-      ? 'DBMS'
-      : subjectName;
-
   const toggleUnit = (unitId) => {
-    setExpandedUnit((prev) => (prev === unitId ? null : unitId));
+    if (expandedUnit === unitId) {
+      setExpandedUnit(null);
+    } else {
+      setExpandedUnit(unitId);
+      fetchTopicsForUnit(unitId);
+    }
   };
+
+  const subjectName = subjectData?.name || 'Subject Workspace';
+  const shortSubjectName = subjectData?.name || 'Subject';
 
   const handleStartRevision = () => {
-    navigate(`/revision?subject=${encodeURIComponent(shortSubjectName)}`);
+    navigate(`/revision?subject=${encodeURIComponent(subjectName)}`);
   };
 
-  const unitsList = [
-    {
-      id: 'u1',
-      badge: 'U1',
-      title: 'Introduction to DBMS',
-      topicsCount: 3,
-      mastery: 100,
-      isMastered: true,
-      topics: [
-        { id: 't1', name: 'DBMS Architecture' },
-        { id: 't2', name: 'Data Models' },
-        { id: 't3', name: 'Database Schema' },
-      ],
-    },
-    {
-      id: 'u2',
-      badge: 'U2',
-      title: 'Relational Model & SQL',
-      topicsCount: 4,
-      mastery: 75,
-      isMastered: false,
-      topics: [
-        { id: 't4', name: 'Relational Algebra' },
-        { id: 't5', name: 'SQL Queries & Joins' },
-        { id: 't6', name: 'Integrity Constraints' },
-        { id: 't7', name: 'Views and Triggers' },
-      ],
-    },
-    {
-      id: 'u3',
-      badge: 'U3',
-      title: 'Database Design & Normalization',
-      topicsCount: 3,
-      mastery: 40,
-      isMastered: false,
-      navPath: `/subjects/${subjectId || 'dbms'}/units/normalization`,
-      topics: [
-        { id: 't8', name: 'Functional Dependencies' },
-        { id: 't9', name: 'Closure & Candidate Keys' },
-        { id: 't10', name: 'Normal Forms (1NF, 2NF, 3NF, BCNF)' },
-      ],
-    },
-    {
-      id: 'u4',
-      badge: 'U4',
-      title: 'Transaction Management',
-      topicsCount: 2,
-      mastery: 0,
-      isMastered: false,
-      topics: [
-        { id: 't11', name: 'ACID Properties' },
-        { id: 't12', name: 'Concurrency Control Protocols' },
-      ],
-    },
-  ];
+  // Calculate dynamic metrics
+  const totalUnitsCount = units.length > 0 ? units.length : (subjectData?.totalUnits ?? 0);
+  const totalTopicsCount =
+    units.length > 0
+      ? units.reduce((sum, u) => sum + (u.totalTopics || 0), 0)
+      : (subjectData?.totalTopics ?? 0);
+  const totalQuestionsCount = subjectData?.totalQuestions ?? 0;
+  const subjectMastery = subjectData?.mastery ?? 0;
+
+  // Find least mastered unit for smart recommendation
+  const recommendedUnit =
+    units.length > 0
+      ? [...units].sort((a, b) => (a.mastery || 0) - (b.mastery || 0))[0]
+      : null;
 
   const studyMaterials = [
-    { id: 'm1', type: 'pdf', title: 'DBMS_Syllabus.pdf', sub: 'Added 2 weeks ago', iconClass: styles.matPdf, icon: 'picture_as_pdf' },
-    { id: 'm2', type: 'folder', title: 'Previous Year Qs', sub: '3 files', iconClass: styles.matFolder, icon: 'folder' },
-    { id: 'm3', type: 'notes', title: 'Class Notes', sub: '4 files', iconClass: styles.matNotes, icon: 'description' },
-    { id: 'm4', type: 'attach', title: 'Other References', sub: '2 files', iconClass: styles.matAttach, icon: 'attach_file' },
+    { id: 'm1', type: 'pdf', title: `${subjectName.replace(/\s+/g, '_')}_Syllabus.pdf`, sub: 'Syllabus document', iconClass: styles.matPdf, icon: 'picture_as_pdf' },
+    { id: 'm2', type: 'folder', title: 'Previous Year Qs', sub: 'Practice questions', iconClass: styles.matFolder, icon: 'folder' },
+    { id: 'm3', type: 'notes', title: 'Class Notes', sub: 'Study notes', iconClass: styles.matNotes, icon: 'description' },
+    { id: 'm4', type: 'attach', title: 'References', sub: 'Key concepts', iconClass: styles.matAttach, icon: 'attach_file' },
   ];
 
   return (
@@ -213,7 +202,7 @@ const SubjectWorkspace = () => {
               <h2 className={styles.errorTitle}>Subject Not Found</h2>
               <p className={styles.errorMessage}>{error}</p>
               <div className={styles.errorActionGroup}>
-                <button className={styles.retryBtn} onClick={fetchSubject}>
+                <button className={styles.retryBtn} onClick={fetchSubjectAndUnits}>
                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                     refresh
                   </span>
@@ -280,9 +269,9 @@ const SubjectWorkspace = () => {
                       workspace_premium
                     </span>
                   </div>
-                  <div className={styles.statCardNumber}>{subjectData?.mastery ?? 0}%</div>
+                  <div className={styles.statCardNumber}>{subjectMastery}%</div>
                   <div className={styles.xpTrack}>
-                    <div className={styles.xpFill} style={{ width: `${subjectData?.mastery ?? 0}%` }}></div>
+                    <div className={styles.xpFill} style={{ width: `${subjectMastery}%` }}></div>
                   </div>
                 </div>
 
@@ -294,7 +283,7 @@ const SubjectWorkspace = () => {
                       view_module
                     </span>
                   </div>
-                  <div className={styles.statCardNumber}>{subjectData?.totalUnits ?? 4}</div>
+                  <div className={styles.statCardNumber}>{totalUnitsCount}</div>
                 </div>
 
                 {/* Topics Stat */}
@@ -305,7 +294,7 @@ const SubjectWorkspace = () => {
                       list_alt
                     </span>
                   </div>
-                  <div className={styles.statCardNumber}>{subjectData?.totalTopics ?? 12}</div>
+                  <div className={styles.statCardNumber}>{totalTopicsCount}</div>
                 </div>
 
                 {/* Questions Stat */}
@@ -317,7 +306,7 @@ const SubjectWorkspace = () => {
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                    <span className={styles.statCardNumber}>{subjectData?.totalQuestions ?? 150}</span>
+                    <span className={styles.statCardNumber}>{totalQuestionsCount}</span>
                     <span className={styles.statSubLabel}>Qs</span>
                   </div>
                 </div>
@@ -329,91 +318,135 @@ const SubjectWorkspace = () => {
                 <div className={styles.leftColumn}>
                   <h2 className={styles.sectionHeading}>Your Syllabus</h2>
 
-                  {unitsList.map((unit) => {
-                    const isExpanded = expandedUnit === unit.id;
+                  {units.length === 0 ? (
+                    <div className={styles.emptyUnitsCard}>
+                      <span className={`material-symbols-outlined ${styles.emptyUnitsIcon}`}>
+                        menu_book
+                      </span>
+                      <h3 className={styles.emptyUnitsTitle}>No units created yet</h3>
+                      <p className={styles.emptyUnitsSubtitle}>
+                        Upload your syllabus document to automatically extract and structure units and topics for this subject.
+                      </p>
+                      <button
+                        className={styles.uploadMaterialBtn}
+                        onClick={() => setIsUploadModalOpen(true)}
+                        style={{ marginTop: '8px' }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                          upload
+                        </span>
+                        <span>Upload Syllabus</span>
+                      </button>
+                    </div>
+                  ) : (
+                    units.map((unit, index) => {
+                      const isExpanded = expandedUnit === unit._id;
+                      const unitBadge = `U${unit.order != null ? unit.order : index + 1}`;
+                      const unitMastery = unit.mastery || 0;
+                      const isMastered = unitMastery >= 100 || (unit.completedTopics > 0 && unit.completedTopics === unit.totalTopics);
+                      const unitTopics = unitTopicsMap[unit._id] || [];
+                      const isTopicsLoading = loadingTopics[unit._id];
 
-                    return (
-                      <div key={unit.id} className={styles.unitCard}>
-                        <div
-                          className={styles.unitCardHeader}
-                          onClick={() => {
-                            if (unit.navPath) {
-                              navigate(unit.navPath);
-                            } else {
-                              toggleUnit(unit.id);
-                            }
-                          }}
-                        >
-                          <div className={styles.unitHeaderLeft}>
-                            <div
-                              className={`${styles.unitBadge} ${!unit.isMastered && unit.mastery === 0 ? styles.unitBadgeMuted : ''}`}
-                            >
-                              {unit.badge}
-                            </div>
-                            <div>
-                              <h3 className={styles.unitTitle}>{unit.title}</h3>
-                              <div className={styles.unitMetaRow}>
-                                <span>{unit.topicsCount} Topics</span>
-                                <div className={styles.unitProgressTrack}>
-                                  <div
-                                    className={styles.unitProgressFill}
-                                    style={{ width: `${unit.mastery}%` }}
-                                  ></div>
-                                </div>
-                                {unit.isMastered ? (
-                                  <span className={styles.unitMasteredTag}>Mastered</span>
-                                ) : (
-                                  <span style={{ fontWeight: 700, color: '#4441cc' }}>
-                                    {unit.mastery}%
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <span className="material-symbols-outlined" style={{ color: '#464554' }}>
-                            {isExpanded ? 'expand_less' : 'expand_more'}
-                          </span>
-                        </div>
-
-                        {isExpanded && unit.topics && (
-                          <div className={styles.unitTopicsList}>
-                            {unit.topics.map((topic) => (
+                      return (
+                        <div key={unit._id} className={styles.unitCard}>
+                          <div
+                            className={styles.unitCardHeader}
+                            onClick={() => toggleUnit(unit._id)}
+                          >
+                            <div className={styles.unitHeaderLeft}>
                               <div
-                                key={topic.id}
-                                className={styles.topicItemRow}
-                                onClick={() =>
-                                  navigate(
-                                    `/subjects/${subjectId || 'dbms'}/units/normalization/topics/3nf`
-                                  )
-                                }
+                                className={`${styles.unitBadge} ${!isMastered && unitMastery === 0 ? styles.unitBadgeMuted : ''}`}
                               >
-                                <div className={styles.topicItemLeft}>
-                                  <span
-                                    className={`material-symbols-outlined ${styles.topicCheckIcon}`}
-                                    style={{ fontVariationSettings: "'FILL' 1" }}
-                                  >
-                                    check_circle
-                                  </span>
-                                  <span className={styles.topicName}>{topic.name}</span>
-                                </div>
-                                <button
-                                  className={styles.reviseTopicBtn}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(
-                                      `/revision?topic=${encodeURIComponent(topic.name)}`
-                                    );
-                                  }}
-                                >
-                                  Revise
-                                </button>
+                                {unitBadge}
                               </div>
-                            ))}
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+                                  <h3 className={styles.unitTitle}>{unit.name}</h3>
+                                  <Link
+                                    to={`/subjects/${subjectId}/units/${unit._id}`}
+                                    className={styles.viewUnitLink}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <span>Unit Details</span>
+                                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
+                                      arrow_forward
+                                    </span>
+                                  </Link>
+                                </div>
+                                <div className={styles.unitMetaRow}>
+                                  <span>{unit.totalTopics ?? unitTopics.length} Topics</span>
+                                  <div className={styles.unitProgressTrack}>
+                                    <div
+                                      className={styles.unitProgressFill}
+                                      style={{ width: `${unitMastery}%` }}
+                                    ></div>
+                                  </div>
+                                  {isMastered ? (
+                                    <span className={styles.unitMasteredTag}>Mastered</span>
+                                  ) : (
+                                    <span style={{ fontWeight: 700, color: '#4441cc' }}>
+                                      {unitMastery}%
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <span className="material-symbols-outlined" style={{ color: '#464554', marginLeft: '12px' }}>
+                              {isExpanded ? 'expand_less' : 'expand_more'}
+                            </span>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+
+                          {isExpanded && (
+                            <div className={styles.unitTopicsList}>
+                              {isTopicsLoading && (
+                                <p className={styles.unitTopicsLoading}>Loading topics...</p>
+                              )}
+
+                              {!isTopicsLoading && unitTopics.length === 0 && (
+                                <p className={styles.emptyTopicsMsg}>No topics found in this unit.</p>
+                              )}
+
+                              {!isTopicsLoading && unitTopics.map((topic) => (
+                                <div
+                                  key={topic._id}
+                                  className={styles.topicItemRow}
+                                  onClick={() =>
+                                    navigate(
+                                      `/subjects/${subjectId}/units/${unit._id}/topics/${topic._id}`
+                                    )
+                                  }
+                                >
+                                  <div className={styles.topicItemLeft}>
+                                    <span
+                                      className={`material-symbols-outlined ${styles.topicCheckIcon}`}
+                                      style={{
+                                        color: topic.status === 'completed' || (topic.mastery || 0) >= 80 ? '#ffcc00' : '#c7c4d7',
+                                        fontVariationSettings: "'FILL' 1",
+                                      }}
+                                    >
+                                      {topic.status === 'completed' ? 'check_circle' : 'radio_button_unchecked'}
+                                    </span>
+                                    <span className={styles.topicName}>{topic.name}</span>
+                                  </div>
+                                  <button
+                                    className={styles.reviseTopicBtn}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(
+                                        `/revision?topic=${encodeURIComponent(topic.name)}`
+                                      );
+                                    }}
+                                  >
+                                    Revise
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
 
                 {/* Right Column: Smart Insights & Materials (40%) */}
@@ -433,18 +466,34 @@ const SubjectWorkspace = () => {
                         </div>
                         <h3 className={styles.insightTitle}>AI Study Insight</h3>
                       </div>
-                      <p className={styles.insightBody}>
-                        You struggled with <strong>Normalization</strong> during the last quiz. I
-                        recommend reviewing the 3NF and BCNF flashcards before starting a new unit.
-                      </p>
-                      <button
-                        className={styles.reviewUnitBtn}
-                        onClick={() =>
-                          navigate(`/subjects/${subjectId || 'dbms'}/units/normalization`)
-                        }
-                      >
-                        Review Normalization
-                      </button>
+                      {recommendedUnit ? (
+                        <>
+                          <p className={styles.insightBody}>
+                            To build overall mastery in <strong>{subjectName}</strong>, focusing next on{' '}
+                            <strong>{recommendedUnit.name}</strong> will give you the fastest retention boost.
+                          </p>
+                          <button
+                            className={styles.reviewUnitBtn}
+                            onClick={() =>
+                              navigate(`/subjects/${subjectId}/units/${recommendedUnit._id}`)
+                            }
+                          >
+                            Review {recommendedUnit.name}
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <p className={styles.insightBody}>
+                            Welcome to <strong>{subjectName}</strong>! Upload your syllabus to extract units, topics, and personalized flashcards for targeted revision.
+                          </p>
+                          <button
+                            className={styles.reviewUnitBtn}
+                            onClick={() => setIsUploadModalOpen(true)}
+                          >
+                            Upload Syllabus
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -486,7 +535,7 @@ const SubjectWorkspace = () => {
       <UploadSyllabusModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
-        initialSubjectId={subjectId || 'dbms'}
+        initialSubjectId={subjectId}
       />
     </div>
   );

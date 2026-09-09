@@ -218,3 +218,28 @@ The Unit and Topic models and read APIs are fully implemented. Structural, authe
 - [x] Verify authenticated success responses and ownership behavior against MongoDB.
 
 **Classification:** Fully implemented and verified.
+
+---
+
+# 12. Task 24 — Make Existing Subject/Unit/Topic UI Dynamic
+
+- [x] Convert Subject Workspace UI from static to dynamic data-driven rendering (`subjectData`, `units`, `topics`).
+- [x] Fetch Subject data dynamically from `GET /api/subjects/:subjectId`.
+- [x] Fetch Units data dynamically from `GET /api/subjects/:subjectId/units`.
+- [x] Fetch Topics data dynamically from `GET /api/units/:unitId/topics` on unit expansion.
+- [x] Make Subject Workspace metrics dynamic (Subject Name, Description, Mastery, Total Units, Total Topics, Total Questions).
+- [x] Render dynamic Unit badges (`U1`, `U2`, ...), progress bars, topic counts, and mastery tags in Subject Workspace.
+- [x] Connect Subject Workspace unit accordion and topic items to Unit Detail and Topic Detail routes.
+- [x] Convert Unit Detail UI (`UnitDetail.jsx`) from static to dynamic data-driven rendering.
+- [x] Fetch Unit data from `GET /api/units/:unitId`, Subject data from `GET /api/subjects/:subjectId`, and Topics from `GET /api/units/:unitId/topics`.
+- [x] Make Unit Detail metrics dynamic (Unit Name, Description, Unit Mastery, Topic Count, Revision Due, Completion status).
+- [x] Render dynamic Topic cards with real status badges, mastery percentages, and links to Topic Detail.
+- [x] Convert Topic Detail UI (`TopicDetail.jsx`) from static to dynamic data-driven rendering.
+- [x] Fetch Topic data from `GET /api/topics/:topicId`, Unit data from `GET /api/units/:unitId`, and Subject data from `GET /api/subjects/:subjectId`.
+- [x] Make Topic Detail metrics dynamic (Topic Name, Description/Overview, Mastery %, Status, Parent Unit/Subject context, formatted Last Revised date).
+- [x] Implement robust loading states and error/retry states across Subject Workspace, Unit Detail, and Topic Detail.
+- [x] Implement empty state handling for subjects with 0 units and units with 0 topics.
+- [x] Preserve existing Phase 1 authentication and Phase 2 Home/Dashboard functionality.
+- [x] Verify client production build and test suites.
+
+**Classification:** Fully implemented and verified.

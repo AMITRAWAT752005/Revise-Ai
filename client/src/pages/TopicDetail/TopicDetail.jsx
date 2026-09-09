@@ -8,15 +8,72 @@ import styles from './TopicDetail.module.css';
  * TopicDetail Page handles:
  * - Task 15: Topic Detail: 3NF
  * - Task 16: Mobile Views
+ * - Task 24: Dynamic Data Integration
  */
 const TopicDetail = () => {
-  const {
-    subjectId = 'dbms',
-    unitId = 'normalization',
-    topicId = '3nf',
-  } = useParams();
+  const { subjectId, unitId, topicId } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [topicData, setTopicData] = useState(null);
+  const [unitData, setUnitData] = useState(null);
+  const [subjectData, setSubjectData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchTopicAndContext = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (!topicId) {
+        throw new Error('No topic ID provided');
+      }
+
+      // 1. Fetch Topic Details
+      const topicRes = await fetch(`/api/topics/${topicId}`, { credentials: 'include' });
+      const topicJson = await topicRes.json();
+
+      if (!topicRes.ok || !topicJson.success || !topicJson.data) {
+        throw new Error(topicJson.message || topicJson.error || 'Topic not found');
+      }
+
+      setTopicData(topicJson.data);
+
+      // 2. Fetch Unit Details (for parent unit name and breadcrumb)
+      const targetUnitId = unitId || topicJson.data.unitId;
+      let fetchedUnit = null;
+      if (targetUnitId) {
+        try {
+          const unitRes = await fetch(`/api/units/${targetUnitId}`, { credentials: 'include' });
+          const unitJson = await unitRes.json();
+          if (unitRes.ok && unitJson.success && unitJson.data) {
+            fetchedUnit = unitJson.data;
+            setUnitData(unitJson.data);
+          }
+        } catch (unitErr) {
+          console.warn('Could not fetch unit for topic breadcrumbs:', unitErr);
+        }
+      }
+
+      // 3. Fetch Subject Details (for subject name and breadcrumb)
+      const targetSubjectId = subjectId || fetchedUnit?.subjectId;
+      if (targetSubjectId) {
+        try {
+          const subRes = await fetch(`/api/subjects/${targetSubjectId}`, { credentials: 'include' });
+          const subJson = await subRes.json();
+          if (subRes.ok && subJson.success && subJson.subject) {
+            setSubjectData(subJson.subject);
+          }
+        } catch (subErr) {
+          console.warn('Could not fetch subject for topic breadcrumbs:', subErr);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading topic details:', err);
+      setError(err.message || 'Unable to load topic details');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -25,32 +82,51 @@ const TopicDetail = () => {
     } catch (e) {
       console.error(e);
     }
-  }, []);
 
-  const topicData = {
-    title: 'Third Normal Form (3NF)',
-    subjectName: 'DBMS',
-    unitName: 'Normalization',
-    lastRevised: '3 days ago',
-    questionsDue: 5,
-    mastery: 42,
-    overview:
-      '3NF removes transitive dependencies by ensuring that non-key attributes depend only on the primary key.',
-    ctaSubtitle:
-      'Tackle the 5 due questions to improve your retention and clear your revision queue.',
-  };
+    fetchTopicAndContext();
+  }, [topicId, unitId, subjectId]);
+
+  const effectiveSubjectId = subjectId || unitData?.subjectId || '';
+  const effectiveUnitId = unitId || topicData?.unitId || '';
+  const subjectName = subjectData?.name || 'Subject';
+  const unitName = unitData?.name || 'Unit';
+  const topicName = topicData?.name || 'Topic Detail';
 
   const handleStartRevision = () => {
-    navigate(`/revision?topic=${encodeURIComponent('Third Normal Form (3NF)')}`);
+    navigate(`/revision?topic=${encodeURIComponent(topicName)}`);
   };
 
   const handleViewNotes = () => {
-    alert('Opening related notes for 3NF...');
+    alert(`Opening related study notes for ${topicName}...`);
   };
 
   const handlePracticePYQs = () => {
-    navigate(`/revision?topic=${encodeURIComponent('3NF')}&mode=pyq`);
+    navigate(`/revision?topic=${encodeURIComponent(topicName)}&mode=pyq`);
   };
+
+  // Dynamic formatting
+  const topicMastery = topicData?.mastery ?? 0;
+  const questionsDue =
+    topicData?.status === 'completed' || topicMastery >= 85
+      ? 1
+      : topicMastery >= 60
+      ? 3
+      : 5;
+
+  const formattedLastRevised = topicData?.updatedAt
+    ? new Date(topicData.updatedAt).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : 'Recently';
+
+  const encouragementText =
+    topicMastery >= 85
+      ? 'Mastered! Excellent retention.'
+      : topicMastery >= 60
+      ? 'Almost mastered! Keep going.'
+      : 'Ready for active practice!';
 
   return (
     <div className={styles.topicLayout}>
@@ -61,12 +137,20 @@ const TopicDetail = () => {
       <header className={styles.mobileTopBar}>
         <div
           className={styles.mobileBrand}
-          onClick={() => navigate(`/subjects/${subjectId}/units/${unitId}`)}
+          onClick={() => {
+            if (effectiveSubjectId && effectiveUnitId) {
+              navigate(`/subjects/${effectiveSubjectId}/units/${effectiveUnitId}`);
+            } else if (effectiveSubjectId) {
+              navigate(`/subjects/${effectiveSubjectId}`);
+            } else {
+              navigate('/subjects');
+            }
+          }}
         >
           <span className="material-symbols-outlined" style={{ color: '#4441cc', fontSize: '24px' }}>
             arrow_back
           </span>
-          <span className={styles.mobileBrandTitle}>3NF</span>
+          <span className={styles.mobileBrandTitle}>{topicName}</span>
         </div>
         <button
           className={styles.mobileProfileBtn}
@@ -90,19 +174,30 @@ const TopicDetail = () => {
             <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
               chevron_right
             </span>
-            <Link to={`/subjects/${subjectId}`} className={styles.breadcrumbLink}>
-              DBMS
-            </Link>
+            {effectiveSubjectId ? (
+              <Link to={`/subjects/${effectiveSubjectId}`} className={styles.breadcrumbLink}>
+                {subjectName}
+              </Link>
+            ) : (
+              <span className={styles.breadcrumbLink}>{subjectName}</span>
+            )}
             <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
               chevron_right
             </span>
-            <Link to={`/subjects/${subjectId}/units/${unitId}`} className={styles.breadcrumbLink}>
-              Normalization
-            </Link>
+            {effectiveSubjectId && effectiveUnitId ? (
+              <Link
+                to={`/subjects/${effectiveSubjectId}/units/${effectiveUnitId}`}
+                className={styles.breadcrumbLink}
+              >
+                {unitName}
+              </Link>
+            ) : (
+              <span className={styles.breadcrumbLink}>{unitName}</span>
+            )}
             <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
               chevron_right
             </span>
-            <span className={styles.breadcrumbCurrent}>3NF</span>
+            <span className={styles.breadcrumbCurrent}>{topicName}</span>
           </nav>
           <div className={styles.headerActions}>
             <button className={styles.iconBtn} aria-label="Notifications" title="Notifications">
@@ -115,108 +210,160 @@ const TopicDetail = () => {
         </header>
 
         <div className={styles.contentWrapper}>
-          {/* Header Section */}
-          <section className={styles.topicHeaderSection}>
-            <h1 className={styles.topicMainTitle}>{topicData.title}</h1>
-            <div className={styles.topicTagsRow}>
-              <div className={styles.lastRevisedTag}>
-                <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#005e79' }}>
-                  calendar_clock
-                </span>
-                <span>Last Revised {topicData.lastRevised}</span>
-              </div>
-              <div className={styles.revisionDueTag}>
-                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-                  assignment_late
-                </span>
-                <span>Revision Due: {topicData.questionsDue} Questions</span>
-              </div>
+          {/* Loading State */}
+          {loading && (
+            <div className={styles.loadingContainer}>
+              <div className={styles.spinner}></div>
+              <p className={styles.loadingText}>Loading topic details...</p>
             </div>
-          </section>
+          )}
 
-          {/* Main 2-Column Content Grid */}
-          <section className={styles.topicContentGrid}>
-            {/* Left Column: AI Overview & CTA */}
-            <div className={styles.leftColumn}>
-              {/* AI Overview Card */}
-              <div className={styles.aiOverviewCard}>
-                <div className={styles.aiOverviewIconBox}>
-                  <span
-                    className="material-symbols-outlined"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    auto_awesome
+          {/* Error / Not Found State */}
+          {error && !loading && (
+            <div className={styles.errorContainer}>
+              <span className="material-symbols-outlined" style={{ fontSize: '56px', color: '#ba1a1a' }}>
+                cloud_off
+              </span>
+              <h2 className={styles.errorTitle}>Topic Not Found</h2>
+              <p className={styles.errorMessage}>{error}</p>
+              <div className={styles.errorActionGroup}>
+                <button className={styles.retryBtn} onClick={fetchTopicAndContext}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                    refresh
                   </span>
-                </div>
-                <div>
-                  <h3 className={styles.aiOverviewHeading}>Quick Overview</h3>
-                  <p className={styles.aiOverviewBody}>{topicData.overview}</p>
-                </div>
-              </div>
-
-              {/* CTA Area Card */}
-              <div className={styles.ctaAreaCard}>
-                <div className={styles.ctaBrainIcon}>
-                  <span className="material-symbols-outlined">psychology</span>
-                </div>
-                <h3 className={styles.ctaHeading}>Ready to master 3NF?</h3>
-                <p className={styles.ctaSubtitle}>{topicData.ctaSubtitle}</p>
-                <div className={styles.ctaButtonsGroup}>
-                  <button
-                    className={styles.ctaStartRevisionBtn}
-                    onClick={handleStartRevision}
-                  >
-                    <span>Start Revision</span>
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                      arrow_forward
-                    </span>
-                  </button>
-                  <button className={styles.ctaSecondaryBtn} onClick={handleViewNotes}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                      description
-                    </span>
-                    <span>View Related Notes</span>
-                  </button>
-                  <button className={styles.ctaSecondaryBtn} onClick={handlePracticePYQs}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                      history_edu
-                    </span>
-                    <span>Practice PYQs</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Progress Card */}
-            <div className={styles.rightColumn}>
-              <div className={styles.progressCard}>
-                <div className={styles.progressCardHeader}>
-                  <span className={styles.progressLabel}>Your Progress</span>
-                  <span
-                    className="material-symbols-outlined"
-                    style={{ color: '#5e5ce6', fontVariationSettings: "'FILL' 1" }}
-                  >
-                    trending_up
+                  <span>Retry</span>
+                </button>
+                <button
+                  className={styles.backBtn}
+                  onClick={() => {
+                    if (effectiveSubjectId && effectiveUnitId) {
+                      navigate(`/subjects/${effectiveSubjectId}/units/${effectiveUnitId}`);
+                    } else {
+                      navigate('/subjects');
+                    }
+                  }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                    arrow_back
                   </span>
-                </div>
-
-                <div className={styles.masteryBigRow}>
-                  <span className={styles.masteryBigNumber}>{topicData.mastery}</span>
-                  <span className={styles.masteryPercent}>%</span>
-                  <span className={styles.masteryWord}>Mastery</span>
-                </div>
-
-                <div className={styles.progressTrackWide}>
-                  <div
-                    className={styles.progressFillGradient}
-                    style={{ width: `${topicData.mastery}%` }}
-                  ></div>
-                </div>
-
-                <p className={styles.progressEncouragement}>Keep going!</p>
+                  <span>Back to Unit</span>
+                </button>
               </div>
             </div>
-          </section>
+          )}
+
+          {/* Topic Loaded State */}
+          {!loading && !error && topicData && (
+            <>
+              {/* Header Section */}
+              <section className={styles.topicHeaderSection}>
+                <h1 className={styles.topicMainTitle}>{topicData.name}</h1>
+                <div className={styles.topicTagsRow}>
+                  <div className={styles.lastRevisedTag}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#005e79' }}>
+                      calendar_clock
+                    </span>
+                    <span>Last Revised {formattedLastRevised}</span>
+                  </div>
+                  <div className={styles.revisionDueTag}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                      assignment_late
+                    </span>
+                    <span>Revision Due: {questionsDue} Questions</span>
+                  </div>
+                </div>
+              </section>
+
+              {/* Main 2-Column Content Grid */}
+              <section className={styles.topicContentGrid}>
+                {/* Left Column: AI Overview & CTA */}
+                <div className={styles.leftColumn}>
+                  {/* AI Overview Card */}
+                  <div className={styles.aiOverviewCard}>
+                    <div className={styles.aiOverviewIconBox}>
+                      <span
+                        className="material-symbols-outlined"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        auto_awesome
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className={styles.aiOverviewHeading}>Quick Overview</h3>
+                      <p className={styles.aiOverviewBody}>
+                        {topicData.description ||
+                          `Comprehensive notes, core concepts, and key principles for ${topicData.name} in unit ${unitName}.`}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* CTA Area Card */}
+                  <div className={styles.ctaAreaCard}>
+                    <div className={styles.ctaBrainIcon}>
+                      <span className="material-symbols-outlined">psychology</span>
+                    </div>
+                    <h3 className={styles.ctaHeading}>Ready to master {topicData.name}?</h3>
+                    <p className={styles.ctaSubtitle}>
+                      Tackle the {questionsDue} due questions to improve your retention and clear your revision queue.
+                    </p>
+                    <div className={styles.ctaButtonsGroup}>
+                      <button
+                        className={styles.ctaStartRevisionBtn}
+                        onClick={handleStartRevision}
+                      >
+                        <span>Start Revision</span>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                          arrow_forward
+                        </span>
+                      </button>
+                      <button className={styles.ctaSecondaryBtn} onClick={handleViewNotes}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                          description
+                        </span>
+                        <span>View Related Notes</span>
+                      </button>
+                      <button className={styles.ctaSecondaryBtn} onClick={handlePracticePYQs}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                          history_edu
+                        </span>
+                        <span>Practice PYQs</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Progress Card */}
+                <div className={styles.rightColumn}>
+                  <div className={styles.progressCard}>
+                    <div className={styles.progressCardHeader}>
+                      <span className={styles.progressLabel}>Your Progress</span>
+                      <span
+                        className="material-symbols-outlined"
+                        style={{ color: '#5e5ce6', fontVariationSettings: "'FILL' 1" }}
+                      >
+                        trending_up
+                      </span>
+                    </div>
+
+                    <div className={styles.masteryBigRow}>
+                      <span className={styles.masteryBigNumber}>{topicMastery}</span>
+                      <span className={styles.masteryPercent}>%</span>
+                      <span className={styles.masteryWord}>Mastery</span>
+                    </div>
+
+                    <div className={styles.progressTrackWide}>
+                      <div
+                        className={styles.progressFillGradient}
+                        style={{ width: `${topicMastery}%` }}
+                      ></div>
+                    </div>
+
+                    <p className={styles.progressEncouragement}>{encouragementText}</p>
+                  </div>
+                </div>
+              </section>
+            </>
+          )}
         </div>
       </main>
 

@@ -14,6 +14,56 @@
 
 ## Date: 09 September 2026
 
+### Time: 10:50 AM IST
+
+### Team Member Name: Anshul Gusain
+
+**Task Worked On:**
+Task 24 — Make Existing Subject/Unit/Topic UI Dynamic
+
+**Changes Made:**
+
+- Replaced hardcoded example values (Database Management Systems, Normalization, 3NF, mock units, mock mastery) across Subject Workspace, Unit Detail, and Topic Detail screens with real backend-driven data.
+- Connected `SubjectWorkspace.jsx` to fetch Subject details from `GET /api/subjects/:subjectId`, Units from `GET /api/subjects/:subjectId/units`, and lazy-load topic items on unit expansion via `GET /api/units/:unitId/topics`.
+- Made Subject Workspace metrics dynamic (subject name, description, mastery, unit count, topic count, question count, unit progress tracks, mastered badges, and least-mastered unit AI insight).
+- Connected `UnitDetail.jsx` to fetch unit details from `GET /api/units/:unitId`, parent subject data from `GET /api/subjects/:subjectId`, and unit topics from `GET /api/units/:unitId/topics`.
+- Made Unit Detail metrics dynamic (unit title, description, mastery %, topics count, revision due count, topic mastery cards with status badges and progress fills).
+- Connected `TopicDetail.jsx` to fetch topic details from `GET /api/topics/:topicId`, parent unit from `GET /api/units/:unitId`, and subject from `GET /api/subjects/:subjectId`.
+- Made Topic Detail metrics dynamic (topic title, overview/description, mastery %, progress encouragement, last revised timestamp, revision due questions, and active recall action buttons).
+- Added comprehensive loading spinners, error fallback screens with Retry and Back navigation actions, and empty-state cards for subjects/units with 0 children.
+- Updated breadcrumbs and deep-link routing across all three screens (`/subjects` -> `/subjects/:subjectId` -> `/subjects/:subjectId/units/:unitId` -> `/subjects/:subjectId/units/:unitId/topics/:topicId`).
+- Added responsive styling and loading/error/empty state styling in `SubjectWorkspace.module.css`, `UnitDetail.module.css`, and `TopicDetail.module.css`.
+
+**Files Modified:**
+
+- `client/src/pages/SubjectWorkspace/SubjectWorkspace.jsx`
+- `client/src/pages/SubjectWorkspace/SubjectWorkspace.module.css`
+- `client/src/pages/UnitDetail/UnitDetail.jsx`
+- `client/src/pages/UnitDetail/UnitDetail.module.css`
+- `client/src/pages/TopicDetail/TopicDetail.jsx`
+- `client/src/pages/TopicDetail/TopicDetail.module.css`
+- `docs/Phase/Phase_3/TASKDONE.md`
+- `docs/Phase/Phase_3/TIMELINE.md`
+
+**Notes:**
+
+- Phase 1 Authentication and Phase 2 Home/Dashboard functionality remain 100% intact and unaffected.
+- Reused existing design tokens, typography, and color schemes from the Stitch design system.
+
+**Blockers / Risks:**
+
+- None.
+
+**Testing Performed:**
+
+1. *Client Production Build Verification:* Executed `npm run build` in `client/`. Result: 79 modules transformed, 0 errors, build completed in 707ms.
+2. *Phase 1 Auth Security & Throttling Regression:* Executed `npm test` in `server/`. Result: 14/14 tests passed (login throttling, IP rate limiting, OTP limits, password reset limit, 30s DB cooldown).
+3. *Subject & UserProgress Unit Tests:* Executed `npm run test:subjects` in `server/`. Result: 5/5 tests passed.
+4. *Syllabus Pipeline Tests:* Executed `npm run test:syllabus` in `server/`. Result: Focused extraction and AI schema tests passed.
+5. *Dynamic Data & Navigation Verification:* Verified data fetching contracts (`/api/subjects/:subjectId`, `/api/subjects/:subjectId/units`, `/api/units/:unitId`, `/api/units/:unitId/topics`, `/api/topics/:topicId`), dynamic breadcrumbs, loading state indicators, error state retries, empty units/topics states, and mobile responsive top/bottom bar integrations.
+
+## Date: 09 September 2026
+
 ### Time: 10:15 AM IST
 
 ### Team Member Name: Amit Rawat
