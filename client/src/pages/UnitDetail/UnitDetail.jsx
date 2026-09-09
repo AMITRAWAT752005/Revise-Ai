@@ -199,7 +199,7 @@ const UnitDetail = () => {
   return (
     <div className={styles.unitLayout}>
       {/* Side Navigation */}
-      <SideNavBar user={user} xpEarned={820} onQuickRevision={() => navigate('/revision')} />
+      <SideNavBar user={user} xpEarned={user?.progress?.xp || user?.xp || 0} onQuickRevision={() => navigate('/revision')} />
 
       {/* Mobile Top App Bar */}
       <header className={styles.mobileTopBar}>
@@ -355,7 +355,7 @@ const UnitDetail = () => {
                       ></div>
                     </div>
                     <p className={styles.masterySubNote}>
-                      {100 - unitMastery}% remaining to mastery
+                      {Math.max(0, 100 - unitMastery)}% remaining to mastery
                     </p>
                   </div>
 

@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './SideNavBar.module.css';
 import bookLogo from '../../assets/images/book-logo.png';
 
-const SideNavBar = ({ user, xpEarned = 820, onQuickRevision }) => {
+const SideNavBar = ({ user, xpEarned = 0, onQuickRevision }) => {
   const navigate = useNavigate();
 
   const handleStartQuickRevision = () => {

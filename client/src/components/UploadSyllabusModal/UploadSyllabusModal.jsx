@@ -9,7 +9,7 @@ import styles from './UploadSyllabusModal.module.css';
  * - Task 11: Upload - Success State
  * - Task 16: Mobile responsiveness
  */
-const UploadSyllabusModal = ({ isOpen, onClose, onUploadComplete, initialSubjectId = 'dbms' }) => {
+const UploadSyllabusModal = ({ isOpen, onClose, onUploadComplete, initialSubjectId = '' }) => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
@@ -148,7 +148,11 @@ const UploadSyllabusModal = ({ isOpen, onClose, onUploadComplete, initialSubject
 
   const handleGoToWorkspace = () => {
     onClose();
-    navigate(`/subjects/${initialSubjectId}`);
+    if (initialSubjectId) {
+      navigate(`/subjects/${initialSubjectId}`);
+    } else {
+      navigate('/subjects');
+    }
   };
 
   return (

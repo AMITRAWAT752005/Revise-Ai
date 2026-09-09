@@ -140,7 +140,7 @@ const SubjectWorkspace = () => {
   return (
     <div className={styles.workspaceLayout}>
       {/* Desktop Side Navigation */}
-      <SideNavBar user={user} xpEarned={820} onQuickRevision={() => navigate('/revision')} />
+      <SideNavBar user={user} xpEarned={user?.progress?.xp || user?.xp || 0} onQuickRevision={() => navigate('/revision')} />
 
       {/* Mobile Top App Bar */}
       <header className={styles.mobileTopBar}>

@@ -120,60 +120,53 @@ const Home = () => {
         smartFocusSub: '',
       }
     : {
-        dailyRevision: { completed: userProgress.dailyCompleted || 15, target: userProgress.dailyTarget || 20 },
-        streakDays: userProgress.streak ?? 12,
-        examReadiness: userProgress.readiness ?? 78,
-        smartFocus: userProgress.smartFocus || (userSubjects[0]?.name ? userSubjects[0].name : 'DBMS'),
-        smartFocusSub: 'High priority',
+        dailyRevision: {
+          completed: userProgress.dailyCompleted ?? 0,
+          target: userProgress.dailyTarget ?? (userSubjects.length > 0 ? 20 : 0),
+        },
+        streakDays: userProgress.streak ?? 0,
+        examReadiness: userProgress.readiness ?? 0,
+        smartFocus: userProgress.smartFocus || (userSubjects[0]?.name ? userSubjects[0].name : 'Active Focus'),
+        smartFocusSub: userSubjects.length > 0 ? 'High priority' : '',
       };
 
+  const totalQuestionsSum = userSubjects.reduce((acc, s) => acc + (s.totalQuestions || 0), 0);
   const todayRevision = isNewUser
     ? null
     : {
-        totalQuestions: 15,
-        progress: 5,
-        target: 20,
-        percentage: 25,
+        totalQuestions: totalQuestionsSum > 0 ? totalQuestionsSum : (userProgress.dailyCompleted ? userProgress.dailyCompleted : 0),
+        progress: userProgress.dailyCompleted ?? 0,
+        target: userProgress.dailyTarget ?? (totalQuestionsSum > 0 ? Math.min(20, totalQuestionsSum) : 20),
+        percentage:
+          userProgress.dailyTarget && userProgress.dailyTarget > 0
+            ? Math.min(100, Math.round(((userProgress.dailyCompleted || 0) / userProgress.dailyTarget) * 100))
+            : userProgress.dailyCompleted && userProgress.dailyCompleted > 0
+            ? 100
+            : 0,
       };
 
-  const recommendations = [
-    {
-      id: 'deadlock',
-      tag: 'Needs Work',
-      title: 'Deadlock',
-      subject: 'Operating Systems',
-      accuracy: 42,
-      type: 'urgent',
-    },
-    {
-      id: 'scheduling',
-      tag: 'Review Suggested',
-      title: 'Scheduling',
-      subject: 'Operating Systems',
-      accuracy: 61,
-      type: 'warning',
-    },
-  ];
+  const recommendations =
+    userSubjects.length > 0
+      ? userSubjects.slice(0, 2).map((sub, i) => ({
+          id: sub._id || `rec-${i}`,
+          subjectId: sub._id || sub.id,
+          tag: (sub.mastery || 0) < 50 ? 'Needs Work' : 'Review Suggested',
+          title: sub.name,
+          subject: `${sub.totalTopics || 0} Topics • ${sub.mastery || 0}% Mastery`,
+          accuracy: sub.mastery || 0,
+          type: (sub.mastery || 0) < 50 ? 'urgent' : 'warning',
+        }))
+      : [];
 
-  const gamification = isNewUser
-    ? {
-        level: userProgress.level ?? 1,
-        levelTitle: 'Beginner',
-        currentXP: userProgress.xp ?? 0,
-        nextLevelXP: 100,
-        streak: userProgress.streak ?? 0,
-        percentile: 'Top 100%',
-        todayXP: 0,
-      }
-    : {
-        level: userProgress.level ?? 8,
-        levelTitle: 'Knowledge Seeker',
-        currentXP: userProgress.xp ?? 820,
-        nextLevelXP: 1000,
-        streak: userProgress.streak ?? 12,
-        percentile: 'Top 10%',
-        todayXP: 125,
-      };
+  const gamification = {
+    level: userProgress.level ?? 1,
+    levelTitle: (userProgress.xp ?? 0) >= 500 ? 'Knowledge Seeker' : 'Beginner',
+    currentXP: userProgress.xp ?? 0,
+    nextLevelXP: Math.max(100, (userProgress.level ?? 1) * 200),
+    streak: userProgress.streak ?? 0,
+    percentile: (userProgress.xp ?? 0) > 0 ? 'Top 25%' : 'Top 100%',
+    todayXP: userProgress.todayXP ?? (userProgress.dailyCompleted ? userProgress.dailyCompleted * 10 : 0),
+  };
 
   const handleStartRevision = (params = '') => {
     navigate(`/revision${params ? `?${params}` : ''}`);
@@ -485,7 +478,7 @@ const Home = () => {
                             const icons = ['database', 'router', 'memory'];
                             const themeColor = colors[idx % colors.length];
                             const iconName = icons[idx % icons.length];
-                            const targetSubId = subject._id || subject.id || 'dbms';
+                            const targetSubId = subject._id || subject.id;
 
                             return (
                               <div
@@ -499,15 +492,15 @@ const Home = () => {
                                     <span className="material-symbols-outlined">{iconName}</span>
                                   </div>
                                   <span className={styles.subjectMasteryBadge} style={{ backgroundColor: 'rgba(0, 94, 121, 0.1)', color: '#005e79' }}>
-                                    {subject.mastery ?? 82}%
+                                    {subject.mastery ?? 0}%
                                   </span>
                                 </div>
                                 <div className={styles.subjectContent}>
                                   <h4 className={styles.subjectName}>{subject.name}</h4>
                                   <p className={styles.subjectTopicInfo}>
-                                    {subject.topicsNeedingReview > 0
-                                      ? `${subject.topicsNeedingReview} Topics needing review`
-                                      : 'Active Syllabus'}
+                                    {subject.totalTopics > 0
+                                      ? `${subject.totalTopics} Topics • ${subject.totalQuestions || 0} Qs`
+                                      : '0 Topics • 0 Qs'}
                                   </p>
                                 </div>
                                 <button
@@ -538,36 +531,52 @@ const Home = () => {
                         </span>
                       </h3>
                       <div className={styles.recommendationsCard}>
-                        {recommendations.map((rec) => (
-                          <div
-                            key={rec.id}
-                            className={rec.type === 'urgent' ? styles.recommendationItemRed : styles.recommendationItemYellow}
-                            onClick={() => handleStartRevision(`topic=${encodeURIComponent(rec.title)}`)}
-                          >
-                            <div className={styles.recTopRow}>
-                              <div>
-                                <span className={rec.type === 'urgent' ? styles.recTagRed : styles.recTagYellow}>{rec.tag}</span>
-                                <h4 className={styles.recTitle}>{rec.title}</h4>
-                              </div>
-                              <div className={rec.type === 'urgent' ? styles.recAccuracyBadgeRed : styles.recAccuracyBadgeYellow}>
-                                {rec.accuracy}% Acc.
-                              </div>
-                            </div>
-                            <p className={styles.recSubject}>{rec.subject}</p>
-                            <button
-                              className={styles.reviewTopicBtn}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleStartRevision(`topic=${encodeURIComponent(rec.title)}`);
+                        {recommendations.length === 0 ? (
+                          <div style={{ padding: '24px 16px', textAlign: 'center', color: '#777586' }}>
+                            <p style={{ margin: 0, fontSize: '14px' }}>Add or revise subjects to get personalized recommendations.</p>
+                          </div>
+                        ) : (
+                          recommendations.map((rec) => (
+                            <div
+                              key={rec.id}
+                              className={rec.type === 'urgent' ? styles.recommendationItemRed : styles.recommendationItemYellow}
+                              onClick={() => {
+                                if (rec.subjectId) {
+                                  navigate(`/subjects/${rec.subjectId}`);
+                                } else {
+                                  handleStartRevision(`subject=${encodeURIComponent(rec.title)}`);
+                                }
                               }}
                             >
-                              <span>Review Topic</span>
-                              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-                                arrow_forward
-                              </span>
-                            </button>
-                          </div>
-                        ))}
+                              <div className={styles.recTopRow}>
+                                <div>
+                                  <span className={rec.type === 'urgent' ? styles.recTagRed : styles.recTagYellow}>{rec.tag}</span>
+                                  <h4 className={styles.recTitle}>{rec.title}</h4>
+                                </div>
+                                <div className={rec.type === 'urgent' ? styles.recAccuracyBadgeRed : styles.recAccuracyBadgeYellow}>
+                                  {rec.accuracy}%
+                                </div>
+                              </div>
+                              <p className={styles.recSubject}>{rec.subject}</p>
+                              <button
+                                className={styles.reviewTopicBtn}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (rec.subjectId) {
+                                    navigate(`/subjects/${rec.subjectId}`);
+                                  } else {
+                                    handleStartRevision(`subject=${encodeURIComponent(rec.title)}`);
+                                  }
+                                }}
+                              >
+                                <span>Review Subject</span>
+                                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                                  arrow_forward
+                                </span>
+                              </button>
+                            </div>
+                          ))
+                        )}
                       </div>
                     </section>
 

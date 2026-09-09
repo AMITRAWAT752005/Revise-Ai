@@ -111,15 +111,13 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
         )
       : 0;
 
-  const totalRevisionDue = displaySubjects.reduce(
-    (acc, s) => acc + (s.topicsNeedingReview || 4),
-    0
-  );
+  const totalRevisionDue = displaySubjects.filter((s) => (s.mastery || 0) < 100).length;
   const weakTopicsCount = displaySubjects.filter((s) => (s.mastery || 0) < 70).length;
 
-  const getStatusBadge = (mastery = 80) => {
+  const getStatusBadge = (mastery = 0) => {
     if (mastery >= 90) return { label: 'Excellent', className: styles.statusExcellent };
     if (mastery >= 75) return { label: 'Strong', className: styles.statusStrong };
+    if (mastery >= 50) return { label: 'On Track', className: styles.statusStrong };
     return { label: 'Needs Practice', className: styles.statusNeedsPractice };
   };
 
@@ -136,7 +134,7 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
   return (
     <div className={styles.pageLayout}>
       {/* Desktop Side Navigation */}
-      <SideNavBar user={user} xpEarned={820} onQuickRevision={() => navigate('/revision')} />
+      <SideNavBar user={user} xpEarned={user?.progress?.xp || user?.xp || 0} onQuickRevision={() => navigate('/revision')} />
 
       {/* Mobile Top App Bar */}
       <header className={styles.mobileTopBar}>
@@ -319,7 +317,7 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
                   <div>
                     <div className={styles.metricLabel}>Average Mastery</div>
                     <div className={styles.metricBigNumber} style={{ color: '#4441cc' }}>
-                      {avgMastery || 76}%
+                      {avgMastery}%
                     </div>
                   </div>
                 </div>
@@ -352,7 +350,7 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
                   </div>
                   <div>
                     <div className={styles.metricLabel}>Weak Topics</div>
-                    <div className={styles.metricBigNumber}>{weakTopicsCount || 3}</div>
+                    <div className={styles.metricBigNumber}>{weakTopicsCount}</div>
                   </div>
                 </div>
               </div>
@@ -400,10 +398,10 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
               {/* Subject Grid */}
               <div className={styles.subjectGrid}>
                 {filteredSubjects.map((subject, idx) => {
-                  const mastery = subject.mastery ?? 82;
+                  const mastery = subject.mastery ?? 0;
                   const status = getStatusBadge(mastery);
                   const theme = getSubjectColorTheme(idx, subject.colour);
-                  const subjectId = subject._id || subject.id || 'dbms';
+                  const subjectId = subject._id || subject.id;
 
                   return (
                     <div key={subjectId} className={styles.subjectCard}>
@@ -423,7 +421,9 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
                           <div>
                             <h3 className={styles.subjectTitle}>{subject.name}</h3>
                             <p className={styles.subjectTopicCount}>
-                              {subject.totalTopics || 12} Topics • {subject.totalQuestions || 150} Qs
+                              {subject.totalTopics > 0
+                                ? `${subject.totalTopics} Topics • ${subject.totalQuestions || 0} Qs`
+                                : `${subject.totalTopics || 0} Topics • 0 Qs`}
                             </p>
                           </div>
                         </div>
@@ -449,7 +449,7 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
                           <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>
                             schedule
                           </span>
-                          <span>Revised Today</span>
+                          <span>{subject.updatedAt ? `Last active ${new Date(subject.updatedAt).toLocaleDateString()}` : 'Not revised yet'}</span>
                         </div>
                       </div>
 
@@ -479,16 +479,27 @@ const Subjects = ({ initialCreateModalOpen = false }) => {
                   <div>
                     <h3 className={styles.aiInsightTitle}>AI Study Insight</h3>
                     <p className={styles.aiInsightText}>
-                      <strong>Deadlock</strong> is currently your weakest topic in Operating Systems. A
-                      short focused revision session could help improve your mastery.
+                      {displaySubjects.length > 0 ? (
+                        <>
+                          Focus on revision for <strong>{displaySubjects[0].name}</strong> to build mastery across your syllabus modules.
+                        </>
+                      ) : (
+                        'Upload your syllabus or create a subject to get personalized AI study insights.'
+                      )}
                     </p>
                   </div>
                 </div>
                 <button
                   className={styles.reviewTopicBtn}
-                  onClick={() => navigate('/subjects/dbms/units/normalization/topics/3nf')}
+                  onClick={() => {
+                    if (displaySubjects.length > 0) {
+                      navigate(`/subjects/${displaySubjects[0]._id || displaySubjects[0].id}`);
+                    } else {
+                      setIsCreateModalOpen(true);
+                    }
+                  }}
                 >
-                  <span>Review Topic</span>
+                  <span>{displaySubjects.length > 0 ? `View ${displaySubjects[0].name}` : 'Add Subject'}</span>
                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                     arrow_forward
                   </span>

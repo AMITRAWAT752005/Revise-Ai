@@ -49,7 +49,7 @@ Task 27 — Subject/Unit/Topic Frontend API Integration
 
 ## Date: 09 September 2026
 
-### Time: 10:50 AM IST
+### Time: 01:45 PM IST
 
 ### Team Member Name: Anshul Gusain
 
@@ -65,12 +65,20 @@ Task 24 — Make Existing Subject/Unit/Topic UI Dynamic
 - Made Unit Detail metrics dynamic (unit title, description, mastery %, topics count, revision due count, topic mastery cards with status badges and progress fills).
 - Connected `TopicDetail.jsx` to fetch topic details from `GET /api/topics/:topicId`, parent unit from `GET /api/units/:unitId`, and subject from `GET /api/subjects/:subjectId`.
 - Made Topic Detail metrics dynamic (topic title, overview/description, mastery %, progress encouragement, last revised timestamp, revision due questions, and active recall action buttons).
+- Updated `Subjects.jsx` to make AI Study Insight banner and action buttons completely dynamic based on user subjects.
+- Updated `Home.jsx` to eliminate static fallback identifiers and maintain dynamic subject workspace links.
+- Updated `UploadSyllabusModal.jsx` to support dynamic subject workspace navigation.
 - Added comprehensive loading spinners, error fallback screens with Retry and Back navigation actions, and empty-state cards for subjects/units with 0 children.
 - Updated breadcrumbs and deep-link routing across all three screens (`/subjects` -> `/subjects/:subjectId` -> `/subjects/:subjectId/units/:unitId` -> `/subjects/:subjectId/units/:unitId/topics/:topicId`).
 - Added responsive styling and loading/error/empty state styling in `SubjectWorkspace.module.css`, `UnitDetail.module.css`, and `TopicDetail.module.css`.
 
 **Files Modified:**
 
+- `server/src/services/dashboardService.js`
+- `client/src/components/Navigation/SideNavBar.jsx`
+- `client/src/components/UploadSyllabusModal/UploadSyllabusModal.jsx`
+- `client/src/pages/Home/Home.jsx`
+- `client/src/pages/Subjects/Subjects.jsx`
 - `client/src/pages/SubjectWorkspace/SubjectWorkspace.jsx`
 - `client/src/pages/SubjectWorkspace/SubjectWorkspace.module.css`
 - `client/src/pages/UnitDetail/UnitDetail.jsx`
@@ -84,18 +92,19 @@ Task 24 — Make Existing Subject/Unit/Topic UI Dynamic
 
 - Phase 1 Authentication and Phase 2 Home/Dashboard functionality remain 100% intact and unaffected.
 - Reused existing design tokens, typography, and color schemes from the Stitch design system.
+- Preserved Phase 3 boundaries without prematurely generating Phase 4 flashcards or questions.
 
 **Blockers / Risks:**
 
 - None.
 
-**Testing Performed:**
+**Testing Performed & Step-by-Step Method:**
 
-1. *Client Production Build Verification:* Executed `npm run build` in `client/`. Result: 79 modules transformed, 0 errors, build completed in 707ms.
+1. *Client Production Build Verification:* Executed `npm run build` in `client/`. Result: 79 modules transformed, 0 errors, build completed in 661ms.
 2. *Phase 1 Auth Security & Throttling Regression:* Executed `npm test` in `server/`. Result: 14/14 tests passed (login throttling, IP rate limiting, OTP limits, password reset limit, 30s DB cooldown).
 3. *Subject & UserProgress Unit Tests:* Executed `npm run test:subjects` in `server/`. Result: 5/5 tests passed.
 4. *Syllabus Pipeline Tests:* Executed `npm run test:syllabus` in `server/`. Result: Focused extraction and AI schema tests passed.
-5. *Dynamic Data & Navigation Verification:* Verified data fetching contracts (`/api/subjects/:subjectId`, `/api/subjects/:subjectId/units`, `/api/units/:unitId`, `/api/units/:unitId/topics`, `/api/topics/:topicId`), dynamic breadcrumbs, loading state indicators, error state retries, empty units/topics states, and mobile responsive top/bottom bar integrations.
+5. *Dynamic Data & Navigation Verification:* Verified data fetching contracts (`/api/subjects/:subjectId`, `/api/subjects/:subjectId/units`, `/api/units/:unitId`, `/api/units/:unitId/topics`, `/api/topics/:topicId`), dynamic breadcrumbs, loading state indicators, error state retries, empty units/topics states, and mobile responsive top/bottom bar integrations across Home, Subjects, Subject Workspace, Unit Detail, and Topic Detail.
 
 ## Date: 09 September 2026
 
