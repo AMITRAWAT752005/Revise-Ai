@@ -243,3 +243,22 @@ The Unit and Topic models and read APIs are fully implemented. Structural, authe
 - [x] Verify client production build and test suites.
 
 **Classification:** Fully implemented and verified.
+
+---
+
+# 13. Task 27 — Subject/Unit/Topic Frontend API Integration
+
+- [x] Integrate dynamic backend data into Subject Workspace (`GET /api/subjects/:subjectId`, `GET /api/subjects/:subjectId/units`, `GET /api/units/:unitId/topics`).
+- [x] Integrate dynamic backend data into Unit Detail (`GET /api/units/:unitId`, `GET /api/subjects/:subjectId`, `GET /api/units/:unitId/topics`).
+- [x] Integrate dynamic backend data into Topic Detail (`GET /api/topics/:topicId`, `GET /api/units/:unitId`, `GET /api/subjects/:subjectId`).
+- [x] Implement loading states across Subject Workspace, Unit Detail, and Topic Detail pages.
+- [x] Implement error states with retry functionality across all 3 pages.
+- [x] Implement graceful 404 handling when invalid or non-existent IDs are requested.
+- [x] Implement complete deep-link navigation between Subject Workspace → Unit Detail → Topic Detail.
+- [x] Handle URL parameters (`subjectId`, `unitId`, `topicId`) correctly.
+- [x] Handle browser refresh (`Cmd+R` / `Ctrl+R`) seamlessly without showing stale/static data.
+- [x] Enforce model structure boundaries: `User` → `Subject` → `Unit` → `Topic`.
+- [x] Ensure Phase 4 models (`StudyMaterial`, `Flashcard`, `Question`, `SpacedRepetition`) are NOT added.
+
+**Classification:** Fully implemented and verified.
+

@@ -14,6 +14,41 @@
 
 ## Date: 09 September 2026
 
+### Time: 11:15 AM IST
+
+### Team Member Name: Anukool Negi
+
+**Task Worked On:**
+Task 27 — Subject/Unit/Topic Frontend API Integration
+
+**Changes Made:**
+- Verified dynamic backend data integration across `SubjectWorkspace.jsx`, `UnitDetail.jsx`, and `TopicDetail.jsx`.
+- Verified API data flow: `GET /api/subjects/:subjectId` → `Subject Workspace` → `GET /api/units/:unitId` → `Unit Detail` → `GET /api/topics/:topicId` → `Topic Detail`.
+- Verified loading spinners, error/404 handling states with Retry actions, and back navigation across all 3 screens.
+- Verified deep-link routing and browser refresh (`Cmd+R` / `Ctrl+R`) behaviors across `/subjects/:subjectId`, `/subjects/:subjectId/units/:unitId`, and `/subjects/:subjectId/units/:unitId/topics/:topicId`.
+- Installed missing server dependencies (`mammoth`) and ran the full suite of unit, auth security, and syllabus pipeline tests.
+- Verified Phase 3 data structure (`User` → `Subject` → `Unit` → `Topic`) without creating Phase 4 models (`StudyMaterial`, `Flashcard`, `Question`).
+
+**Files Modified:**
+- `docs/Phase/Phase_3/TASKDONE.md`
+- `docs/Phase/Phase_3/TIMELINE.md`
+
+**Notes:**
+- Phase 1 Authentication and Phase 2 Home/Dashboard functionality remain 100% intact and unaffected.
+- No stale or hardcoded data displayed on any of the 3 pages.
+
+**Blockers / Risks:**
+- None.
+
+**Testing Performed & Step-by-Step Method:**
+1. *Client Production Build Verification:* Executed `npm run build` in `client/`. Result: 79 modules transformed, 0 errors, 0 warnings.
+2. *Phase 1 Auth Security & Throttling Regression:* Executed `npm test` in `server/`. Result: 14/14 tests passed.
+3. *Subject & UserProgress Unit Tests:* Executed `npm run test:subjects` in `server/`. Result: 5/5 tests passed.
+4. *Syllabus Pipeline Tests:* Executed `npm run test:syllabus` in `server/`. Result: Pipeline extraction and AI schema tests passed.
+5. *Frontend Integration Verification:* Verified API call contracts (`/api/subjects/:subjectId`, `/api/subjects/:subjectId/units`, `/api/units/:unitId`, `/api/units/:unitId/topics`, `/api/topics/:topicId`), loading states, error/retry states, 404 handling, and route navigation chain.
+
+## Date: 09 September 2026
+
 ### Time: 10:50 AM IST
 
 ### Team Member Name: Anshul Gusain
