@@ -827,7 +827,7 @@ Create the required environment files according to the project's configuration.
 Example:
 
 ```env
-PORT=5000
+PORT=5001
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=your_jwt_expiration
