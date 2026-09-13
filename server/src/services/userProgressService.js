@@ -6,7 +6,7 @@ export const ensureUserProgress = async (userId, session = null) => {
     throw new Error('User ID is required to initialize progress.');
   }
 
-  const options = { upsert: true, new: true, setDefaultsOnInsert: true };
+  const options = { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true };
   if (session) {
     options.session = session;
   }
@@ -31,7 +31,7 @@ export const syncSubjectCount = async (userId, session = null) => {
 
   await ensureUserProgress(userId, session);
 
-  const options = { new: true };
+  const options = { returnDocument: 'after' };
   if (session) {
     options.session = session;
   }
@@ -50,7 +50,7 @@ export const incrementSubjectCount = async (userId, session = null) => {
 
   await ensureUserProgress(userId, session);
 
-  const options = { new: true };
+  const options = { returnDocument: 'after' };
   if (session) {
     options.session = session;
   }
@@ -69,7 +69,7 @@ export const decrementSubjectCount = async (userId, session = null) => {
 
   await ensureUserProgress(userId, session);
 
-  const options = { new: true };
+  const options = { returnDocument: 'after' };
   if (session) {
     options.session = session;
   }
@@ -106,7 +106,7 @@ export const updateActivityProgress = async (userId, updates = {}, session = nul
 
   await ensureUserProgress(userId, session);
 
-  const options = { new: true, runValidators: true };
+  const options = { returnDocument: 'after', runValidators: true };
   if (session) {
     options.session = session;
   }

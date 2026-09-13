@@ -56,19 +56,19 @@ globalThis.fetch = async (_url, options) => {
   return {
     ok: true,
     json: async () => ({
-      choices: [{ message: { content: '{"subjects":[{"name":"Operating Systems"},{"name":"operating systems"}]}' } }],
+      candidates: [{ content: { parts: [{ text: '{"subjects":[{"name":"Operating Systems"},{"name":"operating systems"}]}' }] } }],
     }),
   };
 };
-process.env.AI_API_KEY = 'test-key';
+process.env.GEMINI_API_KEY = 'test-key';
 const aiResult = await extractSubjectsWithAI('Operating Systems syllabus content.');
 assert.deepEqual(aiResult.subjects, [{ name: 'Operating Systems' }]);
-assert.deepEqual(aiRequest.response_format, { type: 'json_object' });
-assert.equal(aiRequest.max_tokens, 2_000);
+assert.equal(aiRequest.generationConfig.responseMimeType, 'application/json');
+assert.equal(aiRequest.generationConfig.maxOutputTokens, 2_000);
 
 const longSyllabus = `${'Opening course list. '.repeat(700)}Middle course list: Computer Networks. ${'Detailed unit content. '.repeat(700)}End of syllabus.`;
 await extractSubjectsWithAI(longSyllabus);
-assert.match(aiRequest.messages[1].content, /Middle course list: Computer Networks/);
+assert.match(aiRequest.contents[0].parts[0].text, /Middle course list: Computer Networks/);
 
 globalThis.fetch = async () => ({
   ok: false,

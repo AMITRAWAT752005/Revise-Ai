@@ -1,5 +1,26 @@
 import mongoose from 'mongoose';
 
+const detectedUnitSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 200,
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 1000,
+    },
+    order: {
+      type: Number,
+      default: 0,
+    },
+  },
+  { _id: false },
+);
+
 const detectedSubjectSchema = new mongoose.Schema(
   {
     name: {
@@ -17,6 +38,10 @@ const detectedSubjectSchema = new mongoose.Schema(
       type: String,
       trim: true,
       maxlength: 50,
+    },
+    units: {
+      type: [detectedUnitSchema],
+      default: [],
     },
   },
   { _id: false },

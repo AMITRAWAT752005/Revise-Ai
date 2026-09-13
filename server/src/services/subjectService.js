@@ -105,7 +105,7 @@ export const updateSubject = async (userId, subjectId, data = {}) => {
     subject = await Subject.findOneAndUpdate(
       { _id: subjectId, userId },
       { $set: updates },
-      { new: true, runValidators: true },
+      { returnDocument: 'after', runValidators: true },
     ).select(SUBJECT_FIELDS);
   } catch (error) {
     if (error.code === 11000) {

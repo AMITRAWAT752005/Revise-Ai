@@ -682,7 +682,7 @@ Responsible for:
 
 The AI layer uses: 
 
-- Groq API (Primary) 
+- Gemini API (Primary)
 
 - Ollama (Fallback) 
 
@@ -1116,7 +1116,7 @@ Used for:
 
 ## **Primary AI** 
 
-## Groq 
+## Gemini
 
 Used for: 
 
@@ -1500,7 +1500,7 @@ CLOUDINARY_API_KEY=
 
 CLOUDINARY_API_SECRET= 
 
-GROQ_API_KEY= 
+GEMINI_API_KEY=
 
 REDIS_URL= 
 

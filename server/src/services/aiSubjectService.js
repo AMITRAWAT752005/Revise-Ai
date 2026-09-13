@@ -1,34 +1,88 @@
 import { z } from 'zod';
 
-// Keep the complete request below Groq's 8,000-token TPM limit.
-const MAX_AI_INPUT_CHARS = 20_000;
+// ─── Chunking / rate-limit constants ─────────────────────────────────────────
+// Keep requests bounded so syllabus extraction remains within Gemini quotas.
+const CHUNK_SIZE    = 5_000;   // characters per chunk
+const CHUNK_OVERLAP = 800;     // overlap so cross-boundary subjects are captured
+const CHUNK_DELAY_MS = 12_000; // wait 12 s between chunks (≤ 5 calls / minute)
+const MAX_RETRIES   = 3;       // retry transient provider failures before skipping
+const RETRY_DELAY_MS = 8_000;  // base delay before a transient retry
+const RETRYABLE_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
 
-const getAiInput = (text) => {
-  if (text.length <= MAX_AI_INPUT_CHARS) return text;
-  const leadingChars = 8_000;
-  const middleChars = 8_000;
-  const trailingChars = MAX_AI_INPUT_CHARS - leadingChars - middleChars;
-  const middleStart = Math.floor((text.length - middleChars) / 2);
-
-  return [
-    text.slice(0, leadingChars),
-    '[Middle section sample]',
-    text.slice(middleStart, middleStart + middleChars),
-    '[End section sample]',
-    text.slice(-trailingChars),
-  ].join('\n');
-};
+// ─── Zod validation schemas ───────────────────────────────────────────────────
+const detectedUnitSchema = z.object({
+  // unit names can be long ("Unit 1: Introduction to DBMS and its components")
+  name:        z.string().trim().min(1).max(400),
+  description: z.string().trim().max(500).optional(),
+  order:       z.number().int().min(1).optional(),
+});
 
 const subjectResultSchema = z.object({
-  subjects: z.array(z.object({
-    name: z.string().trim().min(2).max(200),
-    code: z.string().trim().max(50).optional(),
-    category: z.string().trim().max(50).optional(),
-  }).strip()).max(100),
+  subjects: z.array(
+    z.object({
+      name:     z.string().trim().min(2).max(200),
+      code:     z.string().trim().max(50).optional(),
+      category: z.string().trim().max(50).optional(),
+      units:    z.array(detectedUnitSchema).optional().default([]),
+    }).strip(),
+  ).max(100),
 }).strict();
 
 const normalizeName = (name) => name.replace(/\s+/g, ' ').trim();
 
+// Truncate a string to maxLen characters, appending "…" if cut.
+const truncate = (str, maxLen) =>
+  str.length <= maxLen ? str : str.slice(0, maxLen - 1) + '…';
+
+// ─── Parse JSON safely ────────────────────────────────────────────────────────
+const parseJsonResponse = (content) => {
+  const withoutFence = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  try {
+    return JSON.parse(withoutFence);
+  } catch {
+    const start = withoutFence.indexOf('{');
+    const end   = withoutFence.lastIndexOf('}');
+    if (start < 0 || end <= start) throw new Error('AI returned invalid JSON.');
+    return JSON.parse(withoutFence.slice(start, end + 1));
+  }
+};
+
+// ─── Validate + deduplicate a raw subjects payload ───────────────────────────
+export const validateAndDeduplicateSubjects = (payload) => {
+  const parsed = subjectResultSchema.safeParse(payload);
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    const field = issue.path.length ? issue.path.join('.') : 'response';
+    throw new Error(`AI returned an invalid subject list: ${field} ${issue.message}`);
+  }
+
+  const seen     = new Set();
+  const subjects = parsed.data.subjects
+    .map((subject) => ({
+      ...subject,
+      name:     normalizeName(subject.name),
+      ...(subject.code     ? { code:     normalizeName(subject.code)     } : {}),
+      ...(subject.category ? { category: normalizeName(subject.category) } : {}),
+      units: (subject.units || [])
+        .filter((u) => u.name && u.name.trim().length > 0)
+        .map((u, i) => ({
+          // Clamp unit name to 200 chars in case the AI returned a long description
+          name:  truncate(normalizeName(u.name), 200),
+          ...(u.description ? { description: truncate(u.description.trim(), 500) } : {}),
+          order: u.order ?? i + 1,
+        })),
+    }))
+    .filter((subject) => {
+      const key = subject.name.toLocaleLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+  return { subjects };
+};
+
+// ─── Deterministic fallback ───────────────────────────────────────────────────
 const cleanCandidateName = (value) => normalizeName(
   value
     .replace(/^[\s\d.)-]+/, '')
@@ -38,13 +92,13 @@ const cleanCandidateName = (value) => normalizeName(
 
 export const extractSubjectsFromText = (text) => {
   const candidates = [];
-  const seen = new Set();
+  const seen       = new Set();
   const addCandidate = (value) => {
     const name = cleanCandidateName(value);
-    const key = name.toLocaleLowerCase();
+    const key  = name.toLocaleLowerCase();
     if (name.length < 2 || name.length > 200 || seen.has(key)) return;
     seen.add(key);
-    candidates.push({ name });
+    candidates.push({ name, units: [] });
   };
 
   for (const rawLine of String(text || '').split('\n')) {
@@ -61,92 +115,153 @@ export const extractSubjectsFromText = (text) => {
   return { subjects: candidates.slice(0, 20) };
 };
 
-export const validateAndDeduplicateSubjects = (payload) => {
-  const parsed = subjectResultSchema.safeParse(payload);
-  if (!parsed.success) {
-    const issue = parsed.error.issues[0];
-    const field = issue.path.length ? issue.path.join('.') : 'response';
-    throw new Error(`AI returned an invalid subject list: ${field} ${issue.message}`);
+// ─── Split text into overlapping chunks ──────────────────────────────────────
+const splitIntoChunks = (text, size = CHUNK_SIZE, overlap = CHUNK_OVERLAP) => {
+  if (text.length <= size) return [text];
+  const chunks = [];
+  let start = 0;
+  while (start < text.length) {
+    const end = Math.min(start + size, text.length);
+    chunks.push(text.slice(start, end));
+    if (end === text.length) break;
+    start += size - overlap;
   }
+  return chunks;
+};
 
-  const seen = new Set();
-  const subjects = parsed.data.subjects
-    .map((subject) => ({
-      ...subject,
-      name: normalizeName(subject.name),
-      ...(subject.code ? { code: normalizeName(subject.code) } : {}),
-      ...(subject.category ? { category: normalizeName(subject.category) } : {}),
-    }))
-    .filter((subject) => {
+// ─── Merge subject lists from multiple chunks ─────────────────────────────────
+const mergeSubjectLists = (lists) => {
+  const map = new Map();
+  for (const list of lists) {
+    for (const subject of list) {
       const key = subject.name.toLocaleLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-
-  return { subjects };
+      if (!map.has(key)) {
+        map.set(key, { ...subject });
+      } else {
+        const existing = map.get(key);
+        if ((subject.units || []).length > (existing.units || []).length) {
+          existing.units = subject.units;
+        }
+        if (!existing.code     && subject.code)     existing.code     = subject.code;
+        if (!existing.category && subject.category) existing.category = subject.category;
+      }
+    }
+  }
+  return Array.from(map.values());
 };
 
-const parseJsonResponse = (content) => {
-  const withoutFence = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+// ─── Helper: sleep ────────────────────────────────────────────────────────────
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// ─── Single LLM call for one chunk (with transient-failure retry) ────────────
+const extractFromChunk = async (chunkText, apiKey, apiUrl, model, signal, attempt = 0) => {
+  const endpoint = `${apiUrl}/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const response = await fetch(endpoint, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal,
+    body: JSON.stringify({
+      systemInstruction: {
+        parts: [{ text: `You are an academic syllabus parser. Output ONLY a single valid JSON object — no markdown, no explanation.
+Schema: {"subjects":[{"name":"...","code":"...","category":"...","units":[{"name":"...","description":"...","order":1}]}]}
+
+Rules:
+- Identify every distinct academic course/subject listed in this text.
+- For each subject, extract ALL its units (Unit 1, Unit 2, Unit I, Unit II, etc.).
+- Keep units associated with the CORRECT parent subject — never mix units across subjects.
+- "name" for a unit MUST be short (max 60 chars) — use just the unit label like "Unit 1: Introduction" not the full topic list.
+- "description" may contain the brief topic list for that unit (max 120 chars).
+- "order" is the unit number (convert Roman numerals to integers).
+- If no units are visible for a subject in this section, return an empty units array.
+- "code" is the course code if present (e.g. TCS756). Omit if not shown.
+- Do NOT invent subjects or units. Extract only what is literally present.
+- Do NOT return duplicate subjects.` }],
+      },
+      contents: [{ role: 'user', parts: [{ text: chunkText }] }],
+      generationConfig: {
+        temperature: 0,
+        responseMimeType: 'application/json',
+        maxOutputTokens: 3_000,
+      },
+    }),
+  });
+
+  // Gemini can briefly reject requests during rate-limit or capacity spikes.
+  if (RETRYABLE_STATUSES.has(response.status) && attempt < MAX_RETRIES) {
+    const retryAfter = Number(response.headers?.get?.('retry-after'));
+    const delay = Number.isFinite(retryAfter) && retryAfter > 0
+      ? retryAfter * 1_000
+      : RETRY_DELAY_MS * (attempt + 1);
+    console.warn(`[aiSubjectService] HTTP ${response.status} on chunk, retrying in ${delay / 1000}s (attempt ${attempt + 1}/${MAX_RETRIES})…`);
+    await sleep(delay);
+    return extractFromChunk(chunkText, apiKey, apiUrl, model, signal, attempt + 1);
+  }
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    const providerMessage = typeof errorBody.error?.message === 'string'
+      ? ` ${errorBody.error.message}` : '';
+    throw new Error(`AI provider returned HTTP ${response.status}.${providerMessage}`);
+  }
+
+  const body    = await response.json();
+  const content = body.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('');
+  if (typeof content !== 'string') throw new Error('AI provider returned no content.');
+
   try {
-    return JSON.parse(withoutFence);
+    return validateAndDeduplicateSubjects(parseJsonResponse(content));
   } catch (error) {
-    const objectStart = withoutFence.indexOf('{');
-    const objectEnd = withoutFence.lastIndexOf('}');
-    if (objectStart < 0 || objectEnd <= objectStart) {
-      throw new Error(`AI returned invalid JSON syntax: ${error.message}`);
+    if (attempt < MAX_RETRIES) {
+      const delay = RETRY_DELAY_MS * (attempt + 1);
+      console.warn(`[aiSubjectService] Invalid JSON on chunk, retrying in ${delay / 1000}s (attempt ${attempt + 1}/${MAX_RETRIES})…`);
+      await sleep(delay);
+      return extractFromChunk(chunkText, apiKey, apiUrl, model, signal, attempt + 1);
     }
-    try {
-      return JSON.parse(withoutFence.slice(objectStart, objectEnd + 1));
-    } catch (fallbackError) {
-      throw new Error(`AI returned invalid JSON syntax: ${fallbackError.message}`);
-    }
+    throw error;
   }
 };
 
+// ─── Main exported function ───────────────────────────────────────────────────
 export const extractSubjectsWithAI = async (text) => {
-  const apiKey = process.env.AI_API_KEY;
-  const apiUrl = process.env.AI_API_URL || 'https://api.openai.com/v1/chat/completions';
-  const model = process.env.AI_MODEL || 'gpt-4o-mini';
+  const apiKey = process.env.GEMINI_API_KEY;
+  const apiUrl = (process.env.GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta').replace(/\/$/, '');
+  const model  = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
   if (!apiKey) throw new Error('AI subject extraction is not configured.');
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), Number(process.env.AI_TIMEOUT_MS || 120_000));
+  const timeout    = setTimeout(() => controller.abort(), Number(process.env.AI_TIMEOUT_MS || 300_000));
+
   try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model,
-        temperature: 0,
-        response_format: { type: 'json_object' },
-        max_tokens: 2_000,
-        messages: [
-          {
-            role: 'system',
-            content: 'Output only one compact valid JSON object, with no markdown, explanation, or reasoning. Use exactly {"subjects":[{"name":"Subject Name"}]} and return at most 20 subjects. Identify academic courses explicitly listed in the syllabus, including computer science and technology courses. Ignore units, topics, concepts, learning outcomes, and tools mentioned only as examples. Prefer official names from the title page, contents, course list, and repeated headings. Do not invent subjects.'
-          },
-          { role: 'user', content: getAiInput(text) },
-        ],
-      }),
-    });
-    if (!response.ok) {
-      const errorBody = await response.json().catch(() => ({}));
-      const providerMessage = typeof errorBody.error?.message === 'string'
-        ? ` ${errorBody.error.message}`
-        : '';
-      throw new Error(`AI provider returned HTTP ${response.status}.${providerMessage}`);
+    const chunks       = splitIntoChunks(text);
+    const chunkResults = [];
+
+    for (let i = 0; i < chunks.length; i++) {
+      // Delay between calls (except before the very first one) to respect TPM limits
+      if (i > 0) await sleep(CHUNK_DELAY_MS);
+
+      try {
+        const result = await extractFromChunk(chunks[i], apiKey, apiUrl, model, controller.signal);
+        chunkResults.push(result.subjects);
+        console.log(`[aiSubjectService] chunk ${i + 1}/${chunks.length}: extracted ${result.subjects.length} subject(s)`);
+      } catch (err) {
+        console.warn(`[aiSubjectService] chunk ${i + 1}/${chunks.length} failed, skipping:`, err.message);
+      }
     }
-    const body = await response.json();
-    const content = body.choices?.[0]?.message?.content;
-    if (typeof content !== 'string') throw new Error('AI provider returned no subject data.');
-    return validateAndDeduplicateSubjects(parseJsonResponse(content));
+
+    if (chunkResults.length === 0) {
+      const fallback = extractSubjectsFromText(text);
+      if (fallback.subjects.length > 0) {
+        console.warn('[aiSubjectService] All AI chunks failed — using deterministic fallback.');
+        return fallback;
+      }
+      throw new Error('Could not extract any subjects from the provided document.');
+    }
+
+    const merged = mergeSubjectLists(chunkResults);
+    console.log(`[aiSubjectService] Final merged result: ${merged.length} subject(s) with units`);
+    return { subjects: merged };
   } catch (error) {
+    if (error.name === 'AbortError') throw new Error('AI extraction timed out.');
     const fallback = extractSubjectsFromText(text);
     if (fallback.subjects.length > 0) return fallback;
     throw error;

@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import mongoose from 'mongoose';
 import SyllabusImport from '../models/SyllabusImport.js';
 import Subject from '../models/Subject.js';
+import Unit from '../models/Unit.js';
 import { createSubject } from './subjectService.js';
 import { extractSyllabusText, getSafeFileName } from './syllabusExtractionService.js';
 import { extractSubjectsWithAI } from './aiSubjectService.js';
@@ -83,28 +84,59 @@ export const confirmSyllabusSubjects = async (userId, importId, confirmedSubject
     throw serviceError('Only a completed syllabus import can be confirmed.', 400);
   }
 
-  const detectedNames = new Set(syllabusImport.detectedSubjects.map(({ name }) => name.toLocaleLowerCase()));
+  // Build a lookup map: normalised-name → detected subject (including its units)
+  const detectedByName = new Map(
+    syllabusImport.detectedSubjects.map((s) => [s.name.toLocaleLowerCase(), s]),
+  );
+
   const seen = new Set();
-  const names = confirmedSubjects.map((subject) => {
+  const subjectsToCreate = confirmedSubjects.map((subject) => {
     if (!subject || typeof subject.name !== 'string') throw serviceError('Each confirmed subject needs a valid name.', 400);
     const name = subject.name.trim().replace(/\s+/g, ' ');
     const key = name.toLocaleLowerCase();
-    if (name.length < 2 || name.length > 200 || !detectedNames.has(key) || seen.has(key)) {
+    if (name.length < 2 || name.length > 200 || !detectedByName.has(key) || seen.has(key)) {
       throw serviceError('Confirmed subjects must be valid, detected, and unique.', 400);
     }
     seen.add(key);
-    return { name, description: typeof subject.description === 'string' ? subject.description : undefined, colour: typeof subject.colour === 'string' ? subject.colour : undefined };
+    return {
+      name,
+      description: typeof subject.description === 'string' ? subject.description : undefined,
+      colour: typeof subject.colour === 'string' ? subject.colour : undefined,
+      // Pull the detected units from the import record
+      detectedUnits: detectedByName.get(key)?.units || [],
+    };
   });
 
   const existing = await Subject.find({ userId }).select('name');
   const existingNames = new Set(existing.map(({ name }) => name.toLocaleLowerCase()));
-  if (names.some(({ name }) => existingNames.has(name.toLocaleLowerCase()))) {
+  if (subjectsToCreate.some(({ name }) => existingNames.has(name.toLocaleLowerCase()))) {
     throw serviceError('One or more confirmed subjects already exist.', 400);
   }
 
   const createdSubjects = [];
-  for (const subject of names) {
-    const result = await createSubject(userId, subject);
+  for (const subjectData of subjectsToCreate) {
+    const { detectedUnits, ...subjectFields } = subjectData;
+    const result = await createSubject(userId, subjectFields);
+    const subjectId = result.subject._id;
+
+    // Persist each detected unit under this subject
+    if (Array.isArray(detectedUnits) && detectedUnits.length > 0) {
+      const unitDocs = detectedUnits.map((unit, idx) => ({
+        subjectId,
+        name: unit.name,
+        ...(unit.description ? { description: unit.description } : {}),
+        order: unit.order ?? idx + 1,
+      }));
+      await Unit.insertMany(unitDocs, { ordered: false }).catch(() => {
+        // Non-fatal: units failing to insert should not roll back the subject
+        console.warn('[syllabusService] Some units failed to insert for subject:', subjectFields.name);
+      });
+
+      // Sync the totalUnits counter on the subject
+      const unitCount = await Unit.countDocuments({ subjectId });
+      await Subject.updateOne({ _id: subjectId }, { $set: { totalUnits: unitCount } });
+    }
+
     createdSubjects.push(result.subject);
   }
 

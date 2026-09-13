@@ -833,7 +833,8 @@ JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=your_jwt_expiration
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-AI_API_KEY=your_ai_api_key
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 Additional variables may be required for email, storage, AI, notifications, and other services.

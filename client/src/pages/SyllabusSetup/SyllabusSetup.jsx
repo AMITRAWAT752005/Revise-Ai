@@ -103,7 +103,7 @@ const SyllabusSetup = () => {
         body: JSON.stringify({
           subjects: availableSubjects
             .filter((subject) => selectedSubjects.includes(subject.name))
-            .map(({ name, code }) => ({ name, code })),
+            .map(({ name, code, units }) => ({ name, code, units: units || [] })),
         }),
       });
       const data = await response.json();
@@ -462,6 +462,7 @@ const SyllabusSetup = () => {
                 <div className={styles.subjectSelectionList}>
                   {availableSubjects.map((sub) => {
                     const isSelected = selectedSubjects.includes(sub.name);
+                    const unitCount = sub.units?.length || 0;
                     return (
                       <div
                         key={sub.name}
@@ -482,6 +483,11 @@ const SyllabusSetup = () => {
                             </div>
                             <p className={styles.subjectMetaText}>
                               {sub.category || 'Academic subject'}
+                              {unitCount > 0 && (
+                                <span style={{ marginLeft: '8px', color: '#4441cc', fontWeight: 600 }}>
+                                  • {unitCount} unit{unitCount !== 1 ? 's' : ''} detected
+                                </span>
+                              )}
                             </p>
                           </div>
                         </div>
@@ -548,7 +554,19 @@ const SyllabusSetup = () => {
                   <ul className={styles.includedSubjectsList}>
                     {availableSubjects.filter((s) => selectedSubjects.includes(s.name)).map((sub) => (
                       <li key={sub.name} className={styles.includedSubjectRow}>
-                        <span>{sub.name}{sub.code ? ` (${sub.code})` : ''}</span>
+                        <div>
+                          <span>{sub.name}{sub.code ? ` (${sub.code})` : ''}</span>
+                          {(sub.units?.length || 0) > 0 && (
+                            <ul style={{ margin: '4px 0 0 16px', listStyle: 'disc', color: '#777586', fontSize: '13px' }}>
+                              {sub.units.slice(0, 5).map((u, i) => (
+                                <li key={i}>{u.name}</li>
+                              ))}
+                              {sub.units.length > 5 && (
+                                <li style={{ color: '#4441cc' }}>+{sub.units.length - 5} more units…</li>
+                              )}
+                            </ul>
+                          )}
+                        </div>
                         <span style={{ color: '#4441cc' }}>Confirmed</span>
                       </li>
                     ))}
@@ -589,10 +607,12 @@ const SyllabusSetup = () => {
 
                 <div className={styles.chipsRow}>
                   <div className={styles.chipPrimary}>
-                    {selectedSubjects.length} Subjects Added
+                    {selectedSubjects.length} Subject{selectedSubjects.length !== 1 ? 's' : ''} Added
                   </div>
                   <div className={styles.chipCyan}>
-                    44 Topics Curated
+                    {availableSubjects
+                      .filter((s) => selectedSubjects.includes(s.name))
+                      .reduce((sum, s) => sum + (s.units?.length || 0), 0)} Units Created
                   </div>
                   <div className={styles.chipPurple}>
                     Level 1 Unlocked

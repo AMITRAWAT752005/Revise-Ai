@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import SideNavBar from '../../components/Navigation/SideNavBar';
 import BottomNavBar from '../../components/Navigation/BottomNavBar';
+import MaterialUploadModal from '../../components/MaterialUploadModal/MaterialUploadModal';
+import MaterialList from '../../components/MaterialList/MaterialList';
 import styles from './TopicDetail.module.css';
 
 /**
@@ -19,6 +21,7 @@ const TopicDetail = () => {
   const [subjectData, setSubjectData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMaterialUploadModalOpen, setIsMaterialUploadModalOpen] = useState(false);
 
   const fetchTopicAndContext = async () => {
     setLoading(true);
@@ -102,6 +105,10 @@ const TopicDetail = () => {
 
   const handlePracticePYQs = () => {
     navigate(`/revision?topic=${encodeURIComponent(topicName)}&mode=pyq`);
+  };
+
+  const triggerMaterialListUpdate = () => {
+    window.dispatchEvent(new Event('materialUploaded'));
   };
 
   // Dynamic formatting
@@ -362,6 +369,27 @@ const TopicDetail = () => {
                   </div>
                 </div>
               </section>
+
+              {/* Study Materials Section */}
+              <section style={{ marginTop: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <h2 className={styles.aiOverviewHeading} style={{ margin: 0 }}>Study Materials</h2>
+                  <button
+                    style={{ background: 'none', border: 'none', color: '#5e5ce6', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
+                    onClick={() => setIsMaterialUploadModalOpen(true)}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>upload</span>
+                    Upload Material
+                  </button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
+                  <MaterialList
+                    subjectId={effectiveSubjectId}
+                    unitId={effectiveUnitId}
+                    topicId={topicId}
+                  />
+                </div>
+              </section>
             </>
           )}
         </div>
@@ -369,6 +397,15 @@ const TopicDetail = () => {
 
       {/* Mobile Bottom Navigation Bar */}
       <BottomNavBar />
+
+      <MaterialUploadModal
+        isOpen={isMaterialUploadModalOpen}
+        onClose={() => setIsMaterialUploadModalOpen(false)}
+        onUploadSuccess={triggerMaterialListUpdate}
+        subjectId={effectiveSubjectId}
+        unitId={effectiveUnitId}
+        topicId={topicId}
+      />
     </div>
   );
 };

@@ -12,6 +12,42 @@
 
 # Timeline Entries
 
+## Date: 11 September 2026
+
+### Time: 08:45 AM IST
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 3 Bug Fix — Syllabus Subject Under-Extraction & Missing Unit Extraction
+
+**Root Causes Identified:**
+- Subject under-extraction: the AI input was hard-truncated to 20,000 chars via fixed offsets, silently dropping subjects on later pages.
+- Unit extraction missing: the AI prompt explicitly ignored units; the Zod schema, the `SyllabusImport` model, and `confirmSyllabusSubjects()` had no concept of units.
+
+**Changes Made:**
+- Completely rewrote `aiSubjectService.js` to use sequential overlapping chunking (14,000 chars/chunk, 1,500 overlap) so every page of the PDF is processed. The merged result eliminates duplicates while preserving the most complete unit list per subject.
+- Rewrote the AI system prompt to hierarchically extract `Subjects → Units`, preserving unit numbering, ordering, and brief topic descriptions.
+- Updated `subjectResultSchema` (Zod) to validate the new `units` array.
+- Added `detectedUnitSchema` to `SyllabusImport.js` and a `units` field on `detectedSubjectSchema`.
+- Updated `confirmSyllabusSubjects()` in `syllabusService.js` to persist extracted units via `Unit.insertMany()` and sync `Subject.totalUnits`.
+- Updated `SyllabusSetup.jsx`: subject cards show detected unit count; review step shows unit sub-list; success screen shows dynamic unit count; `handleConfirm` sends the units array.
+
+**Files Modified:**
+- `server/src/services/aiSubjectService.js`
+- `server/src/services/syllabusService.js`
+- `server/src/models/SyllabusImport.js`
+- `client/src/pages/SyllabusSetup/SyllabusSetup.jsx`
+- `docs/Phase/Phase_3/TASKDONE.md`
+- `docs/Phase/Phase_3/TIMELINE.md`
+
+**Testing Performed:**
+- `node --check` passed for all modified server files.
+- `npm run build` in `client/` passed — 84 modules, 0 errors.
+- Phase 1 and Phase 2 untouched.
+
+---
+
 ## Date: 09 September 2026
 
 ### Time: Current verification session

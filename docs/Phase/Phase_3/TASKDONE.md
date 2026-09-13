@@ -3,9 +3,10 @@
 
 ## Phase Status
 
-🟡 **In Progress**
+🟢 **Bug Fix Completed — Subject Under-Extraction + Unit Extraction**
 
 > Subject management was completed earlier. Syllabus processing and confirmed-subject creation are implemented in part; unchecked items still require environment-backed verification.
+> A regression fix was applied on 11 September 2026 to resolve (A) subjects on later pages of large PDFs being silently dropped and (B) units being completely excluded from extraction and persistence.
 
 ---
 
@@ -162,7 +163,7 @@ Home
 
 The following are explicitly outside Phase 3:
 
-- Unit creation or extraction
+- Unit creation or extraction *(now supported as part of the Phase 3 syllabus confirmation flow)*
 - Topic creation or extraction
 - Flashcard generation
 - Question generation
@@ -262,3 +263,40 @@ The Unit and Topic models and read APIs are fully implemented. Structural, authe
 
 **Classification:** Fully implemented and verified.
 
+---
+
+# 14. Bug Fix — Syllabus Subject Under-Extraction + Missing Unit Extraction
+
+**Date:** 11 September 2026
+
+### Root Cause A — Subject Under-Extraction
+- `getAiInput()` naively truncated the syllabus text to 20,000 characters by sampling fixed offsets from the start, middle, and end of the file. Any subjects that fell outside those three sampling windows were invisible to the AI.
+
+### Root Cause B — Unit Extraction Not Happening
+- The AI system prompt explicitly instructed the model to *ignore* units.
+- The Zod `subjectResultSchema` had no `units` field; any units in the AI response were stripped.
+- `SyllabusImport.detectedSubjectSchema` had no `units` field, so units could never be stored.
+- `confirmSyllabusSubjects()` never created `Unit` documents.
+
+### Fix Applied
+
+- **`server/src/services/aiSubjectService.js` — full rewrite:**
+  - Replaced fixed offset truncation with sequential overlapping chunking (14,000 chars/chunk, 1,500 char overlap). Every chunk is sent independently to the AI; results are merged.
+  - Rewrote the system prompt to extract Subjects **and** their Units hierarchically, preserving ordering and descriptions.
+  - Updated `subjectResultSchema` to include a `units` array per subject.
+  - Implemented `mergeSubjectLists()` to safely deduplicate subjects across chunk results.
+
+- **`server/src/models/SyllabusImport.js`:** Added `detectedUnitSchema` and a `units` field on `detectedSubjectSchema`.
+
+- **`server/src/services/syllabusService.js`:** Imports `Unit` model; `confirmSyllabusSubjects()` now persists all detected units for each confirmed subject and updates `Subject.totalUnits`.
+
+- **`client/src/pages/SyllabusSetup/SyllabusSetup.jsx`:**
+  - Subject selection cards now show `• N units detected` inline.
+  - Review step shows a unit sub-list (up to 5) per subject.
+  - Success chips display real dynamic unit count.
+  - `handleConfirm` includes the full `units` array in the confirmation payload.
+
+### Testing
+- `node --check` passed for all three modified server files.
+- `npm run build` in `client/` passed (84 modules, 0 errors).
+- Phase 1 and Phase 2 functionality untouched.

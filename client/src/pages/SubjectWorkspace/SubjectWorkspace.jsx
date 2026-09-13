@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import SideNavBar from '../../components/Navigation/SideNavBar';
 import BottomNavBar from '../../components/Navigation/BottomNavBar';
 import UploadSyllabusModal from '../../components/UploadSyllabusModal/UploadSyllabusModal';
+import MaterialUploadModal from '../../components/MaterialUploadModal/MaterialUploadModal';
+import MaterialList from '../../components/MaterialList/MaterialList';
 import styles from './SubjectWorkspace.module.css';
 
 /**
@@ -22,6 +24,7 @@ const SubjectWorkspace = () => {
   const [error, setError] = useState(null);
   const [expandedUnit, setExpandedUnit] = useState(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isMaterialUploadModalOpen, setIsMaterialUploadModalOpen] = useState(false);
   const [user, setUser] = useState(null);
 
   const fetchSubjectAndUnits = async () => {
@@ -130,12 +133,9 @@ const SubjectWorkspace = () => {
       ? [...units].sort((a, b) => (a.mastery || 0) - (b.mastery || 0))[0]
       : null;
 
-  const studyMaterials = [
-    { id: 'm1', type: 'pdf', title: `${subjectName.replace(/\s+/g, '_')}_Syllabus.pdf`, sub: 'Syllabus document', iconClass: styles.matPdf, icon: 'picture_as_pdf' },
-    { id: 'm2', type: 'folder', title: 'Previous Year Qs', sub: 'Practice questions', iconClass: styles.matFolder, icon: 'folder' },
-    { id: 'm3', type: 'notes', title: 'Class Notes', sub: 'Study notes', iconClass: styles.matNotes, icon: 'description' },
-    { id: 'm4', type: 'attach', title: 'References', sub: 'Key concepts', iconClass: styles.matAttach, icon: 'attach_file' },
-  ];
+  const triggerMaterialListUpdate = () => {
+    window.dispatchEvent(new Event('materialUploaded'));
+  };
 
   return (
     <div className={styles.workspaceLayout}>
@@ -240,7 +240,7 @@ const SubjectWorkspace = () => {
                 <div className={styles.bannerActions}>
                   <button
                     className={styles.uploadMaterialBtn}
-                    onClick={() => setIsUploadModalOpen(true)}
+                    onClick={() => setIsMaterialUploadModalOpen(true)}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                       upload
@@ -498,28 +498,8 @@ const SubjectWorkspace = () => {
                   </div>
 
                   {/* Study Materials */}
-                  <div>
-                    <h2 className={styles.sectionHeading}>Study Materials</h2>
-                    <div className={styles.materialsGrid}>
-                      {studyMaterials.map((mat) => (
-                        <div
-                          key={mat.id}
-                          className={styles.materialCard}
-                          onClick={() => setIsUploadModalOpen(true)}
-                        >
-                          <div className={styles.materialCardTop}>
-                            <div className={`${styles.materialIconBadge} ${mat.iconClass}`}>
-                              <span className="material-symbols-outlined">{mat.icon}</span>
-                            </div>
-                            <span className="material-symbols-outlined" style={{ color: '#777586' }}>
-                              more_vert
-                            </span>
-                          </div>
-                          <h4 className={styles.materialTitle}>{mat.title}</h4>
-                          <p className={styles.materialSub}>{mat.sub}</p>
-                        </div>
-                      ))}
-                    </div>
+                  <div style={{ marginTop: '2rem' }}>
+                    <MaterialList subjectId={subjectId} />
                   </div>
                 </div>
               </div>
@@ -536,6 +516,13 @@ const SubjectWorkspace = () => {
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
         initialSubjectId={subjectId}
+      />
+
+      <MaterialUploadModal
+        isOpen={isMaterialUploadModalOpen}
+        onClose={() => setIsMaterialUploadModalOpen(false)}
+        onUploadSuccess={triggerMaterialListUpdate}
+        subjectId={subjectId}
       />
     </div>
   );

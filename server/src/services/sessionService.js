@@ -111,7 +111,7 @@ export const updateLastUsed = async (sessionId) => {
     return await Session.findByIdAndUpdate(
       sessionId,
       { lastUsedAt: new Date() },
-      { new: true }
+      { returnDocument: 'after' }
     );
   } catch (error) {
     return null;
@@ -128,7 +128,7 @@ export const revokeSession = async (sessionId) => {
     return await Session.findByIdAndUpdate(
       sessionId,
       { revokedAt: new Date() },
-      { new: true }
+      { returnDocument: 'after' }
     );
   } catch (error) {
     return null;
