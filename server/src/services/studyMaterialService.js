@@ -4,6 +4,7 @@ import { Unit } from '../models/Unit.js';
 import { Topic } from '../models/Topic.js';
 import { uploadToCloudinary, deleteFromCloudinary } from './cloudinaryService.js';
 import { deleteLocalMaterial, saveMaterialLocally } from './localFileStorageService.js';
+import { processStudyMaterial } from './documentProcessingService.js';
 
 /**
  * Validates ownership of the hierarchy for a given subject, unit, or topic.
@@ -92,6 +93,12 @@ export const createStudyMaterial = async (userId, { title, subjectId, unitId, to
   });
 
   await newMaterial.save();
+
+  // Trigger the background processing pipeline
+  processStudyMaterial(newMaterial._id, fileBuffer).catch(err => 
+    console.error(`[BackgroundProcessing] Failed to kick off processing for material ${newMaterial._id}`, err)
+  );
+
   return newMaterial;
 };
 

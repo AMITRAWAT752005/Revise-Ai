@@ -56,3 +56,31 @@ Phase 4A: Study Material Upload Implementation
 - Checked server syntax using `node --check`.
 - Ran frontend build successfully.
 - Cross-user file access checks implemented in backend logic.
+
+## Date: 14 September 2026
+
+### Time: Current session
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 4B: Document Processing Architecture (Task B1)
+
+**Changes Made:**
+- Created `DocumentChunk` schema to store processed text chunks.
+- Established the central `documentProcessingService` orchestrator that routes files to the appropriate extractors and chunks the text.
+- Defined skeleton contracts in `documentExtractors.js` and `textProcessing.js` for other team members to plug their implementations into.
+- Updated `studyMaterialService.js` to automatically trigger the asynchronous processing pipeline after a successful file upload.
+- Verified server syntax.
+- Marked architecture tasks as completed in `TASKDONE.md`.
+
+**Files Created:**
+- `server/src/models/DocumentChunk.js`
+- `server/src/services/documentProcessingService.js`
+- `server/src/services/documentExtractors.js`
+- `server/src/services/textProcessing.js`
+
+**Files Modified:**
+- `server/src/services/studyMaterialService.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
