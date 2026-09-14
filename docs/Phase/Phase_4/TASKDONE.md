@@ -53,6 +53,15 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Update the document processing pipeline to import the dedicated modules directly.
 - [x] Confirm no duplicate cleaning or chunking implementation exists.
 
+### Amit Rawat — A1/A3 Failed-Test Corrections
+
+- [x] Join broken lowercase continuation lines without merging punctuated lines or headings.
+- [x] Remove excessive OCR symbol runs while preserving meaningful text and math content.
+- [x] Replace character-based chunk sizing with paragraph and sentence-aware word sizing.
+- [x] Keep chunks within the 300–800 word target with approximately 500-word chunks.
+- [x] Merge undersized chunks and add controlled overlap between adjacent chunks.
+- [x] Re-run A1/A3 checks and the existing Phase 4B regression suite successfully.
+
 
 ---
 

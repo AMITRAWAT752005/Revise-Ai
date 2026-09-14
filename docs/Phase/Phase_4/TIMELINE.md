@@ -188,3 +188,34 @@ Phase 4B: A1/A3 Responsibility Separation
 - Verified the direct `cleanText()` to `chunkText()` flow and metadata propagation.
 - Confirmed no cleaning or chunking implementation remains in `textProcessing.js`.
 
+## Date: 14 September 2026
+
+### Time: Current session
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4B: A1/A3 Failed-Test Corrections
+
+**Changes Made:**
+- Updated `cleanText()` to join broken lowercase continuation lines while preserving headings and punctuated lines.
+- Improved OCR noise handling by removing excessive symbol runs and standalone garbage tokens.
+- Reworked `chunkText()` from character-based sizing to paragraph and sentence-aware word-based chunking.
+- Added undersized-chunk merging and controlled 60-word overlap between adjacent chunks.
+- Preserved sequential indexes, metadata propagation, sentence safety, and paragraph boundaries.
+
+**Files Created:**
+- None.
+
+**Files Modified:**
+- `server/src/utils/textCleaner.js`
+- `server/src/services/chunkingService.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/document_processing.test.js` successfully.
+- Verified broken-line joining and OCR noise removal with the strict A1 sample.
+- Verified A3 chunks remain within 300–800 words with overlap and metadata.
+- Verified sequential chunk indexes and no diagnostics in the modified files.
+

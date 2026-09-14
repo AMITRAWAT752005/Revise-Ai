@@ -5,9 +5,16 @@ const isLikelyHeading = (line) => {
 
 const isLikelyOcrNoise = (line) => {
   if (line.length < 4) return false;
-  const symbols = (line.match(/[^\p{L}\p{N}\s.,;:'!?()\-/%&]/gu) || []).length;
-  return symbols / line.length > 0.45;
+  const nonWhitespace = line.replace(/\s/g, '');
+  const alphanumeric = (line.match(/[\p{L}\p{N}]/gu) || []).length;
+  const symbolRuns = /[^a-zA-Z0-9\s.,?!:;'"()\-]{3,}/.test(line);
+  return symbolRuns || (nonWhitespace.length > 0 && alphanumeric / nonWhitespace.length < 0.5);
 };
+
+const removeOcrNoiseTokens = (line) => line
+  .replace(/[^a-zA-Z0-9\s.,?!:;'"()\-]{3,}/g, '')
+  .replace(/[ \t]{2,}/g, ' ')
+  .trim();
 
 /**
  * Cleans and normalizes raw extracted text while preserving meaning and structure.
@@ -39,22 +46,30 @@ export const cleanText = (rawText) => {
     }
   }
 
-  const filteredLines = lines.filter((line) => {
+  const filteredLines = lines.map((line) => {
     if (!line) return true;
-    if (isLikelyOcrNoise(line)) return false;
+    if (isLikelyOcrNoise(line)) return removeOcrNoiseTokens(line);
+    return line;
+  }).filter((line) => {
+    if (line === true) return true;
+    if (!line) return false;
     const key = line.toLowerCase().replace(/\s+/g, ' ');
     return counts.get(key) < 2 || !isLikelyHeading(line);
   });
 
   const normalizedLines = [];
-  for (const line of filteredLines) {
+  for (let index = 0; index < filteredLines.length; index += 1) {
+    const line = filteredLines[index] === true ? '' : filteredLines[index];
     if (!line) {
       if (normalizedLines.at(-1) !== '') normalizedLines.push('');
       continue;
     }
 
     const previous = normalizedLines.at(-1);
-    if (previous && !isLikelyHeading(previous) && !isLikelyHeading(line)) {
+    const continuesLine = previous
+      && !/[.!?:]$/.test(previous)
+      && /^[a-z]/.test(line);
+    if (continuesLine) {
       normalizedLines[normalizedLines.length - 1] = `${previous} ${line}`;
     } else {
       normalizedLines.push(line.replace(/[ \t]{2,}/g, ' '));
