@@ -223,7 +223,7 @@ Phase 4B: A1/A3 Failed-Test Corrections
 
 ### Time: Current session
 
-### Team Member Name: Anshul Soni
+### Team Member Name: Anshul Gusain
 
 **Task Worked On:**
 Phase 4B: Document Processing UI (Task AS1)
@@ -251,5 +251,26 @@ Phase 4B: Document Processing UI (Task AS1)
 - Ran `node tests/document_processing.test.js` (all 6 test suites passed).
 - Built client production assets via `npm run build` with 0 errors.
 - Verified state rendering for 'uploaded', 'processing', 'completed', and 'failed' states.
+## Date: 14 September 2026
 
+### Time: Current session
 
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 4: Bugfix - AI Subject Extraction JSON parsing errors
+
+**Changes Made:**
+- Updated `aiSubjectService.js` to utilize Gemini's native `responseSchema` property inside `generationConfig`.
+- Enforced strict JSON structure matching the required schema to prevent "Expected ',' or ']'" syntax errors from the LLM.
+- Eliminated reliance on manual JSON fallback parsing.
+
+**Files Created:**
+- None.
+
+**Files Modified:**
+- `server/src/services/aiSubjectService.js`
+
+**Testing Performed:**
+- Verified syntax correctness.
+- Ensured malformed JSON errors from the AI model are prevented directly at the generation level.

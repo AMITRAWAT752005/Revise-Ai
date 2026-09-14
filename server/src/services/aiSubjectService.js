@@ -181,6 +181,36 @@ Rules:
       generationConfig: {
         temperature: 0,
         responseMimeType: 'application/json',
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            subjects: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  name: { type: "STRING" },
+                  code: { type: "STRING" },
+                  category: { type: "STRING" },
+                  units: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      properties: {
+                        name: { type: "STRING" },
+                        description: { type: "STRING" },
+                        order: { type: "INTEGER" }
+                      },
+                      required: ["name"]
+                    }
+                  }
+                },
+                required: ["name"]
+              }
+            }
+          },
+          required: ["subjects"]
+        },
         maxOutputTokens: 3_000,
       },
     }),
