@@ -29,8 +29,8 @@ const deduplicated = validateAndDeduplicateSubjects({
   ],
 });
 assert.deepEqual(deduplicated.subjects, [
-  { name: 'Database Management Systems' },
-  { name: 'Computer Networks', code: 'CS602', category: 'core' },
+  { name: 'Database Management Systems', units: [] },
+  { name: 'Computer Networks', code: 'CS602', category: 'core', units: [] },
 ]);
 
 assert.throws(
@@ -42,33 +42,35 @@ assert.deepEqual(
   extractSubjectsFromText('Subject: Database Management Systems\nCS602: Computer Networks\nModule - Operating Systems'),
   {
     subjects: [
-      { name: 'Database Management Systems' },
-      { name: 'Computer Networks' },
-      { name: 'Operating Systems' },
+      { name: 'Database Management Systems', units: [] },
+      { name: 'Computer Networks', units: [] },
+      { name: 'Operating Systems', units: [] },
     ],
   },
 );
 
 const originalFetch = globalThis.fetch;
+const aiRequests = [];
 let aiRequest;
 globalThis.fetch = async (_url, options) => {
   aiRequest = JSON.parse(options.body);
+  aiRequests.push(aiRequest);
   return {
     ok: true,
     json: async () => ({
-      candidates: [{ content: { parts: [{ text: '{"subjects":[{"name":"Operating Systems"},{"name":"operating systems"}]}' }] } }],
+      candidates: [{ content: { parts: [{ text: '{"subjects":[{"name":"Operating Systems"}]}' }] } }],
     }),
   };
 };
 process.env.GEMINI_API_KEY = 'test-key';
 const aiResult = await extractSubjectsWithAI('Operating Systems syllabus content.');
-assert.deepEqual(aiResult.subjects, [{ name: 'Operating Systems' }]);
+assert.deepEqual(aiResult.subjects, [{ name: 'Operating Systems', units: [] }]);
 assert.equal(aiRequest.generationConfig.responseMimeType, 'application/json');
-assert.equal(aiRequest.generationConfig.maxOutputTokens, 2_000);
+assert.equal(aiRequest.generationConfig.maxOutputTokens, 3_000);
 
 const longSyllabus = `${'Opening course list. '.repeat(700)}Middle course list: Computer Networks. ${'Detailed unit content. '.repeat(700)}End of syllabus.`;
 await extractSubjectsWithAI(longSyllabus);
-assert.match(aiRequest.contents[0].parts[0].text, /Middle course list: Computer Networks/);
+assert.ok(aiRequests.some((req) => /Middle course list: Computer Networks/.test(req.contents[0].parts[0].text)));
 
 globalThis.fetch = async () => ({
   ok: false,

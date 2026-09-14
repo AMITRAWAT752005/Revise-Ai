@@ -9,6 +9,7 @@
     "test": "node tests/auth_security.test.js",
     "test:subjects": "node tests/subject_api.test.js",
     "test:syllabus": "node tests/syllabus_pipeline.test.js",
+    "test:documents": "node tests/document_processing.test.js",
     "migrate:user-progress": "node src/scripts/migrateUserProgress.js"
   },
   "keywords": [],

@@ -60,7 +60,14 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Replace character-based chunk sizing with paragraph and sentence-aware word sizing.
 - [x] Keep chunks within the 300–800 word target with approximately 500-word chunks.
 - [x] Merge undersized chunks and add controlled overlap between adjacent chunks.
-- [x] Re-run A1/A3 checks and the existing Phase 4B regression suite successfully.
+### Anshul Soni — Task AS1 Document Processing UI
+
+- [x] Build multi-stage Document Processing UI (`File uploaded` -> `Text extraction` -> `Preparing content` -> `Finalizing`).
+- [x] Integrate real-time processing status badges and progress indicator.
+- [x] Provide user-friendly guidance & reassurance message during background processing.
+- [x] Display clear completed state with readiness indicator for next Phase 4 learning features.
+- [x] Display failed state with contextual error message and retry action.
+- [x] Handle loading and empty states cleanly according to ReviseAI design system.
 
 
 ---

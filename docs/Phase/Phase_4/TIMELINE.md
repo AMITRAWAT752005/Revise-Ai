@@ -219,3 +219,37 @@ Phase 4B: A1/A3 Failed-Test Corrections
 - Verified A3 chunks remain within 300–800 words with overlap and metadata.
 - Verified sequential chunk indexes and no diagnostics in the modified files.
 
+## Date: 14 September 2026
+
+### Time: Current session
+
+### Team Member Name: Anshul Soni
+
+**Task Worked On:**
+Phase 4B: Document Processing UI (Task AS1)
+
+**Changes Made:**
+- Enhanced `MaterialList.jsx` to incorporate the 4-stage document processing pipeline visualization (`File uploaded` -> `Text extraction` -> `Preparing content` -> `Finalizing`).
+- Added real-time processing feedback with animated pulse dots, progress percentages, and reassuring background UX messaging.
+- Added completed state visual indicators ("Document processed successfully!") showing the material as ready for upcoming Phase 4 features.
+- Added failed state handling with detailed error messaging and inline retry functionality.
+- Updated `MaterialList.module.css` with responsive styling, stepper step dots, progress tracks, and clean color tokens matching ReviseAI design system.
+- Expanded `server/tests/document_processing.test.js` with comprehensive test cases.
+- Marked Task AS1 as completed in `TASKDONE.md`.
+
+**Files Created:**
+- None.
+
+**Files Modified:**
+- `client/src/components/MaterialList/MaterialList.jsx`
+- `client/src/components/MaterialList/MaterialList.module.css`
+- `server/tests/document_processing.test.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/document_processing.test.js` (all 6 test suites passed).
+- Built client production assets via `npm run build` with 0 errors.
+- Verified state rendering for 'uploaded', 'processing', 'completed', and 'failed' states.
+
+

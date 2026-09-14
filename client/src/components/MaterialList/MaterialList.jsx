@@ -131,20 +131,69 @@ const MaterialList = ({ subjectId, unitId, topicId }) => {
   };
 
   const getFileIcon = (fileType) => {
-    if (fileType.includes('pdf')) return '📄';
-    if (fileType.includes('word') || fileType.includes('docx')) return '📝';
-    return '📃';
+    if (fileType?.includes('pdf')) return 'picture_as_pdf';
+    if (fileType?.includes('word') || fileType?.includes('docx')) return 'description';
+    return 'article';
   };
 
-  const renderStatusBadge = (material) => {
+  // Determine stage active/complete status for 4-stage pipeline
+  const getStageStatus = (status, progress, stageIndex) => {
+    if (status === 'completed') return 'completed';
+    if (status === 'failed') return 'failed';
+    
+    // Stage 0: File uploaded (always completed once created)
+    if (stageIndex === 0) return 'completed';
+
+    // Stage 1: Text extraction (progress 10% -> 40%)
+    if (stageIndex === 1) {
+      if (progress > 40) return 'completed';
+      if (progress >= 10) return 'active';
+      return 'pending';
+    }
+
+    // Stage 2: Preparing content (progress 40% -> 70%)
+    if (stageIndex === 2) {
+      if (progress > 70) return 'completed';
+      if (progress >= 40) return 'active';
+      return 'pending';
+    }
+
+    // Stage 3: Finalizing (progress 70% -> 100%)
+    if (stageIndex === 3) {
+      if (progress >= 100) return 'completed';
+      if (progress >= 70) return 'active';
+      return 'pending';
+    }
+
+    return 'pending';
+  };
+
+  const stages = [
+    { title: 'File uploaded', short: 'Uploaded' },
+    { title: 'Text extraction', short: 'Extraction' },
+    { title: 'Preparing content', short: 'Preparing' },
+    { title: 'Finalizing', short: 'Finalizing' },
+  ];
+
+  const renderStatusSection = (material) => {
     const status = material.processingStatus || 'uploaded';
     const progress = material.processingProgress || 0;
 
     if (status === 'completed') {
       return (
-        <div className={styles.statusSuccess}>
-          <span className={styles.badgeSuccess}>Completed</span>
-          <span className={styles.statusMessage}>Document processed successfully.</span>
+        <div className={styles.statusSuccessContainer}>
+          <div className={styles.statusSuccessHeader}>
+            <div className={styles.badgeSuccess}>
+              <span className="material-symbols-outlined" style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }}>
+                check_circle
+              </span>
+              <span>Completed</span>
+            </div>
+            <span className={styles.statusSuccessMsg}>Document processed successfully!</span>
+          </div>
+          <p className={styles.statusSuccessSubtext}>
+            Ready for ReviseAI learning & knowledge base integration.
+          </p>
         </div>
       );
     }
@@ -152,100 +201,181 @@ const MaterialList = ({ subjectId, unitId, topicId }) => {
     if (status === 'failed') {
       return (
         <div className={styles.statusFailedContainer}>
-          <span className={styles.badgeFailed}>Failed</span>
-          <span className={styles.errorMessage} title={material.processingError}>
-            Document processing failed: {material.processingError || 'Unknown error'}
-          </span>
-          <button
-            className={styles.retryBtn}
-            onClick={() => handleRetry(material._id)}
-            disabled={isRetrying === material._id}
-          >
-            {isRetrying === material._id ? 'Retrying...' : '🔄 Retry'}
-          </button>
-        </div>
-      );
-    }
-
-    if (status === 'processing') {
-      const stepText = progress <= 30 ? 'Extracting text...' : 'Preparing content...';
-      return (
-        <div className={styles.statusProcessingContainer}>
-          <div className={styles.processingHeader}>
-            <span className={styles.badgeProcessing}>Processing</span>
-            <span className={styles.stepText}>{stepText} ({progress}%)</span>
+          <div className={styles.failedHeaderRow}>
+            <div className={styles.badgeFailed}>
+              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
+                error
+              </span>
+              <span>Failed</span>
+            </div>
+            <span className={styles.failedPrimaryTitle}>We couldn't process this document.</span>
           </div>
-          <div className={styles.progressBarTrack}>
-            <div className={styles.progressBarFill} style={{ width: `${progress}%` }} />
+          <p className={styles.errorMessage} title={material.processingError}>
+            {material.processingError || 'An unexpected error occurred during extraction or chunking.'}
+          </p>
+          <div className={styles.failedActionRow}>
+            <button
+              className={styles.retryBtn}
+              onClick={() => handleRetry(material._id)}
+              disabled={isRetrying === material._id}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
+                {isRetrying === material._id ? 'hourglass_top' : 'refresh'}
+              </span>
+              <span>{isRetrying === material._id ? 'Retrying...' : 'Retry'}</span>
+            </button>
           </div>
         </div>
       );
     }
 
-    // Default: uploaded
+    // Status: uploaded or processing
     return (
       <div className={styles.statusProcessingContainer}>
-        <span className={styles.badgeUploaded}>Uploading...</span>
+        <div className={styles.processingHeader}>
+          <div className={styles.badgeProcessing}>
+            <span className={styles.pulseDot}></span>
+            <span>Processing</span>
+          </div>
+          <span className={styles.progressPercent}>{progress}%</span>
+        </div>
+
+        <p className={styles.processingBannerText}>
+          Processing your document... We're extracting and preparing your content for ReviseAI.
+        </p>
+
+        {/* 4-Stage Progress Stepper */}
+        <div className={styles.stageStepper}>
+          {stages.map((stage, idx) => {
+            const stageState = getStageStatus(status, progress, idx);
+            return (
+              <div key={idx} className={`${styles.stageStep} ${styles[`stage_${stageState}`]}`}>
+                <div className={styles.stageIconWrapper}>
+                  {stageState === 'completed' ? (
+                    <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>
+                      check
+                    </span>
+                  ) : stageState === 'active' ? (
+                    <div className={styles.stageActiveDot}></div>
+                  ) : (
+                    <div className={styles.stagePendingDot}></div>
+                  )}
+                </div>
+                <span className={styles.stageLabel}>{stage.title}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Progress Bar Track */}
+        <div className={styles.progressBarTrack}>
+          <div className={styles.progressBarFill} style={{ width: `${Math.max(progress, 8)}%` }} />
+        </div>
+
+        {/* Reassurance UX message */}
+        <p className={styles.reassuranceNote}>
+          <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>
+            info
+          </span>
+          <span>Your document is being processed. This may take a little while. You can leave this page and come back later.</span>
+        </p>
       </div>
     );
   };
 
   if (isLoading) {
-    return <div className={styles.loadingState}>Loading study materials...</div>;
+    return (
+      <div className={styles.loadingState}>
+        <div className={styles.loadingSpinner}></div>
+        <p>Loading study materials...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className={styles.errorState}>{error}</div>;
+    return (
+      <div className={styles.errorState}>
+        <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>
+          warning
+        </span>
+        <p>{error}</p>
+        <button className={styles.retryBtn} onClick={() => fetchMaterials(true)}>
+          <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
+            refresh
+          </span>
+          <span>Retry Loading</span>
+        </button>
+      </div>
+    );
   }
 
   if (materials.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <span className={styles.emptyIcon}>📂</span>
-        <p>No study materials uploaded yet.</p>
+        <div className={styles.emptyIconBox}>
+          <span className="material-symbols-outlined" style={{ fontSize: '36px' }}>
+            folder_open
+          </span>
+        </div>
+        <h4 className={styles.emptyTitle}>No study materials uploaded yet</h4>
+        <p className={styles.emptySubtitle}>
+          Upload lecture notes, textbooks, or reference PDFs to start document processing.
+        </p>
       </div>
     );
   }
 
   return (
     <div className={styles.listContainer}>
-      <h3 className={styles.listHeading}>Study Materials</h3>
+      <div className={styles.listHeaderRow}>
+        <h3 className={styles.listHeading}>Study Materials ({materials.length})</h3>
+      </div>
       <div className={styles.materialsGrid}>
         {materials.map((material) => (
           <div key={material._id} className={styles.materialCard}>
             <div className={styles.materialMainInfo}>
-              <div className={styles.materialIcon}>{getFileIcon(material.fileType)}</div>
+              <div className={styles.materialIcon}>
+                <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>
+                  {getFileIcon(material.fileType)}
+                </span>
+              </div>
               <div className={styles.materialDetails}>
                 <h4 className={styles.materialTitle} title={material.title}>
                   {material.title}
                 </h4>
                 <p className={styles.materialMeta}>
-                  {new Date(material.createdAt).toLocaleDateString()} •{' '}
+                  {material.fileName} • {new Date(material.createdAt).toLocaleDateString()} •{' '}
                   {(material.fileSize / (1024 * 1024)).toFixed(2)} MB
                 </p>
               </div>
               <div className={styles.materialActions}>
-                <a
-                  href={material.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.actionBtn}
-                  title="View Material"
-                >
-                  👁️
-                </a>
+                {material.fileUrl && (
+                  <a
+                    href={material.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.actionBtn}
+                    title="View Original File"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                      open_in_new
+                    </span>
+                  </a>
+                )}
                 <button
                   className={styles.deleteBtn}
                   onClick={() => handleDelete(material._id)}
                   disabled={isDeleting === material._id}
                   title="Delete Material"
                 >
-                  {isDeleting === material._id ? '⏳' : '🗑️'}
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                    {isDeleting === material._id ? 'hourglass_bottom' : 'delete'}
+                  </span>
                 </button>
               </div>
             </div>
 
-            <div className={styles.statusSection}>{renderStatusBadge(material)}</div>
+            <div className={styles.statusSection}>{renderStatusSection(material)}</div>
           </div>
         ))}
       </div>
@@ -254,4 +384,3 @@ const MaterialList = ({ subjectId, unitId, topicId }) => {
 };
 
 export default MaterialList;
-
