@@ -83,3 +83,20 @@ export const deleteMaterial = async (req, res, next) => {
     next(error);
   }
 };
+
+export const retryProcessing = async (req, res, next) => {
+  try {
+    const { materialId } = req.params;
+
+    const material = await studyMaterialService.retryStudyMaterialProcessing(req.user.id, materialId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Document processing retry initiated',
+      material,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

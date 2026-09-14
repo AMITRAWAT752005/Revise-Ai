@@ -167,3 +167,29 @@ export const deleteMaterial = async (userId, materialId) => {
   await StudyMaterial.deleteOne({ _id: materialId });
   return true;
 };
+
+/**
+ * Re-triggers background document processing for a material.
+ */
+export const retryStudyMaterialProcessing = async (userId, materialId) => {
+  const material = await StudyMaterial.findOne({ _id: materialId, userId });
+  if (!material) {
+    const error = new Error('Study material not found or unauthorized');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Set status to uploaded/processing immediately
+  material.processingStatus = 'processing';
+  material.processingProgress = 0;
+  material.processingError = undefined;
+  await material.save();
+
+  // Kick off asynchronous pipeline
+  processStudyMaterial(material._id).catch((err) =>
+    console.error(`[BackgroundProcessing] Retry failed to start for material ${material._id}:`, err)
+  );
+
+  return material;
+};
+

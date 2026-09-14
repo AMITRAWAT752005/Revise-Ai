@@ -6,7 +6,8 @@ import {
   uploadMaterial,
   getMaterialsBySubject,
   getMaterialById,
-  deleteMaterial
+  deleteMaterial,
+  retryProcessing
 } from '../controllers/studyMaterialController.js';
 
 const router = express.Router();
@@ -41,6 +42,8 @@ router.use(authenticateToken);
 router.post('/upload', handleUpload, uploadMaterial);
 router.get('/subject/:subjectId', getMaterialsBySubject); // /api/materials/subject/:subjectId
 router.get('/:materialId', getMaterialById); // /api/materials/:materialId
+router.post('/:materialId/retry', retryProcessing); // /api/materials/:materialId/retry
 router.delete('/:materialId', deleteMaterial); // /api/materials/:materialId
 
 export default router;
+

@@ -30,12 +30,13 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 # 3. Phase 4B — Document Processing
 
 - [x] Establish central Document Processing architecture and orchestrator (`documentProcessingService`).
-- [ ] Implement text extraction for digital PDFs (e.g., via `pdf-parse`).
-- [ ] Implement text extraction for DOCX and TXT files.
-- [ ] Implement OCR fallback (e.g., Google Vision) for scanned/image-based PDFs.
-- [ ] Implement text cleaning and chunking logic.
+- [x] Implement text extraction for digital PDFs (e.g., via `pdf-parse`).
+- [x] Implement text extraction for DOCX and TXT files.
+- [x] Implement OCR fallback (e.g., Tesseract.js / pdf-to-img) for scanned/image-based PDFs.
+- [x] Implement text cleaning and chunking logic.
 - [x] Create `DocumentChunk` schema to store text chunks with metadata.
 - [x] Update `StudyMaterial` status to "completed" or "failed" based on outcome.
+
 
 ---
 

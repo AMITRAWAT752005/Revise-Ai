@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { StudyMaterial } from '../models/StudyMaterial.js';
 import { DocumentChunk } from '../models/DocumentChunk.js';
 import {
@@ -9,11 +11,39 @@ import {
 import { cleanText, chunkText } from './textProcessing.js';
 
 /**
+ * Resolves file buffer either from passed buffer or by downloading/reading from material.fileUrl.
+ * @param {Object} material - The StudyMaterial document.
+ * @param {Buffer} [passedBuffer] - Optional in-memory buffer.
+ * @returns {Promise<Buffer>}
+ */
+const resolveFileBuffer = async (material, passedBuffer) => {
+  if (passedBuffer && Buffer.isBuffer(passedBuffer) && passedBuffer.length > 0) {
+    return passedBuffer;
+  }
+
+  if (!material.fileUrl) {
+    throw new Error('No file URL or file buffer available for document processing');
+  }
+
+  if (material.fileUrl.startsWith('/uploads/')) {
+    const localPath = path.join(process.cwd(), material.fileUrl);
+    return await fs.readFile(localPath);
+  }
+
+  const response = await fetch(material.fileUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to download material file from remote storage (${response.statusText})`);
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+};
+
+/**
  * Main orchestrator for document processing pipeline.
  * Converts an uploaded StudyMaterial into clean, structured DocumentChunks.
  *
  * @param {string} materialId - The ID of the StudyMaterial to process.
- * @param {Buffer} fileBuffer - The file buffer (passed directly to avoid re-downloading).
+ * @param {Buffer} [fileBuffer] - Optional file buffer.
  */
 export const processStudyMaterial = async (materialId, fileBuffer) => {
   let material;
@@ -29,38 +59,41 @@ export const processStudyMaterial = async (materialId, fileBuffer) => {
     material.processingError = undefined;
     await material.save();
 
-    if (!fileBuffer) {
-      throw new Error('File buffer is required for processing');
-      // TODO: Implement file download from material.fileUrl if buffer is not provided
-    }
+    // Resolve buffer
+    const activeBuffer = await resolveFileBuffer(material, fileBuffer);
 
     let extractedText = '';
-    const fileType = material.fileType.toLowerCase();
+    const fileType = (material.fileType || '').toLowerCase();
+    const fileName = (material.fileName || '').toLowerCase();
 
     // 2 & 3. Detect file type and extract text
     console.log(`[DocumentProcessing] Extracting text for ${material.fileName} (${fileType})`);
     
-    if (fileType.includes('pdf')) {
-      extractedText = await extractPdfText(fileBuffer);
+    if (fileType.includes('pdf') || fileName.endsWith('.pdf')) {
+      extractedText = await extractPdfText(activeBuffer);
       
-      // 4. OCR Fallback (if PDF text is insufficient)
+      // 4. OCR Fallback if PDF text is insufficient (<50 chars)
       if (!extractedText || extractedText.trim().length < 50) {
         console.log(`[DocumentProcessing] PDF text insufficient, falling back to OCR...`);
-        extractedText = await performOcrFallback(fileBuffer);
+        extractedText = await performOcrFallback(activeBuffer);
       }
-    } else if (fileType.includes('wordprocessingml.document') || fileType.includes('docx')) {
-      extractedText = await extractDocxText(fileBuffer);
-    } else if (fileType.includes('text/plain') || fileType.includes('txt')) {
-      extractedText = await extractTxtText(fileBuffer);
+    } else if (
+      fileType.includes('wordprocessingml.document') ||
+      fileType.includes('docx') ||
+      fileName.endsWith('.docx')
+    ) {
+      extractedText = await extractDocxText(activeBuffer);
+    } else if (fileType.includes('text/plain') || fileType.includes('txt') || fileName.endsWith('.txt')) {
+      extractedText = await extractTxtText(activeBuffer);
     } else {
-      throw new Error(`Unsupported file type: ${fileType}`);
+      throw new Error(`Unsupported file type: ${fileType || fileName}`);
     }
 
-    material.processingProgress = 50;
+    material.processingProgress = 40;
     await material.save();
 
     if (!extractedText || extractedText.trim().length === 0) {
-      throw new Error('No text could be extracted from the document');
+      throw new Error('No readable text could be extracted from the document.');
     }
 
     // 5. Clean Text
@@ -69,7 +102,7 @@ export const processStudyMaterial = async (materialId, fileBuffer) => {
     // 6. Chunk Text
     const chunks = chunkText(cleanedText);
 
-    material.processingProgress = 80;
+    material.processingProgress = 70;
     await material.save();
 
     // 7. Save DocumentChunks
@@ -82,8 +115,8 @@ export const processStudyMaterial = async (materialId, fileBuffer) => {
       chunkIndex: chunk.chunkIndex,
       text: chunk.text,
       tokenCount: chunk.tokenCount,
-      // pageStart: chunk.pageStart, // if available from extractor
-      // pageEnd: chunk.pageEnd, // if available from extractor
+      pageStart: chunk.pageStart,
+      pageEnd: chunk.pageEnd,
     }));
 
     if (documentChunks.length > 0) {
@@ -97,7 +130,7 @@ export const processStudyMaterial = async (materialId, fileBuffer) => {
     material.processingProgress = 100;
     await material.save();
     
-    console.log(`[DocumentProcessing] Completed processing for ${material.fileName}`);
+    console.log(`[DocumentProcessing] Completed processing for ${material.fileName} (${documentChunks.length} chunks)`);
     return true;
 
   } catch (error) {
@@ -107,6 +140,7 @@ export const processStudyMaterial = async (materialId, fileBuffer) => {
       material.processingError = error.message || 'Unknown processing error';
       await material.save();
     }
-    return false; // Swallow error to avoid crashing the server if run in background
+    return false; // Swallow error for background processing safety
   }
 };
+

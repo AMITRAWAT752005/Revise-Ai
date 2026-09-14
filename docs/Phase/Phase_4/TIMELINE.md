@@ -84,3 +84,45 @@ Phase 4B: Document Processing Architecture (Task B1)
 - `server/src/services/studyMaterialService.js`
 - `docs/Phase/Phase_4/TASKDONE.md`
 - `docs/Phase/Phase_4/TIMELINE.md`
+
+## Date: 14 September 2026
+
+### Time: Current session
+
+### Team Member Name: Anukool Negi
+
+**Task Worked On:**
+Phase 4B: Text Extraction (AN1: PDF, AN2: DOCX, AN3: TXT) & Document Processing Pipeline Integration
+
+**Changes Made:**
+- Implemented `extractPdfText` in `documentExtractors.js` using `pdf-parse` with page tracking and error handling.
+- Implemented `extractDocxText` in `documentExtractors.js` using `mammoth` for text extraction from `.docx` files.
+- Implemented `extractTxtText` in `documentExtractors.js` with UTF-8 decoding and BOM removal.
+- Implemented `performOcrFallback` in `documentExtractors.js` using `pdf-to-img` and `tesseract.js` for scanned PDF pages.
+- Implemented `cleanText` in `textProcessing.js` for control char removal, hyphenation repairs, whitespace normalization, and line break cleanup.
+- Implemented `chunkText` in `textProcessing.js` for paragraph/sentence aware chunking (~500 token target, ~100 token overlap) with `pageStart`/`pageEnd` metadata preservation.
+- Enhanced `documentProcessingService.js` orchestrator with buffer resolution from `material.fileUrl` (retry safety), progress updates, and idempotent `DocumentChunk` database persistence.
+- Added `POST /api/materials/:materialId/retry` route and controller action.
+- Updated `MaterialList.jsx` and `MaterialList.module.css` with processing status steps, progress bar, real-time polling, and Retry action button.
+- Added test suite `server/tests/document_processing.test.js`.
+
+**Files Created:**
+- `server/tests/document_processing.test.js`
+
+**Files Modified:**
+- `server/src/services/documentExtractors.js`
+- `server/src/services/textProcessing.js`
+- `server/src/services/documentProcessingService.js`
+- `server/src/services/studyMaterialService.js`
+- `server/src/controllers/studyMaterialController.js`
+- `server/src/routes/studyMaterialRoutes.js`
+- `client/src/components/MaterialList/MaterialList.jsx`
+- `client/src/components/MaterialList/MaterialList.module.css`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Checked backend syntax via `node --check`.
+- Ran unit test suite `node tests/document_processing.test.js` (all tests passed).
+- Built frontend production assets via `npm run build` (build succeeded).
+
