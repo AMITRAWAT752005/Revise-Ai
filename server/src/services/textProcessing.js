@@ -3,6 +3,51 @@
  * Functions for cleaning, normalizing, and chunking extracted text.
  */
 
+const isLikelyHeading = (line) => {
+  if (line.length > 100 || /[.!?]$/.test(line)) return false;
+  return /^(chapter|unit|module|section|lesson|part)\b/i.test(line) || /^[A-Z][A-Za-z\d\s:-]{2,}$/.test(line);
+};
+
+const isLikelyOcrNoise = (line) => {
+  if (line.length < 4) return false;
+  const symbols = (line.match(/[^\p{L}\p{N}\s.,;:'!?()\-/%&]/gu) || []).length;
+  return symbols / line.length > 0.45;
+};
+
+const splitOversizedParagraph = (paragraph, maxSize) => {
+  if (paragraph.length <= maxSize) return [paragraph];
+
+  const sentences = paragraph.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [paragraph];
+  const segments = [];
+  let current = '';
+
+  for (const sentence of sentences.map((value) => value.trim()).filter(Boolean)) {
+    if (sentence.length > maxSize) {
+      if (current) segments.push(current);
+      current = '';
+      const words = sentence.split(/\s+/);
+      for (const word of words) {
+        if (current && current.length + 1 + word.length > maxSize) {
+          segments.push(current);
+          current = '';
+        }
+        current = current ? `${current} ${word}` : word;
+      }
+      continue;
+    }
+
+    if (current && current.length + 1 + sentence.length > maxSize) {
+      segments.push(current);
+      current = sentence;
+    } else {
+      current = current ? `${current} ${sentence}` : sentence;
+    }
+  }
+
+  if (current) segments.push(current);
+  return segments;
+};
+
 /**
  * Cleans and normalizes raw extracted text.
  * Removes non-printable control characters, fixes broken hyphenations,
@@ -18,28 +63,46 @@ export const cleanText = (rawText) => {
 
   let text = rawText;
 
-  // 1. Remove null characters and control characters except \n, \r, \t
+  // Remove null characters and control characters except line and tab spacing.
   text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
 
-  // 2. Fix broken hyphenated words at line endings: e.g. "comput-\ner" -> "computer"
+  // Rejoin words split at a line ending: "comput-\ner" -> "computer".
   text = text.replace(/([a-zA-Z])-\s*[\r\n]+\s*([a-zA-Z])/g, '$1$2');
 
-  // 3. Convert \r\n to \n
   text = text.replace(/\r\n/g, '\n');
 
-  // 4. Remove trailing whitespace from each line
-  text = text
-    .split('\n')
-    .map((line) => line.trimEnd())
-    .join('\n');
+  const lines = text.split('\n').map((line) => line.trim());
+  const counts = new Map();
+  for (const line of lines) {
+    if (line.length >= 4 && line.length <= 120) {
+      const key = line.toLowerCase().replace(/\s+/g, ' ');
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+  }
 
-  // 5. Replace multiple consecutive blank lines (3 or more) with double newlines
-  text = text.replace(/\n{3,}/g, '\n\n');
+  const filteredLines = lines.filter((line) => {
+    if (!line) return true;
+    if (isLikelyOcrNoise(line)) return false;
+    const key = line.toLowerCase().replace(/\s+/g, ' ');
+    return counts.get(key) < 2 || !isLikelyHeading(line);
+  });
 
-  // 6. Replace multiple spaces/tabs within lines with a single space
-  text = text.replace(/[ \t]{2,}/g, ' ');
+  const normalizedLines = [];
+  for (const line of filteredLines) {
+    if (!line) {
+      if (normalizedLines.at(-1) !== '') normalizedLines.push('');
+      continue;
+    }
 
-  return text.trim();
+    const previous = normalizedLines.at(-1);
+    if (previous && !isLikelyHeading(previous) && !isLikelyHeading(line)) {
+      normalizedLines[normalizedLines.length - 1] = `${previous} ${line}`;
+    } else {
+      normalizedLines.push(line.replace(/[ \t]{2,}/g, ' '));
+    }
+  }
+
+  return normalizedLines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 };
 
 /**
@@ -64,11 +127,18 @@ export const estimateTokenCount = (text) => {
  * @param {number} options.overlapSize - Overlap character length between chunks (default: 350).
  * @returns {Array<{ chunkIndex: number, text: string, tokenCount: number, pageStart?: number, pageEnd?: number }>}
  */
-export const chunkText = (text, options = {}) => {
+export const chunkText = (text, metadataOrOptions = {}) => {
   if (!text || typeof text !== 'string') {
     return [];
   }
 
+  const optionKeys = new Set(['maxChunkSize', 'overlapSize']);
+  const options = Object.fromEntries(
+    Object.entries(metadataOrOptions).filter(([key]) => optionKeys.has(key))
+  );
+  const metadata = Object.fromEntries(
+    Object.entries(metadataOrOptions).filter(([key]) => !optionKeys.has(key))
+  );
   const maxChunkSize = options.maxChunkSize || 2000;
   const overlapSize = options.overlapSize || 350;
 
@@ -98,7 +168,10 @@ export const chunkText = (text, options = {}) => {
   };
 
   // Split text into structural paragraphs first
-  const rawParagraphs = text.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
+  const rawParagraphs = text
+    .split(/\n\s*\n/)
+    .filter((paragraph) => paragraph.trim().length > 0)
+    .flatMap((paragraph) => splitOversizedParagraph(paragraph.trim(), maxChunkSize));
 
   const chunks = [];
   let currentChunk = '';
@@ -124,6 +197,7 @@ export const chunkText = (text, options = {}) => {
       const pageEnd = getPageForIndex(chunkEndIndex);
 
       chunks.push({
+        ...metadata,
         chunkIndex: chunks.length,
         text: currentChunk,
         tokenCount: estimateTokenCount(currentChunk),
@@ -142,6 +216,11 @@ export const chunkText = (text, options = {}) => {
         overlapText = currentChunk;
       }
 
+      const availableOverlap = Math.max(0, maxChunkSize - trimmedParagraph.length - 2);
+      if (overlapText.length > availableOverlap) {
+        overlapText = availableOverlap > 0 ? overlapText.slice(-availableOverlap).trim() : '';
+      }
+
       currentChunk = overlapText ? overlapText + '\n\n' + trimmedParagraph : trimmedParagraph;
       currentStartIndex = Math.max(0, chunkEndIndex - overlapText.length);
     }
@@ -154,6 +233,7 @@ export const chunkText = (text, options = {}) => {
     const pageEnd = getPageForIndex(chunkEndIndex);
 
     chunks.push({
+      ...metadata,
       chunkIndex: chunks.length,
       text: currentChunk.trim(),
       tokenCount: estimateTokenCount(currentChunk),

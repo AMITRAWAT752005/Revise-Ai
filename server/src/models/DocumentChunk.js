@@ -53,6 +53,7 @@ documentChunkSchema.index({ userId: 1 });
 documentChunkSchema.index({ materialId: 1 });
 documentChunkSchema.index({ subjectId: 1 });
 documentChunkSchema.index({ topicId: 1 });
+documentChunkSchema.index({ materialId: 1, chunkIndex: 1 });
 
 const DocumentChunk = mongoose.model('DocumentChunk', documentChunkSchema);
 

@@ -37,6 +37,14 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Create `DocumentChunk` schema to store text chunks with metadata.
 - [x] Update `StudyMaterial` status to "completed" or "failed" based on outcome.
 
+### Amit Rawat — A1, A2, A3 Text Processing
+
+- [x] Refine text cleaning for whitespace, line wrapping, repeated headers/footers, and obvious OCR noise.
+- [x] Preserve paragraph and heading structure while normalizing extracted text.
+- [x] Add metadata-aware paragraph and sentence-boundary chunk preparation with sequential indexes and bounded overlap.
+- [x] Add the `materialId` + `chunkIndex` compound index to `DocumentChunk`.
+- [x] Validate cleaning, metadata propagation, sequential indexes, and oversized paragraph handling.
+
 
 ---
 

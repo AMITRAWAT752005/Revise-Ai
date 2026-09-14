@@ -126,3 +126,33 @@ Phase 4B: Text Extraction (AN1: PDF, AN2: DOCX, AN3: TXT) & Document Processing 
 - Ran unit test suite `node tests/document_processing.test.js` (all tests passed).
 - Built frontend production assets via `npm run build` (build succeeded).
 
+## Date: 14 September 2026
+
+### Time: Current session
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4B: Text Processing Improvements (A1: Cleaning, A2: DocumentChunk, A3: Chunking)
+
+**Changes Made:**
+- Refined `cleanText` to normalize whitespace and line breaks, preserve paragraph and heading structure, remove repeated headers/footers, and filter obvious OCR noise.
+- Updated `chunkText` to accept metadata, preserve paragraph and sentence boundaries, split oversized paragraphs at word boundaries when needed, maintain bounded overlap, and assign sequential `chunkIndex` values.
+- Added the compound `materialId` and `chunkIndex` index to `DocumentChunk`.
+- Kept extraction, OCR, orchestration, upload behavior, and database persistence flow unchanged.
+
+**Files Created:**
+- None. Existing Phase 4B text-processing and model files were updated.
+
+**Files Modified:**
+- `server/src/services/textProcessing.js`
+- `server/src/models/DocumentChunk.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/document_processing.test.js` successfully.
+- Verified metadata propagation and sequential chunk indexes.
+- Verified oversized paragraphs remain within the configured chunk size.
+- Checked diagnostics and whitespace with no errors.
+
