@@ -8,7 +8,8 @@ import {
   extractTxtText,
   performOcrFallback,
 } from './documentExtractors.js';
-import { cleanText, chunkText } from './textProcessing.js';
+import { cleanText } from '../utils/textCleaner.js';
+import { chunkText } from './chunkingService.js';
 
 /**
  * Resolves file buffer either from passed buffer or by downloading/reading from material.fileUrl.

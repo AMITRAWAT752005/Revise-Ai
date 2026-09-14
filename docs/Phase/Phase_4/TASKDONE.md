@@ -45,6 +45,14 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Add the `materialId` + `chunkIndex` compound index to `DocumentChunk`.
 - [x] Validate cleaning, metadata propagation, sequential indexes, and oversized paragraph handling.
 
+### Amit Rawat — A1/A3 Responsibility Separation
+
+- [x] Move text cleaning into `utils/textCleaner.js`.
+- [x] Move chunking and token estimation into `services/chunkingService.js`.
+- [x] Keep `textProcessing.js` as a compatibility re-export without processing logic.
+- [x] Update the document processing pipeline to import the dedicated modules directly.
+- [x] Confirm no duplicate cleaning or chunking implementation exists.
+
 
 ---
 

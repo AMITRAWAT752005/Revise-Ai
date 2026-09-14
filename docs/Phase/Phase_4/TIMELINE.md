@@ -156,3 +156,35 @@ Phase 4B: Text Processing Improvements (A1: Cleaning, A2: DocumentChunk, A3: Chu
 - Verified oversized paragraphs remain within the configured chunk size.
 - Checked diagnostics and whitespace with no errors.
 
+## Date: 14 September 2026
+
+### Time: Current session
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4B: A1/A3 Responsibility Separation
+
+**Changes Made:**
+- Moved the existing text cleaning implementation to `server/src/utils/textCleaner.js`.
+- Moved the existing chunking and token estimation implementation to `server/src/services/chunkingService.js`.
+- Reduced `server/src/services/textProcessing.js` to backward-compatible re-exports only.
+- Updated `documentProcessingService.js` to import cleaning and chunking from their dedicated modules.
+- Preserved `DocumentChunk.js` without changes because its schema and indexes were already correct.
+
+**Files Created:**
+- `server/src/utils/textCleaner.js`
+- `server/src/services/chunkingService.js`
+
+**Files Modified:**
+- `server/src/services/textProcessing.js`
+- `server/src/services/documentProcessingService.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/document_processing.test.js` successfully.
+- Passed syntax checks for all refactored modules.
+- Verified the direct `cleanText()` to `chunkText()` flow and metadata propagation.
+- Confirmed no cleaning or chunking implementation remains in `textProcessing.js`.
+
