@@ -14,12 +14,15 @@ export const extractPdfText = async (fileBuffer) => {
   try {
     const pdfModule = require('pdf-parse');
     let fullText = '';
+    
+    // Explicitly cast to Uint8Array to prevent pdf.js strict type check errors
+    const uint8Array = new Uint8Array(fileBuffer.buffer, fileBuffer.byteOffset, fileBuffer.byteLength);
 
     if (typeof pdfModule === 'function') {
-      const data = await pdfModule(fileBuffer);
+      const data = await pdfModule(uint8Array);
       fullText = data.text || '';
     } else if (pdfModule && pdfModule.PDFParse) {
-      const parser = new pdfModule.PDFParse(fileBuffer);
+      const parser = new pdfModule.PDFParse(uint8Array);
       const result = await parser.getText();
       if (typeof result === 'string') {
         fullText = result;
