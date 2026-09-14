@@ -60,6 +60,18 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Replace character-based chunk sizing with paragraph and sentence-aware word sizing.
 - [x] Keep chunks within the 300–800 word target with approximately 500-word chunks.
 - [x] Merge undersized chunks and add controlled overlap between adjacent chunks.
+
+### Amit Rawat — A4 Processing Status & Error Handling
+
+- [x] Implement `processDocument(materialId)` in `documentProcessingService.js`.
+- [x] Manage the `uploaded` -> `processing` -> `completed` lifecycle.
+- [x] Mark materials as `failed` with a meaningful `processingError` on pipeline failures.
+- [x] Make completed processing idempotent and allow failed materials to retry.
+- [x] Prevent concurrent processing of materials already in `processing` state.
+- [x] Replace chunks safely with ordered bulk insertion and partial-write cleanup.
+- [x] Preserve the existing `processStudyMaterial` upload/retry compatibility path.
+- [x] Validate the Phase 4B regression suite, syntax, diagnostics, and scoped changes.
+
 ### Anshul Gusain — Task AS1 Document Processing UI
 
 - [x] Build multi-stage Document Processing UI (`File uploaded` -> `Text extraction` -> `Preparing content` -> `Finalizing`).

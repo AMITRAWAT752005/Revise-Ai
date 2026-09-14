@@ -46,12 +46,23 @@ const resolveFileBuffer = async (material, passedBuffer) => {
  * @param {string} materialId - The ID of the StudyMaterial to process.
  * @param {Buffer} [fileBuffer] - Optional file buffer.
  */
-export const processStudyMaterial = async (materialId, fileBuffer) => {
+export const processDocument = async (materialId, fileBuffer) => {
   let material;
+  let chunkReplacementStarted = false;
   try {
     material = await StudyMaterial.findById(materialId);
     if (!material) {
-      throw new Error(`StudyMaterial with ID ${materialId} not found`);
+      const error = new Error(`StudyMaterial with ID ${materialId} not found`);
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (material.processingStatus === 'completed') {
+      return true;
+    }
+
+    if (material.processingStatus === 'processing') {
+      return false;
     }
 
     // 1. Update status to processing
@@ -120,11 +131,14 @@ export const processStudyMaterial = async (materialId, fileBuffer) => {
       pageEnd: chunk.pageEnd,
     }));
 
-    if (documentChunks.length > 0) {
-      // Clear any existing chunks for this material (idempotency)
-      await DocumentChunk.deleteMany({ materialId: material._id });
-      await DocumentChunk.insertMany(documentChunks);
+    if (documentChunks.length === 0) {
+      throw new Error('No document chunks were created from the extracted text.');
     }
+
+    // Replace all chunks only after cleaning and chunking have completed.
+    chunkReplacementStarted = true;
+    await DocumentChunk.deleteMany({ materialId: material._id });
+    await DocumentChunk.insertMany(documentChunks, { ordered: true });
 
     // 8. Update status to completed
     material.processingStatus = 'completed';
@@ -135,13 +149,33 @@ export const processStudyMaterial = async (materialId, fileBuffer) => {
     return true;
 
   } catch (error) {
-    console.error(`[DocumentProcessing] Failed processing for ${materialId}:`, error);
+    const errorMessage = error instanceof Error ? error.message : 'Document processing failed';
+    console.error(`[DocumentProcessing] Failed processing for ${materialId}:`, errorMessage);
+    if (error?.statusCode === 404 && !material) {
+      throw error;
+    }
+
+    if (material && chunkReplacementStarted) {
+      try {
+        await DocumentChunk.deleteMany({ materialId: material._id });
+      } catch (cleanupError) {
+        console.error(`[DocumentProcessing] Failed to clean partial chunks for ${materialId}:`, cleanupError.message);
+      }
+    }
+
     if (material) {
       material.processingStatus = 'failed';
-      material.processingError = error.message || 'Unknown processing error';
-      await material.save();
+      material.processingError = errorMessage;
+      try {
+        await material.save();
+      } catch (statusError) {
+        console.error(`[DocumentProcessing] Failed to persist failure status for ${materialId}:`, statusError.message);
+      }
     }
     return false; // Swallow error for background processing safety
   }
 };
+
+// Backward-compatible name used by the existing upload and retry flows.
+export const processStudyMaterial = processDocument;
 

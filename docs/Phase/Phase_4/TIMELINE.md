@@ -274,3 +274,35 @@ Phase 4: Bugfix - AI Subject Extraction JSON parsing errors
 **Testing Performed:**
 - Verified syntax correctness.
 - Ensured malformed JSON errors from the AI model are prevented directly at the generation level.
+
+## Date: 14 September 2026
+
+### Time: Current session
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4B: A4 Processing Status & Error Handling
+
+**Changes Made:**
+- Added `processDocument(materialId)` to the existing `documentProcessingService.js` orchestration layer.
+- Preserved the `uploaded` -> `processing` -> `completed` lifecycle and marked failures as `failed` with `processingError`.
+- Added idempotent no-op behavior for completed materials and retry support for failed materials.
+- Prevented duplicate concurrent processing when a material is already `processing`.
+- Added ordered bulk chunk insertion after cleaning and chunking complete.
+- Added cleanup of partially inserted chunks before persisting the failed state.
+- Preserved `processStudyMaterial` as a compatibility alias for existing upload and retry flows.
+- Left A1 cleaner, A2 model, and A3 chunking implementations unchanged.
+
+**Files Created:**
+- None. The existing processing service was extended.
+
+**Files Modified:**
+- `server/src/services/documentProcessingService.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/document_processing.test.js` successfully.
+- Passed syntax and diagnostics checks for the processing service.
+- Confirmed the change scope excluded A1, A2, and A3 implementation files.
