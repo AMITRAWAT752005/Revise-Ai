@@ -157,7 +157,19 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Wrap Qdrant connection and upsert failures in structured errors while preserving MongoDB chunk records and preventing silent failures.
 - [x] Keep failed indexing isolated to the vector layer; `DocumentChunk` remains intact and is marked with detailed failure metadata when needed.
 - [x] Update the material status on batch indexing failure only as a safe partial-failure state rather than deleting any MongoDB data.
-- [x] Validate duplicate prevention, retry success, failure simulation, and no-data-loss behavior with targeted tests.
+- [x] Handle Qdrant failures, invalid vectors, and timeout-like transient errors without silent failure.
+- [x] Validate duplicate prevention, retry success, partial failure isolation, Qdrant outage safety, processing status failure, and no-data-loss behavior with targeted tests.
+
+**Testing:**
+- Retry success simulation (fail -> success).
+- Partial failure isolation with only failed chunks retried.
+- Qdrant outage safety with no MongoDB data loss.
+- Processing status validation with `failed` status and populated `processingError`.
+
+**Files Added:**
+- `server/tests/qdrantService.test.js`
+- `server/tests/chunkEmbeddingPipeline.test.js`
+- `server/tests/chunkEmbeddingPipeline.real.test.js`
 
 
 # 5. Phase 4D — AI Content Generation

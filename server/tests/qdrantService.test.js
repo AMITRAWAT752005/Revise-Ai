@@ -85,6 +85,114 @@ const retryChunk = {
 const retryUpsertId = await upsertChunkVector(retryChunk, vector);
 assert.equal(retryUpsertId, stableId);
 
+// TEST 1: transient failure retries successfully with one stable vector ID.
+{
+  let attempts = 0;
+  const vectorIds = [];
+  setQdrantClientForTests({
+    async upsert(_name, request) {
+      attempts += 1;
+      vectorIds.push(request.points[0].id);
+      if (attempts === 1) {
+        throw new Error('transient Qdrant failure');
+      }
+      return { status: 'acknowledged' };
+    },
+  });
+
+  const retryResult = await upsertVector(stableId, vector, {
+    userId: 'user-1',
+    subjectId: 'subject-1',
+    materialId,
+    chunkId,
+    chunkIndex,
+  }, { baseDelayMs: 0 });
+
+  assert.equal(retryResult, stableId, 'Retry success must return the stable vector ID');
+  assert.equal(attempts, 2, 'The failed first upsert must trigger exactly one retry');
+  assert.deepEqual(new Set(vectorIds), new Set([stableId]), 'Retry must reuse one vector ID, not create a duplicate identity');
+}
+
+// TEST 2: only failed chunk IDs are retried; successful IDs are not duplicated.
+{
+  const chunks = Array.from({ length: 5 }, (_, index) => ({
+    userId: 'user-1',
+    subjectId: 'subject-1',
+    materialId: 'material-partial',
+    chunkId: `chunk-${index}`,
+    chunkIndex: index,
+    vector,
+  }));
+  const failedChunkIds = new Set(['chunk-1', 'chunk-3']);
+  const storedVectorIds = new Set();
+  const successfulWriteCounts = new Map();
+  const initialAttempts = new Map();
+  let retryMode = false;
+
+  setQdrantClientForTests({
+    async upsert(_name, request) {
+      const point = request.points[0];
+      const chunkIdFromPayload = point.payload.chunkId;
+      const count = (initialAttempts.get(chunkIdFromPayload) || 0) + 1;
+      initialAttempts.set(chunkIdFromPayload, count);
+
+      if (!retryMode && failedChunkIds.has(chunkIdFromPayload)) {
+        throw new Error(`failed ${chunkIdFromPayload}`);
+      }
+
+      storedVectorIds.add(point.id);
+  successfulWriteCounts.set(point.id, (successfulWriteCounts.get(point.id) || 0) + 1);
+      return { status: 'acknowledged' };
+    },
+  });
+
+  const initialResults = await Promise.allSettled(chunks.map((chunk) => upsertChunkVector(chunk, vector, { baseDelayMs: 0 })));
+  assert.equal(initialResults.filter((result) => result.status === 'fulfilled').length, 3);
+  assert.equal(initialResults.filter((result) => result.status === 'rejected').length, 2);
+  assert.equal(storedVectorIds.size, 3, 'Initial indexing must store exactly the three successful vectors');
+  assert.equal(
+    [...successfulWriteCounts.values()].reduce((total, count) => total + count, 0),
+    3,
+    'Exactly three successful upserts must occur initially'
+  );
+
+  retryMode = true;
+  await Promise.all(
+    chunks
+      .filter((chunk) => failedChunkIds.has(chunk.chunkId))
+      .map((chunk) => upsertChunkVector(chunk, vector, { baseDelayMs: 0 }))
+  );
+
+  assert.equal(storedVectorIds.size, 5, 'After retry, the vector store must contain exactly five unique vectors');
+  assert.ok([...storedVectorIds].every((id) => typeof id === 'string'));
+  assert.equal(
+    [...successfulWriteCounts.values()].reduce((total, count) => total + count, 0),
+    5,
+    'The final successful-upsert total must be exactly five'
+  );
+  for (const chunk of chunks) {
+    const vectorId = buildStableVectorId(chunk.materialId, chunk.chunkId, chunk.chunkIndex);
+    assert.equal(successfulWriteCounts.get(vectorId), 1, `Chunk ${chunk.chunkId} must have exactly one successful upsert`);
+  }
+}
+
+// TEST 3: complete Qdrant outage is surfaced as a bounded, structured error.
+setQdrantClientForTests({
+  async upsert() {
+    throw new Error('Qdrant unavailable');
+  },
+});
+await assert.rejects(
+  () => upsertVector(stableId, vector, {
+    userId: 'user-1',
+    subjectId: 'subject-1',
+    materialId,
+    chunkId,
+    chunkIndex,
+  }, { maxRetries: 0, baseDelayMs: 0 }),
+  (error) => error.message.includes('Qdrant upsert') && error.message.includes('Qdrant unavailable') && error.statusCode === 503
+);
+
 await assert.rejects(
   () => upsertVector('vector-2', [0, 1], { userId: 'user-1' }),
   /exactly 384 values/

@@ -15,6 +15,8 @@
  *  T7  — embedChunksForMaterial: zero pending chunks returns early
  *  T8  — Vector dimension is exactly 384 (contract with embeddingService)
  *  T9  — Phase 4B regression: extractors, cleaner, and chunking still work
+ *  T10 — Qdrant outage: chunk is preserved and never marked indexed/completed
+ *  T11 — Processing failure: material is failed with processingError populated
  */
 
 import assert from 'node:assert/strict';
@@ -104,7 +106,7 @@ const makeDocumentChunkMock = (chunks = []) => {
  *   upsertVector: Function
  * }} deps
  */
-const createPipeline = ({ DocumentChunk, generateEmbedding, upsertVector }) => {
+const createPipeline = ({ DocumentChunk, StudyMaterial = { findById: async () => null }, generateEmbedding, upsertVector }) => {
   const CONCURRENCY_LIMIT = 3;
   const LOG_PREFIX = '[TestPipeline]';
 
@@ -176,6 +178,16 @@ const createPipeline = ({ DocumentChunk, generateEmbedding, upsertVector }) => {
     } catch (error) {
       console.error(`${LOG_PREFIX} Outer error:`, error.message);
     }
+
+    if (summary.failed > 0) {
+      const material = await StudyMaterial.findById(materialId);
+      if (material) {
+        material.processingStatus = 'failed';
+        material.processingError = `${summary.failed} chunk(s) failed Qdrant indexing`;
+        await material.save();
+      }
+    }
+
     return summary;
   };
 
@@ -428,6 +440,56 @@ await run('T9c: chunkText produces multiple sequential chunks with metadata', ()
     assert.ok(c.text.length > 0, 'Each chunk must have non-empty text');
     assert.ok(c.tokenCount > 0, 'Each chunk must have a positive token count');
   });
+});
+
+// ── T10: Qdrant outage safety ────────────────────────────────────────────────
+await run('T10: Qdrant outage preserves DocumentChunk and does not complete material', async () => {
+  const chunk = makeChunk({ id: 'chunk-T10', embeddingStatus: 'pending' });
+  const mockModel = makeDocumentChunkMock([chunk]);
+  const material = { processingStatus: 'processing', processingError: null };
+
+  const { embedSingleChunk } = createPipeline({
+    DocumentChunk: mockModel,
+    StudyMaterial: { findById: async () => material },
+    generateEmbedding: async () => makeVector384(10),
+    upsertVector: async () => { throw new Error('Qdrant unavailable'); },
+  });
+
+  const result = await embedSingleChunk(chunk);
+
+  assert.equal(result.success, false, 'Qdrant outage must fail the chunk operation');
+  assert.equal(mockModel._store.length, 1, 'No DocumentChunk may be deleted');
+  assert.equal(mockModel._store[0].embeddingStatus, 'failed');
+  assert.ok(mockModel._store[0].embeddingError.includes('Qdrant unavailable'));
+  assert.notEqual(material.processingStatus, 'completed');
+});
+
+// ── T11: Processing status correctness ──────────────────────────────────────
+await run('T11: indexing failure marks material failed with processingError', async () => {
+  const chunks = [
+    makeChunk({ id: 'chunk-T11-ok', chunkIndex: 0, text: 'healthy chunk' }),
+    makeChunk({ id: 'chunk-T11-fail', chunkIndex: 1, text: 'failing chunk' }),
+  ];
+  const mockModel = makeDocumentChunkMock(chunks);
+  const material = { processingStatus: 'processing', processingError: null, async save() {} };
+
+  const { embedChunksForMaterial } = createPipeline({
+    DocumentChunk: mockModel,
+    StudyMaterial: { findById: async () => material },
+    generateEmbedding: async (text) => {
+      if (text.includes('failing')) throw new Error('indexing failed');
+      return makeVector384(11);
+    },
+    upsertVector: async () => {},
+  });
+
+  const summary = await embedChunksForMaterial('material-T11');
+
+  assert.equal(summary.failed, 1);
+  assert.equal(material.processingStatus, 'failed');
+  assert.notEqual(material.processingStatus, 'completed');
+  assert.ok(material.processingError);
+  assert.ok(material.processingError.includes('1 chunk(s) failed Qdrant indexing'));
 });
 
 // ── Summary ────────────────────────────────────────────────────────────────────

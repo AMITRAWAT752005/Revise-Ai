@@ -425,7 +425,10 @@ Phase 4C-4: Vector Metadata & Source Mapping
 ### Team Member Name: Amit Rawat
 
 **Task Worked On:**
-Phase 4C-7: Retry, Error Handling & Idempotency
+Phase 4C-7
+
+**Description:**
+Implemented idempotent vector indexing with retry-safe Qdrant integration and added strict test coverage.
 
 **Changes Made:**
 - Added the stable vector identity contract `hash(materialId + chunkId + chunkIndex)` so the same DocumentChunk updates the same Qdrant point instead of producing duplicates on rerun.
@@ -437,19 +440,22 @@ Phase 4C-7: Retry, Error Handling & Idempotency
 - Kept the changes limited to the reliability layer and did not modify the embedding logic or search scope.
 
 **Files Created:**
-- None.
+- `server/tests/qdrantService.test.js`
+- `server/tests/chunkEmbeddingPipeline.test.js`
+- `server/tests/chunkEmbeddingPipeline.real.test.js`
 
 **Files Modified:**
-- `server/src/services/qdrantService.js`
-- `server/src/services/chunkEmbeddingPipeline.js`
-- `server/tests/qdrantService.test.js`
 - `docs/Phase/Phase_4/TASKDONE.md`
 - `docs/Phase/Phase_4/TIMELINE.md`
 
+**Status:**
+Completed.
+
 **Testing Performed:**
 - Ran `node tests/qdrantService.test.js` — passed.
-- Ran `node tests/chunkEmbeddingPipeline.test.js` — passed with 11/11 tests green.
-- Confirmed duplicate prevention, stable vector IDs, retry behavior, and no MongoDB data loss under failed indexing scenarios.
+- Ran `node tests/chunkEmbeddingPipeline.test.js` — passed with all 13 tests green.
+- Ran `node --experimental-test-module-mocks tests/chunkEmbeddingPipeline.real.test.js` — both real-pipeline tests passed.
+- Confirmed duplicate prevention, stable vector IDs, retry success, partial failure isolation, processing status validation, and no MongoDB data loss under failed indexing scenarios.
 
 **Files Created:**
 - `server/src/services/vectorMetadataService.js`
