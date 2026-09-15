@@ -114,6 +114,19 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 
 ---
 
+### Amit Rawat — 4C-2 Qdrant Setup & Vector Collection
+
+- [x] Add the official `@qdrant/js-client-rest` dependency.
+- [x] Create `server/src/services/qdrantService.js` as the dedicated Qdrant infrastructure service.
+- [x] Configure Qdrant through `QDRANT_URL`, `QDRANT_API_KEY`, and `QDRANT_COLLECTION_NAME` environment variables.
+- [x] Define the `reviseai_document_chunks` collection convention with 384-dimensional Cosine vectors.
+- [x] Implement reusable client initialization and collection-existence checks.
+- [x] Implement safe collection creation without blindly recreating an existing collection.
+- [x] Implement basic vector upsert with required chunk metadata payload fields.
+- [x] Add vector dimension and numeric-value validation for 384-dimensional vectors.
+- [x] Add focused Qdrant infrastructure tests using a mocked client.
+- [ ] Complete live Qdrant connection and collection verification after credentials are configured.
+
 # 5. Phase 4D — AI Content Generation
 
 - [ ] Integrate an LLM API (e.g., Groq) for content generation.

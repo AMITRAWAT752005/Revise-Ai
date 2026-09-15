@@ -364,3 +364,38 @@ Phase 4C-1 — Embedding Service Foundation
 - Confirmed output is a standard JavaScript `number[]` array.
 - Confirmed embedding generated in ~7693ms on first call (model warm-up), subsequent calls will be faster.
 
+## Date: 15 September 2026
+
+### Time: Current session
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4C-2: Qdrant Setup & Vector Collection
+
+**Implementation Completed:**
+- Added the official `@qdrant/js-client-rest` dependency.
+- Created the dedicated `server/src/services/qdrantService.js` module.
+- Added environment-based configuration for `QDRANT_URL`, `QDRANT_API_KEY`, and `QDRANT_COLLECTION_NAME`.
+- Defined the `reviseai_document_chunks` collection with 384-dimensional Cosine vectors.
+- Implemented reusable Qdrant initialization and collection-existence checks.
+- Implemented safe collection creation that does not recreate an existing collection.
+- Implemented basic vector upsert with the required user, subject, material, chunk, and page metadata payload.
+- Added validation for vector dimension and finite numeric values.
+- Added `server/tests/qdrantService.test.js` for isolated infrastructure verification.
+
+**Files Created:**
+- `server/src/services/qdrantService.js`
+- `server/tests/qdrantService.test.js`
+
+**Files Modified:**
+- `server/package.json`
+- `server/package-lock.json`
+- `server/.env.example`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Scope Boundaries:**
+- No retry logic, idempotency strategy, embedding logic, semantic search, RAG, or document-processing integration was implemented.
+- Live Qdrant verification remains pending until `QDRANT_URL` and `QDRANT_API_KEY` are configured.
+
