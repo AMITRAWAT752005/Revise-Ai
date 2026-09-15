@@ -21,10 +21,9 @@
  *  - Semantic search, search APIs, and RAG are strictly out of scope.
  */
 
-import { StudyMaterial } from '../models/StudyMaterial.js';
 import { DocumentChunk } from '../models/DocumentChunk.js';
 import { generateEmbedding } from './embeddingService.js';
-import { buildStableVectorId, upsertVector } from './qdrantService.js';
+import { buildStableVectorId, createCollection, upsertVector } from './qdrantService.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -180,6 +179,19 @@ export const embedChunksForMaterial = async (materialId) => {
       return summary;
     }
 
+    // Ensure the Qdrant collection exists before attempting any upserts.
+    // createCollection() is idempotent — it no-ops if the collection already exists.
+    try {
+      await createCollection();
+    } catch (collectionError) {
+      console.error(
+        `${LOG_PREFIX} Cannot ensure Qdrant collection for material ${materialId}:`,
+        collectionError instanceof Error ? collectionError.message : collectionError
+      );
+      // Cannot index without a collection — exit early but do not throw.
+      return summary;
+    }
+
     console.log(
       `${LOG_PREFIX} Starting embedding for material ${materialId}: ` +
       `${chunks.length} chunk(s) to index (concurrency=${CONCURRENCY_LIMIT}).`
@@ -215,21 +227,10 @@ export const embedChunksForMaterial = async (materialId) => {
     );
   }
 
-  if (summary.failed > 0) {
-    try {
-      const material = await StudyMaterial.findById(materialId);
-      if (material) {
-        material.processingStatus = 'failed';
-        material.processingError = `${summary.failed} chunk(s) failed Qdrant indexing`;
-        await material.save();
-      }
-    } catch (statusError) {
-      console.error(
-        `${LOG_PREFIX} Failed to update material status after partial indexing failure for ${materialId}:`,
-        statusError instanceof Error ? statusError.message : statusError
-      );
-    }
-  }
+  // NOTE: Embedding failures do NOT revert processingStatus to 'failed'.
+  // Document processing already completed successfully — the material stays 'completed'.
+  // Per-chunk embedding state is tracked via DocumentChunk.embeddingStatus.
+  // Failed chunks can be retried without affecting the source-of-truth MongoDB records.
 
   return summary;
 };

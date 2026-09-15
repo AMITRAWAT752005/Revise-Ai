@@ -604,4 +604,45 @@ None (reused and integrated existing component architecture).
 - Ran `node server/tests/document_processing.test.js` — all 6 Phase 4B tests passed.
 - Confirmed full compatibility with Phase 1–3 and Phase 4A/B/C features.
 
+## Date: 15 September 2026
 
+### Time: Current session
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 4C-3 — Bugfix: Qdrant Vector ID Format & Collection Auto-Creation
+
+**Context:**
+Two runtime errors were discovered during live end-to-end testing with a real Qdrant Cloud cluster immediately after Phase 4C-3 implementation. Both were diagnosed and fixed in the same session.
+
+**Bug 1 — Invalid Qdrant Point ID (400 Bad Request)**
+
+The `buildStableVectorId` function in `qdrantService.js` produced a raw 64-character SHA-256 hex string (e.g. `988a2b3c4569c162...`). Qdrant's REST API strictly requires point IDs to be either UUIDs or unsigned 64-bit integers. A raw hex string caused every upsert to return `400 Bad Request`.
+
+Fix: Reformatted the first 32 hex characters of the SHA-256 digest into the standard `8-4-4-4-12` UUID layout (e.g. `7a619da3-7d0d-e15e-0cc4-1b397561621d`). The value remains deterministic and stable — the same chunk always maps to the same Qdrant point ID.
+
+**Bug 2 — Collection Not Found (404 Not Found)**
+
+The `embedChunksForMaterial` function attempted to upsert vectors directly without first ensuring the Qdrant collection existed. The collection is not created at server startup, so the first upsert into an empty cluster returned `404 Not Found` on every attempt.
+
+Fix: Added `await createCollection()` at the start of `embedChunksForMaterial`, before the chunk loop. `createCollection()` is already idempotent — it checks whether the collection exists and only creates it if missing.
+
+**Bug 3 — Incorrect `processingStatus` Revert on Embedding Failure**
+
+Amit's Phase 4C-7 code set `processingStatus = 'failed'` on the `StudyMaterial` document when any chunk failed Qdrant indexing. This violated the design contract: document processing had already completed successfully and the material should remain `'completed'`. This caused the UI to show a "Failed" card even though the PDF was fully extracted and chunked.
+
+Fix: Removed the block that reverted `processingStatus`. Embedding failures are now tracked exclusively via `DocumentChunk.embeddingStatus = 'failed'`, which is the correct source of truth for the indexing state.
+
+**Files Modified:**
+- `server/src/services/qdrantService.js` (fixed UUID format in `buildStableVectorId`)
+- `server/src/services/chunkEmbeddingPipeline.js` (added `createCollection()` call; removed incorrect `processingStatus` revert; removed unused `StudyMaterial` import)
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/chunkEmbeddingPipeline.test.js` — all 13 tests passed after fixes.
+- Ran `node --check` syntax check on all modified files.
+- Verified UUID format is valid: `7a619da3-7d0d-e15e-0cc4-1b397561621d` (length 36, passes UUID regex).
+- Verified determinism: same chunk identity always produces the same UUID.
+- Live tested with a real Qdrant Cloud cluster (sa-east-1, AWS): uploaded a 12-chunk PDF and confirmed `indexed=12, failed=0, skipped=0` in the server terminal.
+- Confirmed the `reviseai_document_chunks` collection was auto-created in the Qdrant dashboard without any manual intervention.

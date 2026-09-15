@@ -38,6 +38,21 @@ const validateVector = (vector) => {
   }
 };
 
+/**
+ * Builds a stable, deterministic UUID-formatted point ID for a Qdrant vector.
+ *
+ * Qdrant requires point IDs to be either unsigned 64-bit integers or UUIDs.
+ * We derive a UUID v4-shaped string from a SHA-256 hash of the chunk identity
+ * so the same chunk always maps to the same Qdrant point (idempotent upsert).
+ *
+ * The UUID format is:  xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx  (8-4-4-4-12 hex)
+ * We take the first 32 hex chars of the SHA-256 digest and reformat them.
+ *
+ * @param {string|ObjectId} materialId
+ * @param {string|ObjectId} chunkId
+ * @param {number} chunkIndex
+ * @returns {string} UUID-formatted stable vector ID
+ */
 export const buildStableVectorId = (materialId, chunkId, chunkIndex) => {
   const materialKey = String(materialId ?? '').trim();
   const chunkKey = String(chunkId ?? '').trim();
@@ -47,10 +62,22 @@ export const buildStableVectorId = (materialId, chunkId, chunkIndex) => {
     throw new Error('materialId, chunkId, and chunkIndex are required to build a stable vector ID');
   }
 
-  return crypto
+  // Generate a 32-char hex string from the first 16 bytes of the SHA-256 digest.
+  // SHA-256 produces 64 hex chars; we take the first 32 to fill UUID slots.
+  const hash = crypto
     .createHash('sha256')
-    .update(`${materialKey}${chunkKey}${indexKey}`)
-    .digest('hex');
+    .update(`${materialKey}:${chunkKey}:${indexKey}`)
+    .digest('hex')
+    .slice(0, 32);  // 32 hex chars = 16 bytes, enough for UUID 8-4-4-4-12
+
+  // Reformat 32 hex chars into UUID layout: 8-4-4-4-12
+  return [
+    hash.slice(0, 8),
+    hash.slice(8, 12),
+    hash.slice(12, 16),
+    hash.slice(16, 20),
+    hash.slice(20, 32),
+  ].join('-');
 };
 
 export const checkCollectionExists = async (client = getClient()) => {
