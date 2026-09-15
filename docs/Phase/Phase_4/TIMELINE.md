@@ -523,3 +523,50 @@ Phase 4C-3 — Chunk-to-Embedding Pipeline Integration
 - No semantic search, search API, RAG, or LLM generation implemented.
 - Qdrant collection setup and client configuration remains in Amit's `qdrantService.js`.
 - Upload request is never blocked by embedding; embedding runs fully in the background.
+
+## Date: 15 September 2026
+
+### Time: Current session
+
+### Team Member Name: Anukool Negi
+
+**Task Worked On:**
+Phase 4C Tasks 4C-5 (Semantic Search Service) & 4C-6 (Protected Semantic Search API)
+
+**Changes Made:**
+- Added `searchVectors` method to `server/src/services/qdrantService.js` to execute Qdrant similarity search with retries.
+- Added `setGenerateEmbeddingForTests` helper to `server/src/services/embeddingService.js`.
+- Created `server/src/services/semanticSearchService.js` implementing `searchSemanticChunks` which:
+  - Generates query embedding using the existing `embeddingService`.
+  - Constructs Qdrant filter object with mandatory `userId` filter and optional `subjectId`, `unitId`, `topicId`, `materialId` filters.
+  - Enforces ownership validation across `Subject`, `Unit`, `Topic`, and `StudyMaterial` records.
+  - Performs Qdrant similarity search.
+  - Hydrates matching chunks and materials from MongoDB.
+  - Formats clean citations and returns sanitized chunk results (omitting raw vectors and Qdrant internal IDs).
+- Created `server/src/controllers/searchController.js` and `server/src/routes/searchRoutes.js` exposing `POST /api/search` protected by `authenticateToken`.
+- Updated `server/src/app.js` to mount `app.use('/api/search', searchRoutes)`.
+- Created `server/tests/semanticSearch.test.js` covering input validation, user isolation, hierarchical filtering, happy path hydration, and protected endpoint behavior.
+- Marked Tasks 4C-5 and 4C-6 as completed in `TASKDONE.md`.
+
+**Files Created:**
+- `server/src/services/semanticSearchService.js`
+- `server/src/controllers/searchController.js`
+- `server/src/routes/searchRoutes.js`
+- `server/tests/semanticSearch.test.js`
+
+**Files Modified:**
+- `server/src/services/qdrantService.js`
+- `server/src/services/embeddingService.js`
+- `server/src/app.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node server/tests/semanticSearch.test.js` — all 4 test suites passed.
+- Ran `node server/tests/embeddingService.test.js` — passed.
+- Ran `node server/tests/qdrantService.test.js` — passed.
+- Ran `node server/tests/vectorMetadataService.test.js` — passed.
+- Ran `node server/tests/chunkEmbeddingPipeline.test.js` — passed (13/13 passed).
+- Ran `node server/tests/document_processing.test.js` — passed (6/6 passed).
+- Ran `node --check` syntax check across all created and modified JavaScript files.
+

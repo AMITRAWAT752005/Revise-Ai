@@ -94,12 +94,12 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 # 4. Phase 4C — Embeddings & Vector Database Foundation
 
 - [x] Implement reusable Embedding Service using `sentence-transformers/all-MiniLM-L6-v2` (dimension 384).
-- [ ] Configure Qdrant with appropriate environment variables and create the collection.
-- [ ] Build the chunk-to-embedding pipeline seamlessly integrating with existing `documentProcessingService`.
-- [ ] Ensure Qdrant payloads include necessary metadata (`userId`, `subjectId`, `unitId`, `topicId`, `materialId`, `chunkId`).
-- [ ] Implement robust duplicate vector handling and idempotency logic.
-  - [ ] Create a reusable Semantic Search Service with strict `userId` and hierarchical metadata filtering.
-- [ ] Create a protected Search API (`/api/search`).
+- [x] Configure Qdrant with appropriate environment variables and create the collection.
+- [x] Build the chunk-to-embedding pipeline seamlessly integrating with existing `documentProcessingService`.
+- [x] Ensure Qdrant payloads include necessary metadata (`userId`, `subjectId`, `unitId`, `topicId`, `materialId`, `chunkId`).
+- [x] Implement robust duplicate vector handling and idempotency logic.
+- [x] Create a reusable Semantic Search Service with strict `userId` and hierarchical metadata filtering.
+- [x] Create a protected Search API (`/api/search`).
 - [x] Ensure embedding/indexing failure does not lose `DocumentChunk` and supports retry mechanism.
 
 ### Bikram Singh Bisht — 4C-1 Embedding Service
@@ -109,6 +109,15 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Implement `generateEmbedding(text)` → `number[]` using `Xenova/all-MiniLM-L6-v2` with mean pooling and L2 normalization.
 - [x] Write `tests/embeddingService.test.js` and verify output dimension is exactly 384.
 - [x] Confirm model can be swapped later without changing callers.
+
+### Anukool Negi — 4C-5 Semantic Search Service & 4C-6 Protected Search API
+
+- [x] Add `searchVectors` method to `qdrantService.js` wrapping Qdrant REST client vector search with retry logic.
+- [x] Create `server/src/services/semanticSearchService.js` implementing `searchSemanticChunks` with query embedding, metadata filtering, and MongoDB chunk hydration.
+- [x] Enforce strict user data isolation by requiring authenticated `userId` and validating ownership of subject/unit/topic/material filters.
+- [x] Create `server/src/controllers/searchController.js` and `server/src/routes/searchRoutes.js` exposing `POST /api/search` protected by `authenticateToken`.
+- [x] Return sanitized search results containing text, metadata, similarity score, and formatted source citations (omitting raw vectors and Qdrant internal IDs).
+- [x] Create and pass comprehensive test suite `server/tests/semanticSearch.test.js`.
 
 
 

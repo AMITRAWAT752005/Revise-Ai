@@ -187,6 +187,22 @@ export const retryFailedIndexing = async (chunks = [], options = {}) => {
   return indexChunks(chunks, options);
 };
 
+export const searchVectors = async (queryVector, filter = {}, limit = 5, options = {}) => {
+  validateVector(queryVector);
+
+  const client = getClient();
+  const request = {
+    vector: queryVector,
+    filter,
+    limit,
+    with_payload: true,
+  };
+
+  return retryQdrantOperation(async () => {
+    return await client.search(QDRANT_COLLECTION_NAME, request);
+  }, { ...options, context: 'Qdrant vector search' });
+};
+
 export const setQdrantClientForTests = (client) => {
   qdrantClient = client;
 };
@@ -202,5 +218,7 @@ export default {
   upsertChunkVector,
   indexChunks,
   retryFailedIndexing,
+  searchVectors,
   setQdrantClientForTests,
 };
+

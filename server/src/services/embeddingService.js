@@ -25,6 +25,12 @@ const initPipeline = async () => {
   return embeddingPipeline;
 };
 
+let customEmbeddingGenerator = null;
+
+export const setGenerateEmbeddingForTests = (fn) => {
+  customEmbeddingGenerator = fn;
+};
+
 /**
  * Generates an embedding vector for a given text.
  * Uses the sentence-transformers/all-MiniLM-L6-v2 model (384 dimensions).
@@ -35,6 +41,10 @@ const initPipeline = async () => {
 export const generateEmbedding = async (text) => {
   if (typeof text !== 'string' || text.trim().length === 0) {
     throw new Error('Invalid input text for embedding generation');
+  }
+
+  if (customEmbeddingGenerator) {
+    return customEmbeddingGenerator(text);
   }
 
   const extractor = await initPipeline();
@@ -50,3 +60,4 @@ export const generateEmbedding = async (text) => {
     throw new Error(`Embedding generation failed: ${error.message}`);
   }
 };
+

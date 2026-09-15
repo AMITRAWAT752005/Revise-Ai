@@ -12,6 +12,7 @@ import { errorHandler } from './middleware/errorMiddleware.js';
 import topicRoutes from './routes/topicRoutes.js';
 import unitRoutes from './routes/unitRoutes.js';
 import studyMaterialRoutes from './routes/studyMaterialRoutes.js';
+import searchRoutes from './routes/searchRoutes.js';
 
 const app = express();
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -45,6 +46,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/syllabus', syllabusRoutes);
 app.use('/api/materials', studyMaterialRoutes);
+app.use('/api/search', searchRoutes);
 app.use('/api', unitRoutes);
 app.use('/api', topicRoutes);
 
