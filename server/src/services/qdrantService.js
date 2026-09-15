@@ -1,5 +1,6 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import '../config/env.js';
+import { buildVectorPayload } from './vectorMetadataService.js';
 
 export const QDRANT_VECTOR_SIZE = 384;
 export const QDRANT_COLLECTION_NAME = process.env.QDRANT_COLLECTION_NAME || 'reviseai_document_chunks';
@@ -31,18 +32,6 @@ const validateVector = (vector) => {
     throw new Error('Qdrant vectors must contain only finite numbers');
   }
 };
-
-const buildPayload = (payload = {}) => ({
-  userId: payload.userId,
-  subjectId: payload.subjectId,
-  unitId: payload.unitId ?? null,
-  topicId: payload.topicId ?? null,
-  materialId: payload.materialId,
-  chunkId: payload.chunkId,
-  chunkIndex: payload.chunkIndex,
-  pageStart: payload.pageStart ?? null,
-  pageEnd: payload.pageEnd ?? null,
-});
 
 export const checkCollectionExists = async (client = getClient()) => {
   const response = await client.getCollections();
@@ -81,7 +70,7 @@ export const upsertVector = async (vectorId, vector, payload) => {
     points: [{
       id: vectorId,
       vector,
-      payload: buildPayload(payload),
+      payload: buildVectorPayload(payload),
     }],
   });
 };

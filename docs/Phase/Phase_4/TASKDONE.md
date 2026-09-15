@@ -127,6 +127,18 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Add focused Qdrant infrastructure tests using a mocked client.
 - [ ] Complete live Qdrant connection and collection verification after credentials are configured.
 
+### Anshul Gusain — 4C-4 Vector Metadata & Source Mapping
+
+- [x] Create `server/src/services/vectorMetadataService.js` to standardize vector payload construction, validation, and source mapping.
+- [x] Ensure complete hierarchical source traceability: Vector -> Chunk -> Material -> Topic/Unit/Subject -> User.
+- [x] Implement `buildVectorPayload` and `validateVectorPayload` enforcing non-empty IDs (`userId`, `subjectId`, `materialId`, `chunkId`, `chunkIndex`) and valid page bounds.
+- [x] Implement `mapVectorToSource` and `hydrateSourceMapping` to link vector search results back to full document and academic hierarchy details.
+- [x] Implement `resolveSourceChain` with strict `userId` ownership validation to prevent cross-user vector leakage.
+- [x] Implement `formatSourceCitation` for standardized, human-readable RAG attribution.
+- [x] Integrate `buildVectorPayload` into `qdrantService.js` for single-source payload building.
+- [x] Create and pass comprehensive test suite `server/tests/vectorMetadataService.test.js`.
+
+
 # 5. Phase 4D — AI Content Generation
 
 - [ ] Integrate an LLM API (e.g., Groq) for content generation.

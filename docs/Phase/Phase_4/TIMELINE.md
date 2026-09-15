@@ -399,3 +399,37 @@ Phase 4C-2: Qdrant Setup & Vector Collection
 - No retry logic, idempotency strategy, embedding logic, semantic search, RAG, or document-processing integration was implemented.
 - Live Qdrant verification remains pending until `QDRANT_URL` and `QDRANT_API_KEY` are configured.
 
+## Date: 15 September 2026
+
+### Time: Current session
+
+### Team Member Name: Anshul Gusain
+
+**Task Worked On:**
+Phase 4C-4: Vector Metadata & Source Mapping
+
+**Changes Made:**
+- Created `server/src/services/vectorMetadataService.js` to establish source-mapping and vector metadata handling for Phase 4C.
+- Implemented `buildVectorPayload` to build standardized Qdrant payload schemas preserving complete hierarchical source tracing (`userId`, `subjectId`, `unitId`, `topicId`, `materialId`, `chunkId`, `chunkIndex`, `pageStart`, `pageEnd`).
+- Implemented `validateVectorPayload` to enforce mandatory fields (`userId`, `subjectId`, `materialId`, `chunkId`, `chunkIndex`) and valid page bounds (`pageStart`, `pageEnd`).
+- Implemented `mapVectorToSource` and `hydrateSourceMapping` to link vector search hits back to `DocumentChunk`, `StudyMaterial`, and hierarchical subject/unit/topic context.
+- Implemented `resolveSourceChain` with strict `userId` ownership validation to prevent cross-user vector leakage.
+- Implemented `formatSourceCitation` for human-readable RAG attribution (e.g. `[Material Title, pp. 3-4, Chunk #2]`).
+- Updated `server/src/services/qdrantService.js` to reuse `buildVectorPayload` for unified payload extraction and validation.
+- Created `server/tests/vectorMetadataService.test.js` covering payload extraction, schema validation, citation generation, model hydration, and user isolation.
+
+**Files Created:**
+- `server/src/services/vectorMetadataService.js`
+- `server/tests/vectorMetadataService.test.js`
+
+**Files Modified:**
+- `server/src/services/qdrantService.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/vectorMetadataService.test.js` — all 7 test cases passed (schema extraction, fallback handling, validation errors, source mapping, citation formatting, model hydration, user isolation enforcement).
+- Ran `node tests/qdrantService.test.js` — Qdrant infrastructure tests passed.
+- Ran `node tests/embeddingService.test.js` — 384-d vector generation verified.
+- Ran `node tests/document_processing.test.js` — Phase 4B pipeline regression suite passed.
+
