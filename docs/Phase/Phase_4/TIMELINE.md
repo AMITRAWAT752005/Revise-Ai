@@ -433,3 +433,54 @@ Phase 4C-4: Vector Metadata & Source Mapping
 - Ran `node tests/embeddingService.test.js` — 384-d vector generation verified.
 - Ran `node tests/document_processing.test.js` — Phase 4B pipeline regression suite passed.
 
+## Date: 15 September 2026
+
+### Time: Current session
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 4C-3 — Chunk-to-Embedding Pipeline Integration
+
+**Changes Made:**
+- Extended `DocumentChunk` schema with `embeddingStatus` (`pending`|`indexed`|`failed`) and `embeddingError` fields to track per-chunk vector indexing state independently of document processing state.
+- Added compound index `{ materialId, embeddingStatus }` to `DocumentChunk` for efficient retry queries.
+- Created `server/src/services/chunkEmbeddingPipeline.js` as the dedicated embedding orchestrator:
+  - `embedChunksForMaterial(materialId)`: fetches all `pending`/`failed` chunks, embeds each via `embeddingService`, upserts into Qdrant via `qdrantService.upsertVector`, updates `embeddingStatus` in MongoDB.
+  - `embedSingleChunk`: isolated per-chunk try/catch — failure of one chunk never stops others and never deletes the chunk.
+  - Idempotent: chunks already in `embeddingStatus: 'indexed'` are skipped without re-embedding.
+  - Bounded concurrency (`CONCURRENCY_LIMIT = 3`) to prevent transformer model memory exhaustion.
+  - Both outer and inner error paths log clearly and never propagate to the caller.
+- Wired `embedChunksForMaterial` into `documentProcessingService.processDocument` as a non-blocking fire-and-forget call after the material is marked `completed`. Embedding failures do not revert `processingStatus`.
+- Created `server/tests/chunkEmbeddingPipeline.test.js` with 11 fully isolated tests using constructor-injection mocking (no real MongoDB, no real Qdrant).
+
+**Files Created:**
+- `server/src/services/chunkEmbeddingPipeline.js`
+- `server/tests/chunkEmbeddingPipeline.test.js`
+
+**Files Modified:**
+- `server/src/models/DocumentChunk.js` (added `embeddingStatus`, `embeddingError`, compound index)
+- `server/src/services/documentProcessingService.js` (wired embedding pipeline call)
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/chunkEmbeddingPipeline.test.js` — all 11 tests passed:
+  - T1: Happy path — vector generated, Qdrant upserted, chunk marked `indexed`
+  - T2: Embedding failure — chunk NOT deleted, `embeddingStatus` = `failed`
+  - T3: Qdrant failure — chunk NOT deleted, `embeddingStatus` = `failed`
+  - T4: Multiple chunks produce separate, independent embeddings
+  - T5: Already-indexed chunks skipped on retry (idempotent)
+  - T6: Partial failure — other chunks still indexed, all chunks preserved in MongoDB
+  - T7: Zero pending chunks — returns early, no embedding calls made
+  - T8: 384-dimensional vector contract verified
+  - T9a/b/c: Phase 4B regression — extraction, cleaning, and chunking still pass
+- Ran `node tests/document_processing.test.js` — all 6 Phase 4B tests passed.
+- Ran `node tests/qdrantService.test.js` — Qdrant infrastructure tests passed.
+- Ran `node tests/vectorMetadataService.test.js` — all 7 metadata service tests passed.
+- Syntax checked all modified/created files via `node --check`.
+
+**Scope Boundaries:**
+- No semantic search, search API, RAG, or LLM generation implemented.
+- Qdrant collection setup and client configuration remains in Amit's `qdrantService.js`.
+- Upload request is never blocked by embedding; embedding runs fully in the background.

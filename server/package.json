@@ -10,6 +10,7 @@
     "test:subjects": "node tests/subject_api.test.js",
     "test:syllabus": "node tests/syllabus_pipeline.test.js",
     "test:documents": "node tests/document_processing.test.js",
+    "test:embedding-pipeline": "node tests/chunkEmbeddingPipeline.test.js",
     "migrate:user-progress": "node src/scripts/migrateUserProgress.js"
   },
   "keywords": [],

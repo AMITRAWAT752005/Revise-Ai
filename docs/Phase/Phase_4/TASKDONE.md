@@ -98,9 +98,9 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [ ] Build the chunk-to-embedding pipeline seamlessly integrating with existing `documentProcessingService`.
 - [ ] Ensure Qdrant payloads include necessary metadata (`userId`, `subjectId`, `unitId`, `topicId`, `materialId`, `chunkId`).
 - [ ] Implement robust duplicate vector handling and idempotency logic.
-- [ ] Create a reusable Semantic Search Service with strict `userId` and hierarchical metadata filtering.
+  - [ ] Create a reusable Semantic Search Service with strict `userId` and hierarchical metadata filtering.
 - [ ] Create a protected Search API (`/api/search`).
-- [ ] Ensure embedding/indexing failure does not lose `DocumentChunk` and supports retry mechanism.
+- [x] Ensure embedding/indexing failure does not lose `DocumentChunk` and supports retry mechanism.
 
 ### Bikram Singh Bisht — 4C-1 Embedding Service
 
@@ -114,7 +114,18 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 
 ---
 
-### Amit Rawat — 4C-2 Qdrant Setup & Vector Collection
+### Bikram Singh Bisht — 4C-3 Chunk-to-Embedding Pipeline
+
+- [x] Create `server/src/services/chunkEmbeddingPipeline.js` to orchestrate per-chunk embedding and Qdrant indexing.
+- [x] Add `embeddingStatus` (`pending`|`indexed`|`failed`) and `embeddingError` fields to `DocumentChunk` schema.
+- [x] Add compound `{ materialId, embeddingStatus }` index to `DocumentChunk` for efficient retry queries.
+- [x] Implement `embedChunksForMaterial(materialId)` — fetches unindexed chunks, embeds each independently, upserts into Qdrant.
+- [x] Implement `embedSingleChunk` with per-chunk isolation: failure of one chunk does not stop others.
+- [x] Implement idempotency: chunks already in `embeddingStatus: 'indexed'` are skipped on retry.
+- [x] Implement bounded concurrency (`CONCURRENCY_LIMIT = 3`) for transformer model memory safety.
+- [x] Wire `embedChunksForMaterial` into `documentProcessingService.processDocument` as a non-blocking post-completion step.
+- [x] Ensure embedding failures never delete `DocumentChunk` and never revert `processingStatus` to `failed`.
+- [x] Write `tests/chunkEmbeddingPipeline.test.js` with 11 tests covering: happy path, embedding failure (no deletion), Qdrant failure (no deletion), separate per-chunk embeddings, idempotency, partial failure isolation, early exit on zero pending chunks, vector dimension contract, and three Phase 4B regressions.
 
 - [x] Add the official `@qdrant/js-client-rest` dependency.
 - [x] Create `server/src/services/qdrantService.js` as the dedicated Qdrant infrastructure service.

@@ -10,6 +10,7 @@ import {
 } from './documentExtractors.js';
 import { cleanText } from '../utils/textCleaner.js';
 import { chunkText } from './chunkingService.js';
+import { embedChunksForMaterial } from './chunkEmbeddingPipeline.js';
 
 /**
  * Resolves file buffer either from passed buffer or by downloading/reading from material.fileUrl.
@@ -144,8 +145,29 @@ export const processDocument = async (materialId, fileBuffer) => {
     material.processingStatus = 'completed';
     material.processingProgress = 100;
     await material.save();
-    
+
     console.log(`[DocumentProcessing] Completed processing for ${material.fileName} (${documentChunks.length} chunks)`);
+
+    // 9. Trigger embedding + Qdrant indexing in a non-blocking sub-task.
+    //
+    //    This intentionally does NOT await embedChunksForMaterial — document
+    //    processing is already complete and the material is marked 'completed'.
+    //    Embedding failures are recorded per-chunk via DocumentChunk.embeddingStatus
+    //    and do NOT revert the material to 'failed'.
+    embedChunksForMaterial(material._id).then((summary) => {
+      console.log(
+        `[DocumentProcessing] Embedding summary for ${material._id}: ` +
+        `indexed=${summary.indexed}, failed=${summary.failed}, skipped=${summary.skipped}`
+      );
+    }).catch((err) => {
+      // Belt-and-suspenders: embedChunksForMaterial already swallows its own
+      // errors internally, but we guard here in case of an unexpected throw.
+      console.error(
+        `[DocumentProcessing] Unexpected embedding pipeline error for ${material._id}:`,
+        err instanceof Error ? err.message : err
+      );
+    });
+
     return true;
 
   } catch (error) {
