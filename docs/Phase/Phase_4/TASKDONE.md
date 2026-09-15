@@ -91,12 +91,26 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 
 ---
 
-# 4. Phase 4C — RAG Knowledge Base
+# 4. Phase 4C — Embeddings & Vector Database Foundation
 
-- [ ] Integrate an Embedding API (OpenAI, Gemini, Cohere, etc.).
-- [ ] Generate vector embeddings for `DocumentChunk` records.
-- [ ] Configure MongoDB Atlas Vector Search for the chunks.
-- [ ] Implement RAG retrieval service that filters by `userId`, `subjectId`, etc.
+- [x] Implement reusable Embedding Service using `sentence-transformers/all-MiniLM-L6-v2` (dimension 384).
+- [ ] Configure Qdrant with appropriate environment variables and create the collection.
+- [ ] Build the chunk-to-embedding pipeline seamlessly integrating with existing `documentProcessingService`.
+- [ ] Ensure Qdrant payloads include necessary metadata (`userId`, `subjectId`, `unitId`, `topicId`, `materialId`, `chunkId`).
+- [ ] Implement robust duplicate vector handling and idempotency logic.
+- [ ] Create a reusable Semantic Search Service with strict `userId` and hierarchical metadata filtering.
+- [ ] Create a protected Search API (`/api/search`).
+- [ ] Ensure embedding/indexing failure does not lose `DocumentChunk` and supports retry mechanism.
+
+### Bikram Singh Bisht — 4C-1 Embedding Service
+
+- [x] Install `@xenova/transformers` as a local embedding dependency (no Gemini, no external API).
+- [x] Create `server/src/services/embeddingService.js` with a singleton pipeline abstraction.
+- [x] Implement `generateEmbedding(text)` → `number[]` using `Xenova/all-MiniLM-L6-v2` with mean pooling and L2 normalization.
+- [x] Write `tests/embeddingService.test.js` and verify output dimension is exactly 384.
+- [x] Confirm model can be swapped later without changing callers.
+
+
 
 ---
 

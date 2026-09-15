@@ -331,3 +331,36 @@ Task B3 — Complete Document Processing Pipeline
 
 **Testing Performed:**
 - Ran `node tests/document_processing.test.js` assuring end-to-end extraction and chunk storage without errors.
+
+## Date: 15 September 2026
+
+### Time: Current session
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 4C-1 — Embedding Service Foundation
+
+**Changes Made:**
+- Installed `@xenova/transformers` (v3.x) as a local embedding dependency — no external API, no Gemini.
+- Created `server/src/services/embeddingService.js` as a singleton abstraction over the `Xenova/all-MiniLM-L6-v2` model.
+- Implemented `generateEmbedding(text) → number[]` using mean pooling and L2 normalization to produce cosine-similarity-ready vectors.
+- The service is isolated behind a clean interface so the underlying model can be swapped later without modifying any callers.
+- Created `server/tests/embeddingService.test.js` to verify end-to-end embedding generation.
+
+**Files Created:**
+- `server/src/services/embeddingService.js`
+- `server/tests/embeddingService.test.js`
+
+**Files Modified:**
+- `server/package.json` (added `@xenova/transformers` dependency)
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/embeddingService.test.js` — test passed.
+- Confirmed model initialized: `Xenova/all-MiniLM-L6-v2`.
+- Confirmed output vector dimension is exactly **384**.
+- Confirmed output is a standard JavaScript `number[]` array.
+- Confirmed embedding generated in ~7693ms on first call (model warm-up), subsequent calls will be faster.
+

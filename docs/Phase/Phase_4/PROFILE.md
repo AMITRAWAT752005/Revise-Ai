@@ -16,7 +16,7 @@ Phase 4 must reuse the existing models (`User`, `UserProgress`, `Subject`, `Unit
 
 - Implement Study Material upload and storage (Cloudinary/S3).
 - Process uploaded documents (PDF/DOCX/TXT) to extract and chunk text, using OCR only when necessary.
-- Build a RAG Knowledge Base by generating embeddings for document chunks and storing them in MongoDB Atlas Vector Search.
+- Build a Vector Database Foundation by generating embeddings (e.g., all-MiniLM-L6-v2) for document chunks and storing them in Qdrant for semantic search.
 - Use an LLM (Groq) with RAG to generate varied learning content (MCQs, Flashcards, Short/Long questions, etc.) from user's actual material.
 - Persist generated content in `Question` and `Flashcard` collections.
 - Build a Practice Engine for users to practice questions with randomized selection and session tracking.
@@ -66,10 +66,11 @@ Phase 4 will introduce:
 - Use external OCR APIs (e.g., Google Vision) ONLY for scanned PDFs.
 - Clean text and break it into chunks (`DocumentChunk`).
 
-### 4C — RAG Knowledge Base
-- Generate vector embeddings for text chunks using an Embedding API (OpenAI, Gemini, Cohere, etc.).
-- Store vectors and metadata (user, subject, topic, etc.) in MongoDB Atlas Vector Search.
-- Implement isolated retrieval (only search within the user's specific subject/topic).
+### 4C — Embeddings & Vector Database Foundation
+- Create a reusable Embedding Service generating numerical vectors (e.g., using `sentence-transformers/all-MiniLM-L6-v2` with 384 dimensions) isolated from LLMs like Gemini.
+- Store vectors and extensive metadata (`userId`, `subjectId`, `materialId`, etc.) in Qdrant (MongoDB remains the source of truth).
+- Implement an idempotent indexing pipeline with retry support and accurate processing status.
+- Build a protected Semantic Search API ensuring strict data isolation by enforcing `userId` and hierarchical filters.
 
 ### 4D & 4E — AI Content Generation & Storage
 - Retrieve relevant source chunks using RAG.
@@ -96,8 +97,8 @@ Phase 4 will introduce:
 - Ensure uploaded files are strictly associated with the authenticated user.
 - Enforce file size and type validation before uploading.
 - Handle extraction pipeline failures gracefully and update `StudyMaterial.processingError`.
-- Chunking must retain context and token limits suitable for the embedding model.
-- Vector search must always filter by `userId` to prevent data leakage.
+- Chunking must retain context and token limits suitable for the embedding model (e.g., all-MiniLM-L6-v2).
+- Vector search via Qdrant must always filter by `userId` to prevent data leakage.
 
 ---
 
@@ -124,8 +125,8 @@ The following are not Phase 4 responsibilities:
 
 - Verify secure file upload and robust error handling.
 - Verify text extraction and OCR fallback triggers correctly.
-- Verify embedding generation and vector DB storage with correct metadata.
-- Verify RAG retrieval isolates data by `userId` and `topicId`.
+- Verify embedding generation (e.g., 384 dimensions) and Qdrant storage with correct metadata payload.
+- Verify semantic search isolates data strictly by `userId` and prevents duplicate vectors.
 - Verify structured LLM output for content generation.
 - Verify objective and subjective answer evaluation logic.
 - Verify Spaced Repetition scheduling calculates future dates correctly.

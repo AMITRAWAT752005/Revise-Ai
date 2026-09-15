@@ -46,12 +46,14 @@
 
 ---
 
-## 3. RAG Knowledge Base Review
+## 3. Embeddings & Vector Database Review
 
-- [ ] Embeddings are generated successfully via the external API.
-- [ ] Vectors are stored in MongoDB Atlas Vector Search.
-- [ ] Vector metadata correctly includes `userId`, `subjectId`, `unitId`, and `topicId`.
-- [ ] Retrieval queries successfully filter by user and hierarchical metadata to ensure isolation.
+- [ ] Reusable Embedding Service successfully generates vectors (e.g., all-MiniLM-L6-v2) without relying on Gemini.
+- [ ] Vectors are stored in Qdrant with appropriate environment variables and collection name.
+- [ ] Vector payload correctly includes `userId`, `subjectId`, `unitId`, `topicId`, `materialId`, and `chunkId`.
+- [ ] Semantic search APIs successfully filter by `userId` and hierarchical metadata, preventing data leakage.
+- [ ] Idempotent chunk-to-embedding pipeline prevents duplicate vectors and handles retries safely.
+- [ ] System fails gracefully (e.g. keeping DocumentChunks intact) if Qdrant or embedding model is temporarily unavailable.
 
 **Review Notes:**
 
