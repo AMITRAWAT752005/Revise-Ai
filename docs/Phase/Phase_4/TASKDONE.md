@@ -158,6 +158,16 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Integrate `buildVectorPayload` into `qdrantService.js` for single-source payload building.
 - [x] Create and pass comprehensive test suite `server/tests/vectorMetadataService.test.js`.
 
+### Anshul Gusain — 4C-8 Processing State + Frontend Integration
+
+- [x] Integrate frontend material processing state with actual backend `processingStatus` (`uploaded`, `processing`, `completed`, `failed`).
+- [x] Multi-stage asynchronous pipeline UI representation (`File uploaded` -> `Text extraction` -> `Chunking & Cleaning` -> `Building knowledge index`).
+- [x] Auto-polling mechanism for materials in active processing states without blocking UI interactions.
+- [x] Reassurance UX messaging for long-running asynchronous background indexing jobs.
+- [x] Robust failure state handling displaying contextual error messages with retry action calling existing backend retry endpoint.
+- [x] Keep user data safe without exposing internal vector database identifiers or sensitive embedding data.
+- [x] Validate client production build with zero syntax, rendering, or build errors.
+
 ### Amit Rawat — 4C-7 Retry, Error Handling & Idempotency
 
 - [x] Stabilize the vector identity contract using `hash(materialId + chunkId + chunkIndex)` so the same chunk re-runs without producing duplicate vectors.
