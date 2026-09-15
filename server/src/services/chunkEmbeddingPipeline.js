@@ -21,9 +21,10 @@
  *  - Semantic search, search APIs, and RAG are strictly out of scope.
  */
 
+import { StudyMaterial } from '../models/StudyMaterial.js';
 import { DocumentChunk } from '../models/DocumentChunk.js';
 import { generateEmbedding } from './embeddingService.js';
-import { upsertVector } from './qdrantService.js';
+import { buildStableVectorId, upsertVector } from './qdrantService.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -61,14 +62,18 @@ const runWithConcurrency = async (items, fn, concurrency) => {
 };
 
 /**
- * Builds the Qdrant vector ID for a DocumentChunk.
- * Uses the MongoDB ObjectId string so every vector is directly traceable to its
- * source document without any secondary lookup.
+ * Builds a stable Qdrant vector ID for a DocumentChunk.
+ * The same document chunk must always resolve to the same vector value so a
+ * re-run updates the existing point instead of creating duplicates.
  *
  * @param {import('mongoose').Document} chunk
  * @returns {string}
  */
-const buildVectorId = (chunk) => chunk._id.toString();
+const buildVectorId = (chunk) => buildStableVectorId(
+  chunk.materialId.toString(),
+  chunk._id.toString(),
+  chunk.chunkIndex
+);
 
 /**
  * Builds the Qdrant payload object from a DocumentChunk.
@@ -106,16 +111,12 @@ const embedSingleChunk = async (chunk) => {
   const chunkId = chunk._id.toString();
 
   try {
-    // 1. Generate embedding vector (384 dimensions, L2-normalized)
     const vector = await generateEmbedding(chunk.text);
-
-    // 2. Upsert into Qdrant — uses Amit's qdrantService which owns the
-    //    collection config and client lifecycle.
     const vectorId = buildVectorId(chunk);
     const payload = buildPayload(chunk);
+
     await upsertVector(vectorId, vector, payload);
 
-    // 3. Persist success state — clears any previous embeddingError
     await DocumentChunk.updateOne(
       { _id: chunk._id },
       { $set: { embeddingStatus: 'indexed' }, $unset: { embeddingError: '' } }
@@ -128,8 +129,6 @@ const embedSingleChunk = async (chunk) => {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`${LOG_PREFIX} Failed to index chunk ${chunkId}:`, message);
 
-    // Preserve the chunk — only update the status fields.
-    // The DocumentChunk itself is the source of truth and must not be deleted.
     try {
       await DocumentChunk.updateOne(
         { _id: chunk._id },
@@ -210,12 +209,26 @@ export const embedChunksForMaterial = async (materialId) => {
     );
 
   } catch (error) {
-    // Outer catch covers unexpected failures (e.g. MongoDB query error).
-    // We log and return the partial summary so the caller is aware but not blocked.
     console.error(
       `${LOG_PREFIX} Unexpected error during embedding for material ${materialId}:`,
       error instanceof Error ? error.message : error
     );
+  }
+
+  if (summary.failed > 0) {
+    try {
+      const material = await StudyMaterial.findById(materialId);
+      if (material) {
+        material.processingStatus = 'failed';
+        material.processingError = `${summary.failed} chunk(s) failed Qdrant indexing`;
+        await material.save();
+      }
+    } catch (statusError) {
+      console.error(
+        `${LOG_PREFIX} Failed to update material status after partial indexing failure for ${materialId}:`,
+        statusError instanceof Error ? statusError.message : statusError
+      );
+    }
   }
 
   return summary;

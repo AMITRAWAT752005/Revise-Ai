@@ -418,6 +418,39 @@ Phase 4C-4: Vector Metadata & Source Mapping
 - Updated `server/src/services/qdrantService.js` to reuse `buildVectorPayload` for unified payload extraction and validation.
 - Created `server/tests/vectorMetadataService.test.js` covering payload extraction, schema validation, citation generation, model hydration, and user isolation.
 
+## Date: 15 September 2026
+
+### Time: Current session
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4C-7: Retry, Error Handling & Idempotency
+
+**Changes Made:**
+- Added the stable vector identity contract `hash(materialId + chunkId + chunkIndex)` so the same DocumentChunk updates the same Qdrant point instead of producing duplicates on rerun.
+- Kept Qdrant writes in UPSERT mode and ensured reprocessing revises existing vectors without deleting or duplicating MongoDB chunk records.
+- Added bounded retry handling for transient Qdrant failures with a short exponential backoff and strict max retry count.
+- Ensured invalid vector length and connection failures raise structured errors instead of being silently discarded.
+- Preserved `DocumentChunk` integrity during partial failures and recorded meaningful failure metadata without deleting the source chunk.
+- Updated the material status to a safe partial-failure state when a chunk batch fails indexing, rather than corrupting the source-of-truth MongoDB data.
+- Kept the changes limited to the reliability layer and did not modify the embedding logic or search scope.
+
+**Files Created:**
+- None.
+
+**Files Modified:**
+- `server/src/services/qdrantService.js`
+- `server/src/services/chunkEmbeddingPipeline.js`
+- `server/tests/qdrantService.test.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node tests/qdrantService.test.js` — passed.
+- Ran `node tests/chunkEmbeddingPipeline.test.js` — passed with 11/11 tests green.
+- Confirmed duplicate prevention, stable vector IDs, retry behavior, and no MongoDB data loss under failed indexing scenarios.
+
 **Files Created:**
 - `server/src/services/vectorMetadataService.js`
 - `server/tests/vectorMetadataService.test.js`

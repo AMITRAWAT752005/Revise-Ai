@@ -149,6 +149,16 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Integrate `buildVectorPayload` into `qdrantService.js` for single-source payload building.
 - [x] Create and pass comprehensive test suite `server/tests/vectorMetadataService.test.js`.
 
+### Amit Rawat — 4C-7 Retry, Error Handling & Idempotency
+
+- [x] Stabilize the vector identity contract using `hash(materialId + chunkId + chunkIndex)` so the same chunk re-runs without producing duplicate vectors.
+- [x] Ensure Qdrant writes use UPSERT semantics so repeated indexing results in update rather than duplicate insert.
+- [x] Add bounded retry logic for transient Qdrant errors using a short exponential backoff window and a strict retry limit.
+- [x] Wrap Qdrant connection and upsert failures in structured errors while preserving MongoDB chunk records and preventing silent failures.
+- [x] Keep failed indexing isolated to the vector layer; `DocumentChunk` remains intact and is marked with detailed failure metadata when needed.
+- [x] Update the material status on batch indexing failure only as a safe partial-failure state rather than deleting any MongoDB data.
+- [x] Validate duplicate prevention, retry success, failure simulation, and no-data-loss behavior with targeted tests.
+
 
 # 5. Phase 4D — AI Content Generation
 
