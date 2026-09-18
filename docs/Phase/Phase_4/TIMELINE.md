@@ -243,6 +243,12 @@ Phase 5 — Question & Flashcard Model Design
 - `docs/Phase/Phase_4/TASKDONE.md`
 - `docs/Phase/Phase_4/TIMELINE.md`
 
+**Testing Performed:**
+- Ran `node --check server/src/models/Question.js` successfully.
+- Ran `node --check server/src/models/Flashcard.js` successfully.
+- Verified required fields, enum values, and index declarations in both model schemas.
+- Confirmed no API, service, embedding, or Qdrant logic was introduced.
+
 **Status:**
 Completed
 

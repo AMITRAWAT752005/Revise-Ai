@@ -292,3 +292,6 @@ Phase 5 — Question & Flashcard Model Design
 - Required fields enforced
 - Enum validation verified
 - MongoDB model creation successful
+- `node --check server/src/models/Question.js` passed
+- `node --check server/src/models/Flashcard.js` passed
+- File and schema review confirmed no forbidden logic, no API/service code, and no unrelated file changes
