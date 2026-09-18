@@ -295,3 +295,25 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - `node --check server/src/models/Question.js` passed
 - `node --check server/src/models/Flashcard.js` passed
 - File and schema review confirmed no forbidden logic, no API/service code, and no unrelated file changes
+
+ # # #   B i k r a m   S i n g h   B i s h t   -   T a s k   2 :   R A G   C o n t e x t   R e t r i e v a l   &   C o n t e x t   B u i l d e r 
+ 
+ -   [ x ]   I m p l e m e n t   \  a g C o n t e x t S e r v i c e . j s \   u s i n g   t h e   e x i s t i n g   \ s e m a n t i c S e a r c h S e r v i c e \ . 
+ -   [ x ]   I m p l e m e n t   \  u i l d R a g C o n t e x t \   t o   r e t r i e v e   c h u n k s . 
+ -   [ x ]   I m p l e m e n t   c h u n k   d e d u p l i c a t i o n   a n d   m a x   c h a r a c t e r   l i m i t s   ( d e f a u l t   1 5 0 0 0   c h a r s )   f o r   p r o m p t   s a f e t y . 
+ -   [ x ]   I m p l e m e n t   s o u r c e   t r a c e a b i l i t y   e n s u r i n g   c h u n k s   a r e   m a p p e d   b a c k   t o   \ m a t e r i a l I d \ ,   \ s u b j e c t I d \ ,   \ u n i t I d \ ,   e t c . 
+ -   [ x ]   I n t e g r a t e   e m p t y   r e s u l t ,   m i s s i n g   q u e r y ,   a n d   m i s s i n g   u s e r I d   e r r o r   h a n d l i n g . 
+ -   [ x ]   W r i t e   \  a g C o n t e x t S e r v i c e . t e s t . j s \   t o   v e r i f y   r e t r i e v a l ,   c o n t e x t   b u i l d i n g ,   l i m i t s ,   a n d   e r r o r   h a n d l i n g . 
+  
+ 
+ # # #   B i k r a m   S i n g h   B i s h t   -   T a s k   3 :   A I   G e n e r a t i o n   S e r v i c e   &   L L M   I n t e g r a t i o n 
+ 
+ -   [ x ]   I m p l e m e n t   \  i G e n e r a t i o n S e r v i c e . j s \ . 
+ -   [ x ]   V a l i d a t e   g e n e r a t i o n   r e q u e s t s   u s i n g   \ G e n e r a t i o n R e q u e s t S c h e m a \ . 
+ -   [ x ]   I n t e g r a t e   R A G   c o n t e x t   r e t r i e v a l   i n t o   t h e   p r o m p t . 
+ -   [ x ]   C o n s t r u c t   a   s t r i c t   p r o m p t   t e m p l a t e   e n f o r c i n g   d i f f i c u l t y ,   c o u n t ,   i t e m   t y p e s ,   a n d   s o u r c e - g r o u n d i n g . 
+ -   [ x ]   I n t e g r a t e   G e m i n i   L L M   d i r e c t l y   u s i n g   t h e   f e t c h   A P I   w i t h   r e t r y   l o g i c   a n d   t i m e o u t   h a n d l i n g . 
+ -   [ x ]   P a r s e   L L M   o u t p u t   a n d   v a l i d a t e   a g a i n s t   \ A I G e n e r a t i o n R e s p o n s e S c h e m a \ . 
+ -   [ x ]   W r i t e   \  i G e n e r a t i o n S e r v i c e . t e s t . j s \   t o   v e r i f y   l o g i c ,   s c h e m a   v a l i d a t i o n ,   a n d   e r r o r   s c e n a r i o s . 
+  
+ 

@@ -706,3 +706,61 @@ Phase 4D Task 1 — AI Generation Contract & Architecture Analysis
 
 **Testing Performed:**
 - Created and successfully ran `node --test tests/aiGenerationContract.test.js` to ensure the Zod validation works correctly.
+
+## Date: 18 September 2026
+
+### Time: Current session
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 4D Task 2 — RAG Context Retrieval & Context Builder
+
+**Changes Made:**
+- Implemented `server/src/services/ragContextService.js`.
+- Utilized the existing `semanticSearchService.searchSemanticChunks` to fetch vectors.
+- Implemented `buildRagContext()` with chunk deduplication using `chunkId`.
+- Enforced a max character limit (default 15,000) for prompts to prevent context overflows.
+- Passed along all semantic search tracking variables back to the caller for accurate `sources` generation to enable LLM traceability.
+- Wrote tests in `server/tests/ragContextService.test.js` covering error validation, empty results handling, text deduplication, and bounds enforcement.
+
+**Files Created:**
+- `server/src/services/ragContextService.js`
+- `server/tests/ragContextService.test.js`
+
+**Files Modified:**
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran the unit test file `ragContextService.test.js` to verify empty results and limits logic.
+
+## Date: 18 September 2026
+
+### Time: Current session
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 4D Task 3 — AI Generation Service & LLM Integration
+
+**Changes Made:**
+- Created `server/src/services/aiGenerationService.js` to orchestrate AI content generation.
+- Integrated `ragContextService` to retrieve context for the LLM.
+- Implemented `callGeminiApi` with retry logic for robust Gemini API integration.
+- Constructed a system instruction prompt restricting the LLM to only output facts present in the retrieved RAG context.
+- Formatted retrieved chunks into a numbered list so the LLM can reference them in `sourceChunkIds`.
+- Utilized Zod schema validation using the `AIGenerationResponseSchema` from Task 1.
+- Implemented `validateAndHydrateResponse` to ensure strict schema adherence of the LLM JSON output.
+- Wrote `server/tests/aiGenerationService.test.js` covering validation errors, insufficient RAG context, successful generation, and LLM output parsing failures.
+
+**Files Created:**
+- `server/src/services/aiGenerationService.js`
+- `server/tests/aiGenerationService.test.js`
+
+**Files Modified:**
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node --test tests/aiGenerationService.test.js` successfully with all 4 tests passing.
