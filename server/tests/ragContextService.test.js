@@ -2,7 +2,7 @@ import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import mongoose from 'mongoose';
 import { buildRagContext } from '../src/services/ragContextService.js';
-import * as semanticSearchService from '../src/services/semanticSearchService.js';
+import semanticSearchService from '../src/services/semanticSearchService.js';
 import { mock } from 'node:test';
 
 describe('RAG Context Service - buildRagContext', () => {

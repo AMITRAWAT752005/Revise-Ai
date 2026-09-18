@@ -200,8 +200,18 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Support 9 content types (MCQ, Flashcard, True/False, One-word, Fill-in-the-blank, Match the following, Sequence, Spot the mistake, What happens next).
 - [x] Ensure the generation pipeline validates and parses structured output from the LLM.
 
-- [ ] Integrate an LLM API (e.g., Groq) for content generation.
-- [ ] Implement prompt templates for generating MCQs, True/False, Short/Long questions, and Flashcards based on retrieved RAG chunks.
+- [x] Integrate an LLM API (e.g., Groq/Gemini) for content generation.
+- [x] Implement prompt templates for generating MCQs, True/False, Short/Long questions, and Flashcards based on retrieved RAG chunks.
+
+### Anukool Negi — Protected API Integration
+
+- [x] Create `server/src/controllers/aiController.js` handling request validation, `userId` derivation from auth token, and resource ownership checks.
+- [x] Create `server/src/routes/aiRoutes.js` exposing `POST /api/ai/generate` protected by `authenticateToken`.
+- [x] Mount `/api/ai` routes in `server/src/app.js`.
+- [x] Enforce strict user isolation and hierarchy ownership validation across Subject, Unit, and Topic.
+- [x] Integrate backend AI generation service (`aiGenerationService.js`) with backend-only API key handling.
+- [x] Standardize API success responses (`{ success: true, data: { generatedContent, meta } }`) and error responses without leaking credentials.
+- [x] Create and pass comprehensive test suite `server/tests/protected_ai_api.test.js` (13 tests passing).
 
 ---
 

@@ -915,3 +915,40 @@ Completed
 - Task: Phase 4 — Task 5: Testing Verification (Validation & Persistence)  
 - Description: Added strict test coverage and verified duplicate handling, ownership validation, failure safety, and return contract consistency  
 - Status: Completed  
+
+## Date: 18 September 2026
+
+### Time: Current session
+
+### Team Member Name: Anukool Negi
+
+**Task Worked On:**
+Phase 4 — Protected API Integration
+
+**Changes Made:**
+- Created `server/src/controllers/aiController.js` to process content-generation requests, derive `userId` from `authenticateToken` middleware, validate input bounds/types, and verify resource ownership.
+- Created `server/src/routes/aiRoutes.js` exposing `POST /api/ai/generate` protected by `authenticateToken`.
+- Mounted `/api/ai` router in `server/src/app.js`.
+- Enforced strict hierarchical ownership validation (`Subject`, `Unit`, `Topic`) via `validateHierarchyOwnership`.
+- Ensured backend AI credentials (`GEMINI_API_KEY`) remain strictly backend-only and are never exposed in responses or logs.
+- Standardized JSON success responses (`{ success: true, data: { generatedContent, meta } }`) and error handling.
+- Created comprehensive test suite `server/tests/protected_ai_api.test.js` covering authentication protection, input/format validation, hierarchy/ownership checks, body spoofing prevention, and AI service integration.
+
+**Files Created:**
+- `server/src/controllers/aiController.js`
+- `server/src/routes/aiRoutes.js`
+- `server/tests/protected_ai_api.test.js`
+
+**Files Modified:**
+- `server/src/app.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node --check` syntax verification across created and modified files.
+- Executed `node --test server/tests/protected_ai_api.test.js` (13/13 tests passed).
+- Executed full test suite runner across 7 test files (`aiGenerationContract.test.js`, `aiGenerationService.test.js`, `ragContextService.test.js`, `vectorMetadataService.test.js`, `content_validation_persistence.test.js`, `document_processing.test.js`, `protected_ai_api.test.js`) with 38 passing tests and 0 failures.
+
+**Status:**
+Completed
+
