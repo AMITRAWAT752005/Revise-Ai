@@ -231,29 +231,6 @@ const Revision = () => {
           </div>
         </header>
 
-        {/* Stitch Screen Switcher / Stepper Tab Bar */}
-        {sessionActive && (
-          <div className={styles.tabBarWrapper}>
-            <div className={styles.tabBar}>
-              {STITCH_MODES.map((mode) => {
-                const isActive = currentMode === mode.id;
-                return (
-                  <button
-                    key={mode.id}
-                    type="button"
-                    className={`${styles.tabBtn} ${
-                      isActive ? styles.activeTabBtn : ''
-                    }`}
-                    onClick={() => handleSelectMode(mode.id)}
-                  >
-                    {mode.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         {/* Content Canvas */}
         <div className={styles.contentCanvas}>
           {!sessionActive ? (
