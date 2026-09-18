@@ -342,3 +342,27 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Integrate all 17 revision modes seamlessly into `Revision.jsx` with progressive state flow and comprehensive Stitch screen tab bar navigator.
 - [x] Validate production build with `npm run build` passing with zero errors.
 
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4 — Task 5: Validation & Persistence Layer
+
+**Changes Made:**
+- Implemented validation for AI-generated Question & Flashcard data
+- Added strict AI output structure validation
+- Enforced sourceChunks validation
+- Implemented persistence service with duplicate handling
+- Added ownership validation and hierarchy checks
+- Ensured safe and consistent data persistence
+
+**Files Created:**
+- server/src/services/contentValidationService.js
+- server/src/services/contentPersistenceService.js
+
+**Testing Performed:**
+- Invalid AI output rejected
+- SourceChunks validation verified
+- Duplicate detection tested
+- Ownership validation enforced
+- Data consistency verified
+

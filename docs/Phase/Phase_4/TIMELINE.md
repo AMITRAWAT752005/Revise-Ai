@@ -220,6 +220,8 @@ Phase 4B: A1/A3 Failed-Test Corrections
 - Verified sequential chunk indexes and no diagnostics in the modified files.
 
 
+
+
 ## Date: 14 September 2026
 
 ### Time: Current session
@@ -882,3 +884,29 @@ Phase 4D Prompt 2 — Advanced Revision Modes & Session Flow (Stitch Project `83
 - Verified that no backend code or database files were touched.
 
 
+## Date: 18 September 2026
+
+### Time: Current session
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4 — Task 5: Validation & Persistence Layer
+
+**Changes Made:**
+- Implemented strict validation for AI-generated Question and Flashcard payloads.
+- Added sourceChunks enforcement and ObjectId-level checks for metadata.
+- Added persistence logic with duplicate detection and ownership validation.
+- Enforced hierarchy checks across Subject, Unit, Topic, and Material before save.
+- Kept the implementation scoped to validation and persistence only.
+
+**Files Created:**
+- `server/src/services/contentValidationService.js`
+- `server/src/services/contentPersistenceService.js`
+
+**Files Modified:**
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Status:**
+Completed
