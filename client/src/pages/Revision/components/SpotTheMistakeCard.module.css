@@ -1,0 +1,313 @@
+.container {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  background: var(--surface-container-lowest, #ffffff);
+  border-radius: 24px;
+  padding: 32px;
+  border: 1px solid var(--outline-variant, #e4e2e4);
+  box-shadow: 0 10px 30px rgba(94, 92, 230, 0.06);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.headerBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.badgeGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: #ffdad6;
+  color: #ba1a1a;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.modeIcon {
+  color: #ba1a1a;
+}
+
+.topicText {
+  font-size: 14px;
+  font-weight: 500;
+  color: #777586;
+}
+
+.timerBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: #f0edef;
+  color: #464554;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.titleSection {
+  margin-bottom: 28px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1b1b1d;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: #777586;
+  line-height: 1.5;
+}
+
+.sentenceBoard {
+  background: #fcf8fb;
+  border: 2px dashed #c7c4d7;
+  border-radius: 20px;
+  padding: 32px 28px;
+  margin-bottom: 28px;
+  transition: all 0.25s ease;
+}
+
+.sentenceBoard:hover {
+  border-color: #5e5ce6;
+  background: #ffffff;
+}
+
+.tokenContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 8px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.tokenBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 19px;
+  font-weight: 600;
+  color: #1b1b1d;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tokenBtn:hover:not(:disabled) {
+  background: #e2dfff;
+  color: #4441cc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(68, 65, 204, 0.12);
+}
+
+.correctToken {
+  background: #ecfdf5 !important;
+  border: 2px solid #10b981 !important;
+  color: #065f46 !important;
+  transform: scale(1.04);
+}
+
+.correctedWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.struckWord {
+  text-decoration: line-through;
+  color: #ba1a1a;
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.replacementWord {
+  color: #10b981;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.wrongToken {
+  background: #ffdad6 !important;
+  border-color: #ba1a1a !important;
+  color: #93000a !important;
+  animation: shake 0.4s ease-in-out;
+}
+
+.explanationSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.rewardBanner {
+  background: linear-gradient(135deg, #10b981, #005e79);
+  border-radius: 18px;
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+}
+
+.bannerLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sparkleCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sparkleIcon {
+  color: #ffd700;
+  animation: pulse 1.8s infinite;
+}
+
+.bannerTitle {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.bannerSubtitle {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.bannerBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.aiExplanationCard {
+  background: #f4f1ff;
+  border: 1px solid #c2c1ff;
+  border-radius: 16px;
+  padding: 20px 24px;
+}
+
+.aiHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.bulbIcon {
+  color: #5e5ce6;
+}
+
+.aiHeader h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #4441cc;
+  margin: 0;
+}
+
+.aiText {
+  font-size: 14.5px;
+  color: #303032;
+  line-height: 1.6;
+}
+
+.actionRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.continueBtn {
+  background: #4441cc;
+  color: #ffffff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(68, 65, 204, 0.25);
+}
+
+.continueBtn:hover {
+  background: #5e5ce6;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(68, 65, 204, 0.35);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+  .tokenBtn {
+    font-size: 16px;
+    padding: 4px 8px;
+  }
+  .rewardBanner {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .continueBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

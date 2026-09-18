@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import SideNavBar from '../../components/Navigation/SideNavBar';
 import BottomNavBar from '../../components/Navigation/BottomNavBar';
+
+// Prompt 1 Components
 import QuickPickCard from './components/QuickPickCard';
 import FillTheGapCard from './components/FillTheGapCard';
 import FlashcardCard from './components/FlashcardCard';
@@ -10,6 +12,17 @@ import ShortAnswerEvaluation from './components/ShortAnswerEvaluation';
 import CorrectFeedbackModal from './components/CorrectFeedbackModal';
 import WrongFeedbackModal from './components/WrongFeedbackModal';
 import ComboRewardModal from './components/ComboRewardModal';
+
+// Prompt 2 Components
+import MatchItCard from './components/MatchItCard';
+import PutInOrderCard from './components/PutInOrderCard';
+import SpotTheMistakeCard from './components/SpotTheMistakeCard';
+import TrueFalseCard from './components/TrueFalseCard';
+import ScenarioChoiceCard from './components/ScenarioChoiceCard';
+import WhatHappensNextCard from './components/WhatHappensNextCard';
+import RankItCard from './components/RankItCard';
+import SessionCompleteCard from './components/SessionCompleteCard';
+
 import styles from './Revision.module.css';
 
 const STITCH_MODES = [
@@ -19,9 +32,17 @@ const STITCH_MODES = [
   { id: 'flashcard_back', label: '4. Flashcard Back' },
   { id: 'short_answer', label: '5. Short Answer' },
   { id: 'evaluation', label: '6. AI Evaluation' },
-  { id: 'correct_feedback', label: '7. Correct Feedback' },
-  { id: 'wrong_feedback', label: '8. Wrong Feedback' },
-  { id: 'combo_reward', label: '9. Combo Reward' }
+  { id: 'match_it', label: '7. Match It' },
+  { id: 'put_in_order', label: '8. Put in Order' },
+  { id: 'spot_mistake', label: '9. Spot Mistake' },
+  { id: 'true_false', label: '10. True / False' },
+  { id: 'scenario_choice', label: '11. Scenario Choice' },
+  { id: 'what_happens_next', label: '12. What Next?' },
+  { id: 'rank_it', label: '13. Rank It' },
+  { id: 'correct_feedback', label: '14. Correct Feedback' },
+  { id: 'wrong_feedback', label: '15. Wrong Feedback' },
+  { id: 'combo_reward', label: '16. Combo Reward' },
+  { id: 'session_complete', label: '17. Session Complete' }
 ];
 
 const Revision = () => {
@@ -30,10 +51,10 @@ const Revision = () => {
   const [user, setUser] = useState(null);
   const [sessionActive, setSessionActive] = useState(false);
   const [currentMode, setCurrentMode] = useState('quick_pick');
-  const [interactiveStep, setInteractiveStep] = useState(1);
   const [userAnswer, setUserAnswer] = useState('');
   const [totalXpEarned, setTotalXpEarned] = useState(820);
-  const [streakCount, setStreakCount] = useState(5);
+  const [streakCount, setStreakCount] = useState(7);
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(14);
 
   useEffect(() => {
     try {
@@ -55,7 +76,6 @@ const Revision = () => {
   const handleStartNow = () => {
     setSessionActive(true);
     setCurrentMode('quick_pick');
-    setInteractiveStep(1);
   };
 
   const handleMaybeLater = () => {
@@ -68,10 +88,11 @@ const Revision = () => {
     setSearchParams({ mode: modeId });
   };
 
-  // Flow handlers
+  // Progression Flow Handlers
   const handleQuickPickOption = (option) => {
     if (option.isCorrect) {
       setTotalXpEarned((prev) => prev + 10);
+      setCorrectAnswersCount((prev) => prev + 1);
       setCurrentMode('correct_feedback');
     } else {
       setCurrentMode('wrong_feedback');
@@ -81,13 +102,57 @@ const Revision = () => {
   const handleFillGapContinue = (isCorrect) => {
     if (isCorrect) {
       setTotalXpEarned((prev) => prev + 15);
+      setCorrectAnswersCount((prev) => prev + 1);
     }
+    setCurrentMode('match_it');
+  };
+
+  const handleMatchItNext = () => {
+    setTotalXpEarned((prev) => prev + 15);
+    setCorrectAnswersCount((prev) => prev + 1);
+    setCurrentMode('put_in_order');
+  };
+
+  const handlePutInOrderNext = () => {
+    setTotalXpEarned((prev) => prev + 15);
+    setCorrectAnswersCount((prev) => prev + 1);
+    setCurrentMode('spot_mistake');
+  };
+
+  const handleSpotMistakeNext = () => {
+    setTotalXpEarned((prev) => prev + 15);
+    setCorrectAnswersCount((prev) => prev + 1);
+    setCurrentMode('true_false');
+  };
+
+  const handleTrueFalseNext = () => {
+    setTotalXpEarned((prev) => prev + 10);
+    setCorrectAnswersCount((prev) => prev + 1);
+    setCurrentMode('scenario_choice');
+  };
+
+  const handleScenarioChoiceNext = () => {
+    setTotalXpEarned((prev) => prev + 15);
+    setCorrectAnswersCount((prev) => prev + 1);
+    setCurrentMode('what_happens_next');
+  };
+
+  const handleWhatHappensNext = () => {
+    setTotalXpEarned((prev) => prev + 15);
+    setCorrectAnswersCount((prev) => prev + 1);
+    setCurrentMode('rank_it');
+  };
+
+  const handleRankItNext = () => {
+    setTotalXpEarned((prev) => prev + 15);
+    setCorrectAnswersCount((prev) => prev + 1);
     setCurrentMode('flashcard_front');
   };
 
   const handleFlashcardRate = (rating) => {
     const xpBonus = rating === 'easy' ? 15 : rating === 'good' ? 10 : 5;
     setTotalXpEarned((prev) => prev + xpBonus);
+    setCorrectAnswersCount((prev) => prev + 1);
     setCurrentMode('short_answer');
   };
 
@@ -104,8 +169,11 @@ const Revision = () => {
   const handleComboContinue = () => {
     setTotalXpEarned((prev) => prev + 25);
     setStreakCount((prev) => prev + 1);
+    setCurrentMode('session_complete');
+  };
+
+  const handleRestartSession = () => {
     setCurrentMode('quick_pick');
-    setInteractiveStep(1);
   };
 
   return (
@@ -186,7 +254,7 @@ const Revision = () => {
           </div>
         )}
 
-        {/* Content Area */}
+        {/* Content Canvas */}
         <div className={styles.contentCanvas}>
           {!sessionActive ? (
             /* ==================================================== */
@@ -215,8 +283,8 @@ const Revision = () => {
                 </h2>
 
                 <p className={styles.modalDescription}>
-                  10 minutes is all it takes to make it stick. Try to complete the
-                  full series or stay focused for at least 10 minutes.
+                  10 minutes is all it takes to make it stick. Complete the daily
+                  interactive revision session to keep your streak glowing!
                 </p>
 
                 <div className={styles.actionGroup}>
@@ -243,9 +311,10 @@ const Revision = () => {
             </div>
           ) : (
             /* ==================================================== */
-            /* ACTIVE STITCH REVISION SCREENS                       */
+            /* ACTIVE STITCH REVISION SCREENS (PROMPTS 1 & 2)       */
             /* ==================================================== */
             <div className={styles.screenRenderer}>
+              {/* 1. Quick Pick */}
               {currentMode === 'quick_pick' && (
                 <QuickPickCard
                   onSelectOption={handleQuickPickOption}
@@ -253,6 +322,7 @@ const Revision = () => {
                 />
               )}
 
+              {/* 2. Fill the Gap */}
               {currentMode === 'fill_gap' && (
                 <FillTheGapCard
                   onContinue={handleFillGapContinue}
@@ -260,14 +330,16 @@ const Revision = () => {
                 />
               )}
 
+              {/* 3. Flashcard Front */}
               {currentMode === 'flashcard_front' && (
                 <FlashcardCard
                   initialFlipped={false}
                   onRate={handleFlashcardRate}
-                  onBack={() => setCurrentMode('fill_gap')}
+                  onBack={() => setCurrentMode('rank_it')}
                 />
               )}
 
+              {/* 4. Flashcard Back */}
               {currentMode === 'flashcard_back' && (
                 <FlashcardCard
                   initialFlipped={true}
@@ -276,6 +348,7 @@ const Revision = () => {
                 />
               )}
 
+              {/* 5. Short Answer Empty/Input */}
               {currentMode === 'short_answer' && (
                 <ShortAnswerCard
                   onSubmit={handleShortAnswerSubmit}
@@ -283,21 +356,22 @@ const Revision = () => {
                 />
               )}
 
+              {/* 6. AI Short Answer Evaluation */}
               {currentMode === 'evaluation' && (
                 <ShortAnswerEvaluation
                   data={{
-                    questionIndex: 4,
-                    totalQuestions: 10,
-                    question: 'What is the difference between TCP and UDP?',
+                    questionIndex: 6,
+                    totalQuestions: 17,
+                    question: 'What is the primary difference between TCP and UDP?',
                     userAnswer:
                       userAnswer ||
-                      'TCP is connection-oriented and provides reliable, ordered data delivery with error checking. UDP is connectionless and faster without delivery guarantees.',
-                    score: 8,
+                      'TCP is connection-oriented and provides reliable, ordered data delivery with error checking. UDP is connectionless and lightweight without delivery guarantees.',
+                    score: 9,
                     maxScore: 10,
                     xpEarned: 20,
-                    headline: 'Solid Understanding!',
+                    headline: 'Outstanding Precision!',
                     summary:
-                      "You've grasped the core distinction between reliability and speed effectively.",
+                      "You've grasped the core distinction between reliability, handshake overhead, and streaming throughput.",
                     criteria: [
                       {
                         title: 'Connection Type Distinction',
@@ -306,21 +380,78 @@ const Revision = () => {
                         passed: true
                       },
                       {
-                        title: 'Reliability & Overhead',
+                        title: 'Reliability & Flow Control',
                         description:
-                          'Correctly explained delivery guarantees and performance trade-offs.',
+                          'Correctly explained packet acknowledgment and retransmission trade-offs.',
                         passed: true
                       }
                     ],
                     quickTip:
-                      'For full marks, mention specific protocol examples like HTTP/HTTPS using TCP and DNS/Streaming using UDP.'
+                      'Mentioning real-world protocols (TCP for HTTP/TLS, UDP for DNS/WebRTC) adds extra depth to exam answers.'
                   }}
                   onNext={handleEvaluationNext}
-                  onReport={() => alert('Issue reported for review.')}
+                  onReport={() => alert('Feedback noted for AI fine-tuning.')}
                   onBack={() => setCurrentMode('short_answer')}
                 />
               )}
 
+              {/* 7. Match It (Prompt 2) */}
+              {currentMode === 'match_it' && (
+                <MatchItCard
+                  onCorrect={() => {}}
+                  onNext={handleMatchItNext}
+                />
+              )}
+
+              {/* 8. Put in Order / Immersion (Prompt 2) */}
+              {currentMode === 'put_in_order' && (
+                <PutInOrderCard
+                  onCorrect={() => {}}
+                  onNext={handlePutInOrderNext}
+                />
+              )}
+
+              {/* 9. Spot the Mistake (Prompt 2) */}
+              {currentMode === 'spot_mistake' && (
+                <SpotTheMistakeCard
+                  onCorrect={() => {}}
+                  onNext={handleSpotMistakeNext}
+                />
+              )}
+
+              {/* 10. True / False (Prompt 2) */}
+              {currentMode === 'true_false' && (
+                <TrueFalseCard
+                  onCorrect={() => {}}
+                  onNext={handleTrueFalseNext}
+                />
+              )}
+
+              {/* 11. Scenario Choice (Prompt 2) */}
+              {currentMode === 'scenario_choice' && (
+                <ScenarioChoiceCard
+                  onCorrect={() => {}}
+                  onNext={handleScenarioChoiceNext}
+                />
+              )}
+
+              {/* 12. What Happens Next? (Prompt 2) */}
+              {currentMode === 'what_happens_next' && (
+                <WhatHappensNextCard
+                  onCorrect={() => {}}
+                  onNext={handleWhatHappensNext}
+                />
+              )}
+
+              {/* 13. Rank It (Prompt 2) */}
+              {currentMode === 'rank_it' && (
+                <RankItCard
+                  onCorrect={() => {}}
+                  onNext={handleRankItNext}
+                />
+              )}
+
+              {/* 14. Correct Feedback Modal */}
               {currentMode === 'correct_feedback' && (
                 <CorrectFeedbackModal
                   onNext={() => setCurrentMode('fill_gap')}
@@ -328,6 +459,7 @@ const Revision = () => {
                 />
               )}
 
+              {/* 15. Wrong Feedback Modal */}
               {currentMode === 'wrong_feedback' && (
                 <WrongFeedbackModal
                   onGotIt={() => setCurrentMode('fill_gap')}
@@ -336,8 +468,20 @@ const Revision = () => {
                 />
               )}
 
+              {/* 16. Combo Reward Modal */}
               {currentMode === 'combo_reward' && (
                 <ComboRewardModal onContinue={handleComboContinue} />
+              )}
+
+              {/* 17. Session Complete (Prompt 2) */}
+              {currentMode === 'session_complete' && (
+                <SessionCompleteCard
+                  onRestart={handleRestartSession}
+                  totalQuestions={17}
+                  correctCount={correctAnswersCount}
+                  xpEarned={135}
+                  streakDays={streakCount}
+                />
               )}
             </div>
           )}
