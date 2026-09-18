@@ -226,7 +226,7 @@ Phase 4B: A1/A3 Failed-Test Corrections
 ### Team Member Name: Amit Rawat
 
 **Task Worked On:**
-Phase 5 — Question & Flashcard Model Design
+ Question & Flashcard Model Design
 
 **Changes Made:**
 - Designed and implemented MongoDB schemas for Questions and Flashcards with full metadata and validation support.
