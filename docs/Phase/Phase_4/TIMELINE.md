@@ -219,38 +219,6 @@ Phase 4B: A1/A3 Failed-Test Corrections
 - Verified A3 chunks remain within 300–800 words with overlap and metadata.
 - Verified sequential chunk indexes and no diagnostics in the modified files.
 
-## Date: 18 September 2026
-
-### Time: Current session
-
-### Team Member Name: Amit Rawat
-
-**Task Worked On:**
- Question & Flashcard Model Design
-
-**Changes Made:**
-- Designed and implemented MongoDB schemas for Questions and Flashcards with full metadata and validation support.
-- Added hierarchical references for user, subject, unit, topic, and material.
-- Added `sourceChunks` linkage to preserve RAG provenance and AI generation traceability.
-- Enforced schema-level validation for required fields and enum values.
-- Kept the implementation limited to the model layer, without services, APIs, or business logic.
-
-**Files Created:**
-- `server/src/models/Question.js`
-- `server/src/models/Flashcard.js`
-
-**Files Modified:**
-- `docs/Phase/Phase_4/TASKDONE.md`
-- `docs/Phase/Phase_4/TIMELINE.md`
-
-**Testing Performed:**
-- Ran `node --check server/src/models/Question.js` successfully.
-- Ran `node --check server/src/models/Flashcard.js` successfully.
-- Verified required fields, enum values, and index declarations in both model schemas.
-- Confirmed no API, service, embedding, or Qdrant logic was introduced.
-
-**Status:**
-Completed
 
 ## Date: 14 September 2026
 
@@ -679,6 +647,7 @@ Fix: Removed the block that reverted `processingStatus`. Embedding failures are 
 - Verified determinism: same chunk identity always produces the same UUID.
 - Live tested with a real Qdrant Cloud cluster (sa-east-1, AWS): uploaded a 12-chunk PDF and confirmed `indexed=12, failed=0, skipped=0` in the server terminal.
 - Confirmed the `reviseai_document_chunks` collection was auto-created in the Qdrant dashboard without any manual intervention.
+    
 
 ## Date: 18 September 2026
 
@@ -706,6 +675,40 @@ Phase 4D Task 1 — AI Generation Contract & Architecture Analysis
 
 **Testing Performed:**
 - Created and successfully ran `node --test tests/aiGenerationContract.test.js` to ensure the Zod validation works correctly.
+
+## Date: 18 September 2026
+
+### Time: Current session
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+ Question & Flashcard Model Design
+
+**Changes Made:**
+- Designed and implemented MongoDB schemas for Questions and Flashcards with full metadata and validation support.
+- Added hierarchical references for user, subject, unit, topic, and material.
+- Added `sourceChunks` linkage to preserve RAG provenance and AI generation traceability.
+- Enforced schema-level validation for required fields and enum values.
+- Kept the implementation limited to the model layer, without services, APIs, or business logic.
+
+**Files Created:**
+- `server/src/models/Question.js`
+- `server/src/models/Flashcard.js`
+
+**Files Modified:**
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `node --check server/src/models/Question.js` successfully.
+- Ran `node --check server/src/models/Flashcard.js` successfully.
+- Verified required fields, enum values, and index declarations in both model schemas.
+- Confirmed no API, service, embedding, or Qdrant logic was introduced.
+
+**Status:**
+Completed
+
 
 ## Date: 18 September 2026
 
