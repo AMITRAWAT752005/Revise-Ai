@@ -1,0 +1,246 @@
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.topContext {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.subjectGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backBtn {
+  background: transparent;
+  border: none;
+  color: #464554;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.backBtn:hover {
+  color: #4441cc;
+  background-color: #f0edef;
+}
+
+.subjectTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #777586;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.progressPills {
+  display: flex;
+  gap: 6px;
+}
+
+.pill {
+  width: 32px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: #e4e2e4;
+  transition: background-color 0.3s;
+}
+
+.activePill {
+  background-color: #9026c3;
+}
+
+/* Shaking Question Card */
+.questionCard {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #c7c4d7;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.cardAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #ffdad6;
+}
+
+.questionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1b1b1d;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wrongOption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 2px solid #cb66fe;
+  background-color: #f6f3f5;
+  color: #1b1b1d;
+  font-weight: 600;
+}
+
+.optionText {
+  font-size: 15px;
+}
+
+.wrongIcon {
+  color: #9026c3;
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.otherOption {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #e4e2e4;
+  background-color: #ffffff;
+  color: #777586;
+  opacity: 0.6;
+}
+
+/* Feedback Area */
+.feedbackArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 16px;
+}
+
+.errorIconCircle {
+  width: 64px;
+  height: 64px;
+  background-color: #f6d9ff;
+  color: #4a006b;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 14px rgba(144, 38, 195, 0.15);
+}
+
+.feedbackTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1b1b1d;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.feedbackExplanation {
+  font-size: 16px;
+  color: #464554;
+  line-height: 1.5;
+  max-width: 420px;
+  margin-bottom: 24px;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.tryAgainBtn {
+  padding: 14px 24px;
+  background-color: #f0edef;
+  color: #464554;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tryAgainBtn:hover {
+  background-color: #e4e2e4;
+  color: #1b1b1d;
+}
+
+.gotItBtn {
+  padding: 14px 44px;
+  background-color: #4441cc;
+  color: #ffffff;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(68, 65, 204, 0.35), 0 3px 0 0 #332dbc;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gotItBtn:hover {
+  background-color: #332dbc;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(68, 65, 204, 0.45), 0 5px 0 0 #332dbc;
+}
+
+.gotItBtn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .actionsRow {
+    flex-direction: column;
+  }
+
+  .tryAgainBtn,
+  .gotItBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

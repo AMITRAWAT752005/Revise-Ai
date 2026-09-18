@@ -1,0 +1,352 @@
+.container {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.backBtn {
+  background: transparent;
+  border: none;
+  color: #464554;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.backBtn:hover {
+  color: #4441cc;
+  background-color: #f0edef;
+}
+
+.topicBadge {
+  font-size: 13px;
+  font-weight: 600;
+  color: #464554;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 45%;
+}
+
+.track {
+  flex: 1;
+  height: 8px;
+  background-color: #e4e2e4;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4441cc, #9026c3);
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+.percentText {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4441cc;
+}
+
+.card {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #c7c4d7;
+  box-shadow: 0 10px 25px rgba(94, 92, 230, 0.08);
+  padding: 36px 32px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(94, 92, 230, 0.12);
+}
+
+.topAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4441cc, #68d3ff);
+}
+
+.aiHintBtn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.aiHintBtn:hover {
+  background-color: #f0edef;
+}
+
+.sparkleIcon {
+  font-size: 18px;
+  background: linear-gradient(135deg, #4441cc, #68d3ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hintLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #464554;
+}
+
+.sentenceWrapper {
+  margin: 12px 0 8px;
+}
+
+.sentenceText {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1b1b1d;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.gapTarget {
+  position: relative;
+  display: inline-block;
+  min-width: 140px;
+  border-bottom: 2px dashed #4441cc;
+  padding: 0 10px;
+  color: #4441cc;
+  transition: all 0.3s ease;
+}
+
+.gapCorrect {
+  border-bottom-style: solid;
+  background-color: #bee9ff;
+  color: #004d64;
+  border-radius: 4px;
+  padding: 2px 10px;
+}
+
+.gapIncorrect {
+  border-bottom-style: solid;
+  background-color: #ffdad6;
+  color: #93000a;
+  border-radius: 4px;
+  padding: 2px 10px;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+.chipBtn {
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 2px solid #e4e2e4;
+  background-color: #ffffff;
+  color: #1b1b1d;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+}
+
+.chipBtn:hover:not(:disabled) {
+  border-color: #68d3ff;
+  background-color: #00789a;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 120, 154, 0.2);
+}
+
+.chipCorrect {
+  background-color: #00789a !important;
+  color: #ffffff !important;
+  border-color: #68d3ff !important;
+}
+
+.chipIncorrect {
+  background-color: #ffdad6 !important;
+  color: #93000a !important;
+  border-color: #ba1a1a !important;
+}
+
+.chipTargetHighlight {
+  border-color: #68d3ff !important;
+  border-style: dashed !important;
+  background-color: #f6f3f5 !important;
+}
+
+.feedbackArea {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feedbackSuccess {
+  background-color: #bee9ff;
+  color: #004d64;
+  border: 1px solid #68d3ff;
+}
+
+.feedbackError {
+  background-color: #ffdad6;
+  color: #93000a;
+  border: 1px solid #ba1a1a;
+}
+
+.feedbackIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.feedbackContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feedbackTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.feedbackExplanation {
+  font-size: 14px;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.actionFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.retryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: #f0edef;
+  color: #464554;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retryBtn:hover {
+  background-color: #e4e2e4;
+  color: #1b1b1d;
+}
+
+.continueBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background-color: #4441cc;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 3px 0 0 #0c006b;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+}
+
+.continueBtn:hover {
+  background-color: #332dbc;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 0 #0c006b;
+}
+
+.continueBtn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 24px 16px;
+    gap: 20px;
+  }
+
+  .sentenceText {
+    font-size: 20px;
+  }
+
+  .optionsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .chipBtn {
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+
+  .progressContainer {
+    width: 50%;
+  }
+}

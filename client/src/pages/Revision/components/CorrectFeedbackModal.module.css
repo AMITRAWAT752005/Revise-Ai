@@ -1,0 +1,377 @@
+.overlay {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Floating XP Popup Animation */
+.xpPopupWrapper {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  pointer-events: none;
+  animation: floatUpAndFade 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes floatUpAndFade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 20px) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -10px) scale(1.1);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -15px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -30px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50px) scale(0.9);
+  }
+}
+
+.xpGlowContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sparkle1 {
+  position: absolute;
+  top: -24px;
+  left: -24px;
+  font-size: 32px;
+  color: #cb66fe;
+  animation: sparklePulse 1.5s infinite 0.1s;
+}
+
+.sparkle2 {
+  position: absolute;
+  top: -16px;
+  right: -32px;
+  font-size: 36px;
+  color: #00789a;
+  animation: sparklePulse 1.5s infinite 0.4s;
+}
+
+.sparkle3 {
+  position: absolute;
+  bottom: -10px;
+  left: -30px;
+  font-size: 26px;
+  color: #c2c1ff;
+  animation: sparklePulse 1.5s infinite 0.7s;
+}
+
+@keyframes sparklePulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(45deg);
+  }
+}
+
+.xpBadge {
+  background-color: #ffffff;
+  padding: 16px 36px;
+  border-radius: 9999px;
+  box-shadow: 0 16px 40px rgba(94, 92, 230, 0.25);
+  border: 2px solid #e2dfff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.xpInnerGlow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(68, 65, 204, 0.08), rgba(144, 38, 195, 0.08));
+}
+
+.greatJobText {
+  font-size: 32px;
+  font-weight: 800;
+  color: #4441cc;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
+}
+
+.xpBonusText {
+  font-size: 20px;
+  font-weight: 700;
+  color: #9026c3;
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Card Container */
+.cardContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 10;
+}
+
+.progressHeader {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: #464554;
+}
+
+.subjectName {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.progressCount {
+  color: #4441cc;
+  font-weight: 700;
+}
+
+.progressTrack {
+  width: 100%;
+  height: 10px;
+  background-color: #eae7ea;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: linear-gradient(90deg, #4441cc, #9026c3);
+  border-radius: 9999px;
+  position: relative;
+  transition: width 0.4s ease;
+}
+
+.progressShimmer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
+  animation: pulseShimmer 2s infinite;
+}
+
+@keyframes pulseShimmer {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Card */
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #c7c4d7;
+  box-shadow: 0 10px 30px rgba(94, 92, 230, 0.08);
+  padding: 36px 32px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.cardTopAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4441cc, #68d3ff);
+}
+
+.sparkleIcon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: #4441cc;
+}
+
+.questionSection {
+  margin-bottom: 8px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #005e79;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.questionText {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1b1b1d;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e4e2e4;
+  margin: 16px 0;
+}
+
+.answerSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.answerLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9026c3;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.answerText {
+  font-size: 38px;
+  font-weight: 800;
+  color: #4441cc;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.explanationText {
+  font-size: 15px;
+  color: #464554;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+/* Actions Row */
+.actionsRow {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.againBtn {
+  padding: 14px 28px;
+  background-color: #eae7ea;
+  color: #464554;
+  border-radius: 9999px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 0 #dcd9dc;
+  transition: all 0.15s ease;
+}
+
+.againBtn:hover {
+  background-color: #e4e2e4;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 0 #dcd9dc;
+}
+
+.againBtn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.nextBtn {
+  padding: 14px 44px;
+  background-color: #4441cc;
+  color: #ffffff;
+  border-radius: 9999px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(68, 65, 204, 0.4), 0 3px 0 0 #332dbc;
+  transition: all 0.15s ease;
+}
+
+.nextBtn:hover {
+  background-color: #332dbc;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(68, 65, 204, 0.5), 0 5px 0 0 #332dbc;
+}
+
+.nextBtn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .greatJobText {
+    font-size: 26px;
+  }
+
+  .answerText {
+    font-size: 28px;
+  }
+
+  .card {
+    padding: 24px 16px;
+  }
+
+  .actionsRow {
+    flex-direction: column;
+  }
+
+  .againBtn,
+  .nextBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

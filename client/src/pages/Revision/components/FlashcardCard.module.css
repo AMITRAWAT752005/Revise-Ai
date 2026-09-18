@@ -1,0 +1,391 @@
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.progressHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.backBtn {
+  background: transparent;
+  border: none;
+  color: #464554;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.backBtn:hover {
+  color: #4441cc;
+  background-color: #f0edef;
+}
+
+.subjectText {
+  font-size: 13px;
+  font-weight: 600;
+  color: #464554;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.countText {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4441cc;
+}
+
+.progressTrack {
+  width: 100%;
+  height: 8px;
+  background-color: #eae7ea;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: linear-gradient(90deg, #4441cc, #9026c3);
+  border-radius: 9999px;
+  transition: width 0.5s ease-out;
+}
+
+/* 3D Flip Card Styles */
+.flipCard {
+  width: 100%;
+  min-height: 440px;
+  perspective: 1200px;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+}
+
+.sparkleTopRight {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  color: #00789a;
+  z-index: 10;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.flipCardInner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+}
+
+.isFlipped {
+  transform: rotateY(180deg);
+}
+
+.cardFront,
+.cardBack {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 440px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #c7c4d7;
+  box-shadow: 0 16px 36px -10px rgba(94, 92, 230, 0.12), 0 0 0 1px #e4e2e4;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.cardFront:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 44px -10px rgba(94, 92, 230, 0.18);
+}
+
+.frontAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #5e5ce6, #68d3ff);
+}
+
+.iconCircle {
+  margin-bottom: 24px;
+  color: #ffffff;
+  background-color: #5e5ce6;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(94, 92, 230, 0.25);
+}
+
+.frontTitle {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1b1b1d;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.frontCategory {
+  font-size: 16px;
+  color: #464554;
+  max-width: 480px;
+}
+
+.tapPrompt {
+  position: absolute;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #777586;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  animation: pulsePrompt 2s infinite ease-in-out;
+}
+
+@keyframes pulsePrompt {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* Card Back */
+.cardBack {
+  transform: rotateY(180deg);
+  text-align: left;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.backAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4441cc, #68d3ff);
+}
+
+.sparkleBack {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: #00789a;
+}
+
+.backContent {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+
+.backTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1b1b1d;
+  border-bottom: 1px solid #e4e2e4;
+  padding-bottom: 8px;
+}
+
+.backDefinition {
+  font-size: 17px;
+  color: #464554;
+  line-height: 1.6;
+}
+
+.conditionsBox {
+  background-color: #f6f3f5;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid #e4e2e4;
+}
+
+.conditionsHeading {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4441cc;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.conditionsList {
+  list-style-type: disc;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #1b1b1d;
+  font-size: 15px;
+}
+
+/* Rating Bar */
+.ratingBar {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.rateBtn {
+  flex: 1;
+  max-width: 160px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.rateBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.rateBtn:active {
+  transform: translateY(1px);
+}
+
+.againBtn {
+  background-color: #ffdad6;
+  color: #93000a;
+  border-color: #ffb4ab;
+}
+
+.againBtn:hover {
+  background-color: #ffb4ab;
+}
+
+.goodBtn {
+  background-color: #e2dfff;
+  color: #0c006b;
+  border-color: #c2c1ff;
+}
+
+.goodBtn:hover {
+  background-color: #c2c1ff;
+}
+
+.easyBtn {
+  background-color: #00789a;
+  color: #ffffff;
+  border-color: #005e79;
+}
+
+.easyBtn:hover {
+  background-color: #005e79;
+}
+
+/* Progress Dots */
+.progressDots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: #c7c4d7;
+  transition: all 0.3s;
+}
+
+.activeDot {
+  width: 36px;
+  background-color: #4441cc;
+}
+
+@media (max-width: 640px) {
+  .flipCard {
+    min-height: 480px;
+  }
+
+  .cardFront,
+  .cardBack {
+    padding: 24px 16px;
+    min-height: 480px;
+  }
+
+  .frontTitle {
+    font-size: 24px;
+  }
+
+  .backTitle {
+    font-size: 22px;
+  }
+
+  .backDefinition {
+    font-size: 15px;
+  }
+
+  .ratingBar {
+    gap: 8px;
+  }
+
+  .rateBtn {
+    padding: 10px;
+    font-size: 13px;
+  }
+}
