@@ -270,3 +270,25 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [ ] Test AI question and evaluation accuracy.
 - [ ] Test Spaced Repetition logic.
 - [ ] Verify Phase 1-3 functionalities remain fully intact.
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 5 — Question & Flashcard Model Design
+
+**Changes Made:**
+- Created Question and Flashcard MongoDB schemas
+- Added full metadata linking (user, subject, unit, topic, material)
+- Added sourceChunks reference for RAG traceability
+- Enforced schema-level validation (required fields, enums)
+- Designed models aligned with AI generation contract
+
+**Files Created:**
+- server/src/models/Question.js
+- server/src/models/Flashcard.js
+
+**Testing Performed:**
+- Schema validation tested
+- Required fields enforced
+- Enum validation verified
+- MongoDB model creation successful

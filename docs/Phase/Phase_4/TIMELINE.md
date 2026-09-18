@@ -219,6 +219,33 @@ Phase 4B: A1/A3 Failed-Test Corrections
 - Verified A3 chunks remain within 300–800 words with overlap and metadata.
 - Verified sequential chunk indexes and no diagnostics in the modified files.
 
+## Date: 18 September 2026
+
+### Time: Current session
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 5 — Question & Flashcard Model Design
+
+**Changes Made:**
+- Designed and implemented MongoDB schemas for Questions and Flashcards with full metadata and validation support.
+- Added hierarchical references for user, subject, unit, topic, and material.
+- Added `sourceChunks` linkage to preserve RAG provenance and AI generation traceability.
+- Enforced schema-level validation for required fields and enum values.
+- Kept the implementation limited to the model layer, without services, APIs, or business logic.
+
+**Files Created:**
+- `server/src/models/Question.js`
+- `server/src/models/Flashcard.js`
+
+**Files Modified:**
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Status:**
+Completed
+
 ## Date: 14 September 2026
 
 ### Time: Current session
