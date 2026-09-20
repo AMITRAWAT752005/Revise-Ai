@@ -1100,5 +1100,37 @@ Phase 4E: A2 — Add Validation, Indexing, and Data Integrity Rules to Question 
 **Status:**
 Completed
 
+## Date: 20 September 2026
 
+### Time: Current session
 
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+Phase 4E/4F Task B-2 — Multi-Type Prompt Templates
+
+**Changes Made:**
+- Added `ShortAnswer` support as the 10th content type in `aiGenerationContract.js`.
+- Extracted dynamic template logic into `server/src/prompts/promptTemplates.js`.
+- Integrated `promptTemplates.js` into `aiGenerationService.js` to build modular system instructions per request.
+- Verified test suite integration for the new prompt format and updated schema.
+
+**Files Created:**
+- `server/src/prompts/promptTemplates.js`
+- `server/tests/promptTemplates.test.js`
+
+**Files Modified:**
+- `server/src/contracts/aiGenerationContract.js`
+- `server/src/services/aiGenerationService.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Branch Name:**
+- `Phase_4`
+
+**Testing Performed:**
+- Created unit tests for dynamic prompt construction (`promptTemplates.test.js`).
+- Re-ran the whole AI generation test suite (`aiGenerationService.test.js` and `aiGenerationContract.test.js`), resulting in all tests successfully passing.
+
+**Status:**
+Completed

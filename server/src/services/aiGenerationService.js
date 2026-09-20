@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { AIGenerationResponseSchema, GenerationRequestSchema } from '../contracts/aiGenerationContract.js';
 import ragContextService from './ragContextService.js';
+import { buildSystemInstruction } from '../prompts/promptTemplates.js';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
@@ -89,6 +90,7 @@ const callGeminiApi = async (promptText, systemInstruction, apiKey, apiUrl, mode
             correctOutcome: { type: "STRING" },
             incorrectOutcomes: { type: "ARRAY", items: { type: "STRING" } },
             orderedItems: { type: "ARRAY", items: { type: "STRING" } },
+            idealAnswer: { type: "STRING" },
             pairs: {
               type: "ARRAY",
               items: {
@@ -188,28 +190,7 @@ export const generateContent = async (request) => {
   }
 
   // 3. Prepare Prompts
-  const systemInstruction = `You are an expert AI tutor. Your task is to generate educational revision content strictly based on the provided source material.
-  
-RULES:
-1. ONLY use the facts and information present in the provided source chunks. Do not hallucinate or use external knowledge.
-2. Generate exactly ${parameters.totalItems} items in total.
-3. The content must be of "${parameters.difficulty}" difficulty.
-4. Distribute the items across the following requested types: ${parameters.requestedTypes.join(', ')}.
-5. For each item, you must include a "sourceChunkIds" array containing the exact Chunk IDs from the provided context that support your answer.
-6. Return a valid JSON object matching the required schema.
-
-Schema requirements by type:
-- MCQ: { type: "MCQ", question: "...", options: ["A", "B", "C", "D"], answer: "A", explanation: "...", sourceChunkIds: [...] }
-- Flashcard: { type: "Flashcard", front: "...", back: "...", sourceChunkIds: [...] }
-- TrueFalse: { type: "TrueFalse", statement: "...", answer: true/false, explanation: "...", sourceChunkIds: [...] }
-- OneWord: { type: "OneWord", question: "...", answer: "...", sourceChunkIds: [...] }
-- FillInTheBlank: { type: "FillInTheBlank", statement: "The capital of France is [BLANK].", answer: "Paris", sourceChunkIds: [...] }
-- MatchTheFollowing: { type: "MatchTheFollowing", question: "...", pairs: [{left: "...", right: "..."}], sourceChunkIds: [...] }
-- Sequence: { type: "Sequence", question: "...", orderedItems: ["...", "..."], sourceChunkIds: [...] }
-- SpotTheMistake: { type: "SpotTheMistake", statementWithMistake: "...", correction: "...", mistake: "...", sourceChunkIds: [...] }
-- WhatHappensNext: { type: "WhatHappensNext", scenario: "...", correctOutcome: "...", incorrectOutcomes: ["..."], sourceChunkIds: [...] }
-
-Ensure strict JSON output.`;
+  const systemInstruction = buildSystemInstruction(parameters);
 
   const promptText = formatContextForPrompt(ragResult.sources, ragResult.contextText);
 

@@ -419,3 +419,10 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 **Date and Time:** 2026-09-20 15:20 IST
 
 ---
+
+### Bikram Singh Bisht — Phase 4E/4F Task B-2: Multi-Type Prompt Templates
+
+- [x] Added ShortAnswerSchema to support all 10 content types.
+- [x] Created server/src/prompts/promptTemplates.js to modularize LLM instructions.
+- [x] Integrated dynamic template builder into iGenerationService.js.
+- [x] Verified prompt construction logic and generation contract with test suites.

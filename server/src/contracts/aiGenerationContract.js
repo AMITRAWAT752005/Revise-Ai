@@ -85,6 +85,13 @@ export const WhatHappensNextSchema = z.object({
   sourceChunkIds: z.array(z.string()).min(1),
 });
 
+export const ShortAnswerSchema = z.object({
+  type: z.literal('ShortAnswer'),
+  question: z.string().trim().min(1),
+  idealAnswer: z.string().trim().min(1),
+  sourceChunkIds: z.array(z.string()).min(1),
+});
+
 // A union of all valid generated content schemas.
 export const GeneratedContentItemSchema = z.discriminatedUnion('type', [
   MCQSchema,
@@ -96,6 +103,7 @@ export const GeneratedContentItemSchema = z.discriminatedUnion('type', [
   SequenceSchema,
   SpotTheMistakeSchema,
   WhatHappensNextSchema,
+  ShortAnswerSchema,
 ]);
 
 // ─── 2. AI Response Wrapper Schema ────────────────────────────────────────────
@@ -129,7 +137,8 @@ export const GenerationRequestSchema = z.object({
         'MatchTheFollowing',
         'Sequence',
         'SpotTheMistake',
-        'WhatHappensNext'
+        'WhatHappensNext',
+        'ShortAnswer'
       ])
     ).min(1, 'At least one content type must be requested'),
   }),
