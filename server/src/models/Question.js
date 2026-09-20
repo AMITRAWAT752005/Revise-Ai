@@ -28,7 +28,7 @@ const questionSchema = new mongoose.Schema(
     sourceChunks: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: 'DocumentChunk',
-      required: true,
+      default: [],
     },
     type: {
       type: String,
@@ -43,6 +43,15 @@ const questionSchema = new mongoose.Schema(
     options: {
       type: [String],
       default: undefined,
+      validate: {
+        validator(value) {
+          if (this.type !== 'MCQ') {
+            return value === undefined || value === null || value.length === 0;
+          }
+          return Array.isArray(value) && value.length >= 2;
+        },
+        message: 'MCQ questions require at least two option strings.',
+      },
     },
     correctAnswer: {
       type: String,
@@ -53,6 +62,48 @@ const questionSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    difficulty: {
+      type: String,
+      enum: ['easy', 'medium', 'hard'],
+      required: true,
+    },
+    tags: {
+      type: [String],
+      default: [],
+      validate: {
+        validator(value) {
+          return Array.isArray(value) && value.every((tag) => typeof tag === 'string' && tag.trim().length > 0);
+        },
+        message: 'tags must be a list of non-empty strings.',
+      },
+    },
+    source: {
+      type: String,
+      enum: ['AI', 'manual'],
+      required: true,
+      default: 'AI',
+    },
+    aiMetadata: {
+      promptId: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      model: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      generatedAt: {
+        type: Date,
+        required: true,
+      },
+    },
+    status: {
+      type: String,
+      enum: ['active', 'archived', 'failed'],
+      default: 'active',
+    },
   },
   {
     timestamps: true,
@@ -60,7 +111,10 @@ const questionSchema = new mongoose.Schema(
 );
 
 questionSchema.index({ userId: 1 });
-questionSchema.index({ materialId: 1 });
+questionSchema.index({ subjectId: 1 });
+questionSchema.index({ topicId: 1 });
+questionSchema.index({ userId: 1, subjectId: 1, topicId: 1, materialId: 1 });
+questionSchema.index({ userId: 1, materialId: 1, status: 1 });
 questionSchema.index({ type: 1 });
 
 const Question = mongoose.model('Question', questionSchema);

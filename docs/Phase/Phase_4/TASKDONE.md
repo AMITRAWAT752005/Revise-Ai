@@ -89,8 +89,6 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Handle loading and empty states cleanly according to ReviseAI design system.
 
 
----
-
 # 4. Phase 4C — Embeddings & Vector Database Foundation
 
 - [x] Implement reusable Embedding Service using `sentence-transformers/all-MiniLM-L6-v2` (dimension 384).
@@ -358,3 +356,30 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Review and verify RAG Context Retrieval and Context Builder (`ragContextService.js`).
 - [x] Review and verify AI Provider integration and LLM prompt design (`aiGenerationService.js`).
 - [x] Produce verification report confirming strict `sourceChunkIds` adherence, context bounds, and robust API handling without needing structural adjustments.
+
+
+---
+
+### Amit Rawat — A1: Finalize Question & Flashcard Database Schemas
+
+- [x] Review and align `Question` and `Flashcard` models with the Phase 4 AI-generation contract and project schema conventions.
+- [x] Add required fields for `userId`, `subjectId`, `unitId`, `topicId`, `materialId`, `difficulty`, `tags`, `source`, `aiMetadata`, and `status` to both schemas.
+- [x] Enforce strict validation for required metadata, enum values, object IDs, MCQ options, and AI-trace metadata.
+- [x] Add schema indexes for user hierarchy and content filtering to support scalable queries.
+- [x] Validate successful creation logic and invalid-input rejection with active Node test coverage.
+
+**Developer:** Amit Rawat
+**Task:** A-1
+**Files Modified:**
+- `server/src/models/Question.js`
+- `server/src/models/Flashcard.js`
+- `server/src/services/contentValidationService.js`
+- `server/tests/content_validation_persistence.test.js`
+
+**Actual Testing Done:**
+- Ran `cd /Users/amitrawat/Documents/ReviseAi/Revise-Ai/server && node --test tests/content_validation_persistence.test.js`
+- Result: 10/10 tests passed after the schema fix.
+
+**Date and Time:** 2026-09-20 15:20 IST
+
+---

@@ -31,6 +31,15 @@ const validQuestionPayload = {
   options: ['3', '4', '5', '6'],
   correctAnswer: '4',
   explanation: 'Basic arithmetic',
+  difficulty: 'easy',
+  tags: ['arithmetic', 'basic-math'],
+  source: 'AI',
+  aiMetadata: {
+    promptId: 'prompt-123',
+    model: 'groq-llama',
+    generatedAt: new Date('2026-09-20T12:00:00.000Z'),
+  },
+  status: 'active',
 };
 
 const validFlashcardPayload = {
@@ -40,6 +49,15 @@ const validFlashcardPayload = {
   sourceChunks: validChunks,
   front: 'What is TCP?',
   back: 'A reliable transport protocol.',
+  difficulty: 'medium',
+  tags: ['networking'],
+  source: 'AI',
+  aiMetadata: {
+    promptId: 'flashcard-prompt-1',
+    model: 'groq-llama',
+    generatedAt: new Date('2026-09-20T12:05:00.000Z'),
+  },
+  status: 'active',
 };
 
 const originalQuestionCreate = Question.create;
@@ -113,6 +131,18 @@ test('TEST 2 — question validation strict cases', () => {
 
   const emptyText = { ...validQuestionPayload, questionText: '   ' };
   assert.equal(validateQuestion(emptyText).success, false);
+
+  const invalidDifficulty = { ...validQuestionPayload, difficulty: 'insane' };
+  assert.equal(validateQuestion(invalidDifficulty).success, false);
+
+  const invalidSource = { ...validQuestionPayload, source: 'robot' };
+  assert.equal(validateQuestion(invalidSource).success, false);
+
+  const invalidStatus = { ...validQuestionPayload, status: 'pending' };
+  assert.equal(validateQuestion(invalidStatus).success, false);
+
+  const incompleteAiMetadata = { ...validQuestionPayload, aiMetadata: { promptId: 'p1' } };
+  assert.equal(validateQuestion(incompleteAiMetadata).success, false);
 });
 
 test('TEST 3 — flashcard validation strict cases', () => {
@@ -123,6 +153,15 @@ test('TEST 3 — flashcard validation strict cases', () => {
 
   const emptyBack = { ...validFlashcardPayload, back: '   ' };
   assert.equal(validateFlashcard(emptyBack).success, false);
+
+  const invalidDifficulty = { ...validFlashcardPayload, difficulty: 'expert' };
+  assert.equal(validateFlashcard(invalidDifficulty).success, false);
+
+  const invalidTags = { ...validFlashcardPayload, tags: ['   '] };
+  assert.equal(validateFlashcard(invalidTags).success, false);
+
+  const missingAiMetadata = { ...validFlashcardPayload, source: 'AI', aiMetadata: undefined };
+  assert.equal(validateFlashcard(missingAiMetadata).success, false);
 });
 
 test('TEST 4 — metadata validation', () => {
@@ -273,6 +312,18 @@ test('TEST 9 — return contract consistency', async () => {
 test('TEST 10 — no side effects / no schema modification / no extra service use', () => {
   assert.ok(Question && Question.modelName === 'Question');
   assert.ok(Flashcard && Flashcard.modelName === 'Flashcard');
+  assert.deepEqual(Question.schema.path('difficulty').enumValues, ['easy', 'medium', 'hard']);
+  assert.deepEqual(Question.schema.path('source').enumValues, ['AI', 'manual']);
+  assert.deepEqual(Question.schema.path('status').enumValues, ['active', 'archived', 'failed']);
+  assert.ok(Question.schema.path('aiMetadata.promptId'));
+  assert.ok(Question.schema.path('aiMetadata.model'));
+  assert.ok(Question.schema.path('aiMetadata.generatedAt'));
+  assert.deepEqual(Flashcard.schema.path('difficulty').enumValues, ['easy', 'medium', 'hard']);
+  assert.deepEqual(Flashcard.schema.path('source').enumValues, ['AI', 'manual']);
+  assert.deepEqual(Flashcard.schema.path('status').enumValues, ['active', 'archived', 'failed']);
+  assert.ok(Flashcard.schema.path('aiMetadata.promptId'));
+  assert.ok(Flashcard.schema.path('aiMetadata.model'));
+  assert.ok(Flashcard.schema.path('aiMetadata.generatedAt'));
   assert.equal(typeof validateQuestion, 'function');
   assert.equal(typeof validateFlashcard, 'function');
   assert.equal(typeof saveQuestion, 'function');

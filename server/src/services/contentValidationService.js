@@ -67,6 +67,74 @@ const normalizeSourceChunks = (sourceChunks) => {
   return normalized;
 };
 
+const normalizeDifficulty = (value) => {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  if (!['easy', 'medium', 'hard'].includes(normalized)) {
+    throw createValidationError('difficulty must be one of: easy, medium, hard.', 400, 'INVALID_DIFFICULTY');
+  }
+  return normalized;
+};
+
+const normalizeTags = (value, fieldName) => {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw createValidationError(`${fieldName} must be a non-empty array of strings.`, 400, 'INVALID_TAGS');
+  }
+
+  const normalized = value.map((tag) => {
+    if (typeof tag !== 'string') {
+      throw createValidationError(`${fieldName} entries must be strings.`, 400, 'INVALID_TAG_TYPE');
+    }
+    const trimmed = tag.trim();
+    if (!trimmed) {
+      throw createValidationError(`${fieldName} entries cannot be empty.`, 400, 'EMPTY_TAG');
+    }
+    return trimmed;
+  });
+
+  return normalized;
+};
+
+const normalizeSource = (value) => {
+  const normalized = typeof value === 'string' ? value.trim() : '';
+  if (normalized === 'AI') return 'AI';
+  if (normalized === 'manual') return 'manual';
+  if (normalized.toLowerCase() === 'ai') return 'AI';
+  if (normalized.toLowerCase() === 'manual') return 'manual';
+  throw createValidationError('source must be either AI or manual.', 400, 'INVALID_SOURCE');
+};
+
+const normalizeAiMetadata = (value) => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw createValidationError('aiMetadata must be an object with promptId, model, and generatedAt.', 400, 'INVALID_AI_METADATA');
+  }
+
+  const promptId = ensureRequiredString(value.promptId, 'aiMetadata.promptId');
+  const model = ensureRequiredString(value.model, 'aiMetadata.model');
+  const generatedAt = value.generatedAt;
+  if (generatedAt === undefined || generatedAt === null || generatedAt === '') {
+    throw createValidationError('aiMetadata.generatedAt is required.', 400, 'REQUIRED_FIELD');
+  }
+
+  const parsedDate = new Date(generatedAt);
+  if (Number.isNaN(parsedDate.getTime())) {
+    throw createValidationError('aiMetadata.generatedAt must be a valid date.', 400, 'INVALID_AI_METADATA_DATE');
+  }
+
+  return {
+    promptId,
+    model,
+    generatedAt: parsedDate,
+  };
+};
+
+const validateStatus = (value) => {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  if (!['active', 'archived', 'failed'].includes(normalized)) {
+    throw createValidationError('status must be one of: active, archived, failed.', 400, 'INVALID_STATUS');
+  }
+  return normalized;
+};
+
 const validateCommonMetadata = (data, entityName) => {
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
     throw createValidationError(`${entityName} payload must be an object.`, 400, 'INVALID_PAYLOAD');
@@ -99,6 +167,11 @@ export const validateQuestion = (data) => {
 
     const questionText = ensureRequiredString(data.questionText, 'questionText');
     const explanation = ensureOptionalString(data.explanation, 'explanation');
+    const difficulty = normalizeDifficulty(data.difficulty);
+    const tags = normalizeTags(data.tags, 'tags');
+    const source = normalizeSource(data.source);
+    const aiMetadata = normalizeAiMetadata(data.aiMetadata);
+    const status = validateStatus(data.status ?? 'active');
 
     let options;
     if (type === 'MCQ') {
@@ -165,6 +238,11 @@ export const validateQuestion = (data) => {
         ...(options ? { options } : {}),
         correctAnswer,
         ...(explanation ? { explanation } : {}),
+        difficulty,
+        tags,
+        source,
+        aiMetadata,
+        status,
       },
     };
   } catch (error) {
@@ -182,6 +260,11 @@ export const validateFlashcard = (data) => {
 
     const front = ensureRequiredString(data.front, 'front');
     const back = ensureRequiredString(data.back, 'back');
+    const difficulty = normalizeDifficulty(data.difficulty);
+    const tags = normalizeTags(data.tags, 'tags');
+    const source = normalizeSource(data.source);
+    const aiMetadata = normalizeAiMetadata(data.aiMetadata);
+    const status = validateStatus(data.status ?? 'active');
 
     return {
       success: true,
@@ -190,6 +273,11 @@ export const validateFlashcard = (data) => {
         sourceChunks,
         front,
         back,
+        difficulty,
+        tags,
+        source,
+        aiMetadata,
+        status,
       },
     };
   } catch (error) {

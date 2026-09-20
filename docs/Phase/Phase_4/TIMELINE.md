@@ -221,7 +221,6 @@ Phase 4B: A1/A3 Failed-Test Corrections
 
 
 
-
 ## Date: 14 September 2026
 
 ### Time: Current session
@@ -984,3 +983,36 @@ Phase 4E/4F Task B-1 — Review Generation Contract & Dependencies
 
 **Status:**
 Completed
+
+## Date: 20 September 2026
+
+### Time: 15:20 IST
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4E: Finalize Question & Flashcard Database Schemas (Task A-1)
+
+**Changes Made:**
+- Updated `Question` and `Flashcard` schemas to include the required hierarchy metadata, difficulty, tags, source, AI metadata, and status fields.
+- Enforced enum validation and object ID / required-field checks for production-safe schema integrity.
+- Added efficient user/subject/topic/material indexes for query scalability.
+- Reworked validation logic to reject invalid enum values and incomplete AI metadata while preserving existing duplicate and ownership checks.
+
+**Files Created:**
+- None.
+
+**Files Modified:**
+- `server/src/models/Question.js`
+- `server/src/models/Flashcard.js`
+- `server/src/services/contentValidationService.js`
+- `server/tests/content_validation_persistence.test.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Testing Performed:**
+- Ran `cd /Users/amitrawat/Documents/ReviseAi/Revise-Ai/server && node --test tests/content_validation_persistence.test.js`
+- Verified 10/10 tests passed.
+- Confirmed valid/invalid cases for required fields, enums, missing AI metadata, and preserved duplicate/ownership rules.
+
+
