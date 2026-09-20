@@ -1173,3 +1173,42 @@ A-4 (Ownership & Hierarchy Validation)
 
 **Status:**
 Completed
+
+## Date: 20 September 2026
+
+### Time: 17:07 IST
+
+### Team Member Name: Anukool Negi
+
+**Task Worked On:**
+API REQUEST & RESPONSE INTEGRATION
+
+**Changes Made:**
+- Created reusable frontend API service module `client/src/services/aiService.js` implementing `generateRevisionContent` using native `fetch` API with `credentials: 'include'` and standard JSON request headers.
+- Formatted request options to serialize `subjectId`, `unitId`, `topicId`, `sourceMaterials`, and `parameters` (`totalItems`, `difficulty`, `requestedTypes`) matching backend contract.
+- Built structured response parsing for `{ success: true, data: { generatedContent, meta } }` and extraction of backend error messages (`{ success: false, message: ... }`) or status-based errors.
+- Created `client/src/hooks/useAIGeneration.js` custom React hook to manage request state (`loading`, `error`, `generatedContent`, `meta`, `requestGeneration`, `resetState`).
+- Integrated `useAIGeneration` hook into `client/src/pages/Revision/Revision.jsx` search parameter flow while preserving all existing card components, layout, and styling.
+- Created automated integration test suite `server/tests/aiServiceIntegration.test.js` covering client-side validation, request formatting, credentials headers, response parsing, status-code error handling (400, 401, 403, 404, 500), and network failure fallback.
+- Re-executed full test suite runner across Phase 4 AI test files (`aiServiceIntegration.test.js`, `protected_ai_api.test.js`, `aiGenerationContract.test.js`, `aiGenerationService.test.js`, `ragContextService.test.js`, `vectorMetadataService.test.js`, `content_validation_persistence.test.js`), passing all 44 tests with 0 failures.
+
+**Files Created:**
+- `client/src/services/aiService.js`
+- `client/src/hooks/useAIGeneration.js`
+- `server/tests/aiServiceIntegration.test.js`
+
+**Files Modified:**
+- `client/src/pages/Revision/Revision.jsx`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Branch Name:**
+- Phase_4
+
+**Testing Performed:**
+- Executed `node --test server/tests/aiServiceIntegration.test.js` (6/6 tests passed).
+- Executed full test runner across 7 Phase 4 test suites — 44 tests passed, 0 failures.
+
+**Status:**
+Completed
+

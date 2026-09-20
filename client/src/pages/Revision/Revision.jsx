@@ -23,6 +23,7 @@ import WhatHappensNextCard from './components/WhatHappensNextCard';
 import RankItCard from './components/RankItCard';
 import SessionCompleteCard from './components/SessionCompleteCard';
 
+import useAIGeneration from '../../hooks/useAIGeneration';
 import styles from './Revision.module.css';
 
 const STITCH_MODES = [
@@ -56,6 +57,9 @@ const Revision = () => {
   const [streakCount, setStreakCount] = useState(7);
   const [correctAnswersCount, setCorrectAnswersCount] = useState(14);
 
+  // API Generation Integration
+  const { loading: aiLoading, error: aiError, generatedContent, meta: aiMeta, requestGeneration } = useAIGeneration();
+
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem('user');
@@ -71,12 +75,38 @@ const Revision = () => {
       setCurrentMode(modeParam);
       setSessionActive(true);
     }
-  }, [searchParams]);
+
+    const subjectIdParam = searchParams.get('subjectId');
+    if (subjectIdParam) {
+      requestGeneration({
+        subjectId: subjectIdParam,
+        unitId: searchParams.get('unitId') || undefined,
+        topicId: searchParams.get('topicId') || undefined,
+        parameters: {
+          difficulty: searchParams.get('difficulty') || 'mixed',
+          totalItems: Number(searchParams.get('count')) || 10,
+          requestedTypes: ['MCQ', 'Flashcard'],
+        },
+      }).catch((err) => {
+        console.warn('API Generation Request Notice:', err.message);
+      });
+    }
+  }, [searchParams, requestGeneration]);
 
   const handleStartNow = () => {
     setSessionActive(true);
     setCurrentMode('quick_pick');
+
+    const subjectIdParam = searchParams.get('subjectId');
+    if (subjectIdParam && generatedContent.length === 0 && !aiLoading) {
+      requestGeneration({
+        subjectId: subjectIdParam,
+        unitId: searchParams.get('unitId') || undefined,
+        topicId: searchParams.get('topicId') || undefined,
+      }).catch(() => {});
+    }
   };
+
 
   const handleMaybeLater = () => {
     navigate('/home');

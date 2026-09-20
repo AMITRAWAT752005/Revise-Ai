@@ -211,6 +211,16 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Standardize API success responses (`{ success: true, data: { generatedContent, meta } }`) and error responses without leaking credentials or internal stack traces.
 - [x] Verify complete test suite `server/tests/protected_ai_api.test.js` (13/13 tests passing) and zero regression across 37 Phase 4 AI suite tests.
 
+### Anukool Negi — API Request & Response Integration
+
+- [x] Create reusable frontend API client module `client/src/services/aiService.js` supporting `generateRevisionContent` with native `fetch` and `credentials: 'include'`.
+- [x] Format API request payload (`subjectId`, `unitId`, `topicId`, `sourceMaterials`, `parameters: { totalItems, difficulty, requestedTypes }`) matching backend contracts.
+- [x] Implement structured API response parsing for `{ success: true, data: { generatedContent, meta } }` and extraction of backend error messages for failed requests.
+- [x] Create `useAIGeneration` custom React hook (`client/src/hooks/useAIGeneration.js`) to manage API request/response lifecycle, loading state, and error handling.
+- [x] Connect `useAIGeneration` hook to `Revision.jsx` application flow for subject/unit/topic search parameter integration while preserving all existing visual layout and card styling.
+- [x] Create and pass automated test suite `server/tests/aiServiceIntegration.test.js` (6/6 tests passing) covering client-side validation, request formatting, credentials header, response parsing, status code error handling (400, 401, 403, 404, 500), and network failure fallback.
+
+
 ---
 
 # 6. Phase 4E — Question Bank & Flashcards
