@@ -1062,7 +1062,7 @@ Completed
 
 **Task Worked On:**
 Phase 4E: A2 — Add Validation, Indexing, and Data Integrity Rules to Question & Flashcard Schemas
-
+  
 **Changes Made:**
 - Tightened the existing `Question` and `Flashcard` schemas without redesigning the A1 structure.
 - Added strict required-field validation and minimum-length checks for core content text.
