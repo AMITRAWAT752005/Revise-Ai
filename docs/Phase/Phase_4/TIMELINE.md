@@ -1015,4 +1015,44 @@ Phase 4E: Finalize Question & Flashcard Database Schemas (Task A-1)
 - Verified 10/10 tests passed.
 - Confirmed valid/invalid cases for required fields, enums, missing AI metadata, and preserved duplicate/ownership rules.
 
+## Date: 20 September 2026
+
+### Time: 11:54 IST
+
+### Team Member Name: Anukool Negi
+
+**Task Worked On:**
+U-1 — GENERATION API
+
+**Changes Made:**
+- Verified and exposed protected backend API endpoint `POST /api/ai/generate` in `server/src/routes/aiRoutes.js` and `server/src/controllers/aiController.js`.
+- Ensured authoritative `userId` extraction from `authenticateToken` middleware (`req.userId`), preventing body spoofing.
+- Validated request input fields (`subjectId`, `unitId`, `topicId`, `totalItems`, `difficulty`, `requestedTypes`) with strict bounds and error messages.
+- Enforced resource ownership validation via `validateHierarchyOwnership` ensuring strict user isolation across subjects, units, and topics.
+- Connected controller to existing `aiGenerationService.js` and RAG context builder (`ragContextService.js`), maintaining backend-only `GEMINI_API_KEY` handling.
+- Verified standardized response structure (`{ success: true, data: { generatedContent, meta } }`) and safe error responses without leaking internal stack traces or secrets.
+- Re-executed full test suite across AI pipeline (`protected_ai_api.test.js`, `aiGenerationContract.test.js`, `aiGenerationService.test.js`, `ragContextService.test.js`, `vectorMetadataService.test.js`, `content_validation_persistence.test.js`) confirming 37/37 tests passing with 0 failures.
+
+**Files Created:**
+- None.
+
+**Files Modified:**
+- `server/src/routes/aiRoutes.js`
+- `server/src/controllers/aiController.js`
+- `server/src/app.js`
+- `server/tests/protected_ai_api.test.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Branch Name:**
+- Phase_4
+
+**Testing Performed:**
+- Ran `node --test server/tests/protected_ai_api.test.js` (13/13 tests passed).
+- Executed full test runner across 6 core Phase 4 test files (`node --test server/tests/aiGenerationContract.test.js server/tests/aiGenerationService.test.js server/tests/ragContextService.test.js server/tests/vectorMetadataService.test.js server/tests/content_validation_persistence.test.js server/tests/protected_ai_api.test.js`) — 37 tests passed, 0 failures.
+
+**Status:**
+Completed
+
+
 

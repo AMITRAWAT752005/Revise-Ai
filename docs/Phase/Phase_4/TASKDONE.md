@@ -201,15 +201,15 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Integrate an LLM API (e.g., Groq/Gemini) for content generation.
 - [x] Implement prompt templates for generating MCQs, True/False, Short/Long questions, and Flashcards based on retrieved RAG chunks.
 
-### Anukool Negi — Protected API Integration
+### Anukool Negi — Task U-1: Generation API
 
-- [x] Create `server/src/controllers/aiController.js` handling request validation, `userId` derivation from auth token, and resource ownership checks.
-- [x] Create `server/src/routes/aiRoutes.js` exposing `POST /api/ai/generate` protected by `authenticateToken`.
-- [x] Mount `/api/ai` routes in `server/src/app.js`.
-- [x] Enforce strict user isolation and hierarchy ownership validation across Subject, Unit, and Topic.
-- [x] Integrate backend AI generation service (`aiGenerationService.js`) with backend-only API key handling.
-- [x] Standardize API success responses (`{ success: true, data: { generatedContent, meta } }`) and error responses without leaking credentials.
-- [x] Create and pass comprehensive test suite `server/tests/protected_ai_api.test.js` (13 tests passing).
+- [x] Expose protected backend endpoint `POST /api/ai/generate` mounted in `server/src/app.js` and protected by `authenticateToken` middleware.
+- [x] Enforce authoritative `userId` derivation from auth token (prevent body `userId` spoofing).
+- [x] Validate input parameters (`subjectId`, `unitId`, `topicId`, `totalItems`, `difficulty`, `requestedTypes`) with strict bounds and enum validation.
+- [x] Enforce strict user isolation and hierarchy ownership validation (`validateHierarchyOwnership`).
+- [x] Connect endpoint directly to existing AI generation service (`aiGenerationService.js`) with backend-only API key handling (`GEMINI_API_KEY`).
+- [x] Standardize API success responses (`{ success: true, data: { generatedContent, meta } }`) and error responses without leaking credentials or internal stack traces.
+- [x] Verify complete test suite `server/tests/protected_ai_api.test.js` (13/13 tests passing) and zero regression across 37 Phase 4 AI suite tests.
 
 ---
 
