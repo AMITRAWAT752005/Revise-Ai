@@ -986,7 +986,7 @@ Completed
 
 ## Date: 20 September 2026
 
-### Time: 15:20 IST
+### Time: 10:20  am
 
 ### Team Member Name: Amit Rawat
 
@@ -1050,6 +1050,52 @@ U-1 — GENERATION API
 **Testing Performed:**
 - Ran `node --test server/tests/protected_ai_api.test.js` (13/13 tests passed).
 - Executed full test runner across 6 core Phase 4 test files (`node --test server/tests/aiGenerationContract.test.js server/tests/aiGenerationService.test.js server/tests/ragContextService.test.js server/tests/vectorMetadataService.test.js server/tests/content_validation_persistence.test.js server/tests/protected_ai_api.test.js`) — 37 tests passed, 0 failures.
+
+**Status:**
+Completed
+
+## Date: 20 September 2026
+
+### Time: 12:13pm
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+Phase 4E: A2 — Add Validation, Indexing, and Data Integrity Rules to Question & Flashcard Schemas
+
+**Changes Made:**
+- Tightened the existing `Question` and `Flashcard` schemas without redesigning the A1 structure.
+- Added strict required-field validation and minimum-length checks for core content text.
+- Enforced enum validation for `difficulty`, `status`, `source`, and question type constraints.
+- Added the required single and compound indexes for user, subject, topic, and created-at filtering.
+- Kept data integrity logic focused on valid references and consistent schema typing without introducing new model relationships.
+
+**Files Created:**
+- None.
+
+**Files Modified:**
+- `server/src/models/Question.js`
+- `server/src/models/Flashcard.js`
+- `server/src/services/contentValidationService.js`
+- `server/tests/content_validation_persistence.test.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Validation added:**
+- required-field enforcement for `userId`, `subjectId`, and core content fields
+- enum validation for `difficulty`, `status`, and `source`
+- minimum-length checks for `questionText`, `front`, and `back`
+- MCQ validation for non-empty `options` and matching `correctAnswer`
+- `tags` array validation and AI metadata checks
+
+**Indexes added:**
+- single: `userId`, `subjectId`, `topicId`, `createdAt`
+- compound: `userId + subjectId`, `userId + topicId`, `subjectId + topicId`
+- optional: `difficulty`
+
+**Testing Performed:**
+- Ran `cd /Users/amitrawat/Documents/ReviseAi/Revise-Ai/server && node --test tests/content_validation_persistence.test.js`
+- Verified 11/11 tests passed with 0 failures.
 
 **Status:**
 Completed

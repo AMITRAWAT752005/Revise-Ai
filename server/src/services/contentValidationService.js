@@ -32,13 +32,16 @@ const ensureOptionalObjectId = (value, fieldName) => {
   return value.trim();
 };
 
-const ensureRequiredString = (value, fieldName) => {
+const ensureRequiredString = (value, fieldName, minLength = 1) => {
   if (typeof value !== 'string') {
     throw createValidationError(`${fieldName} must be a string.`, 400, 'INVALID_STRING');
   }
   const trimmed = value.trim();
   if (!trimmed) {
     throw createValidationError(`${fieldName} is required.`, 400, 'REQUIRED_FIELD');
+  }
+  if (trimmed.length < minLength) {
+    throw createValidationError(`${fieldName} must be at least ${minLength} characters long.`, 400, 'INVALID_STRING_LENGTH');
   }
   return trimmed;
 };
@@ -165,7 +168,7 @@ export const validateQuestion = (data) => {
       throw createValidationError('Question type must be one of: MCQ, SHORT, LONG, TRUE_FALSE, FILL_BLANK.', 400, 'INVALID_QUESTION_TYPE');
     }
 
-    const questionText = ensureRequiredString(data.questionText, 'questionText');
+    const questionText = ensureRequiredString(data.questionText, 'questionText', 3);
     const explanation = ensureOptionalString(data.explanation, 'explanation');
     const difficulty = normalizeDifficulty(data.difficulty);
     const tags = normalizeTags(data.tags, 'tags');
@@ -258,8 +261,8 @@ export const validateFlashcard = (data) => {
     const metadata = validateCommonMetadata(data, 'Flashcard');
     const sourceChunks = normalizeSourceChunks(data.sourceChunks);
 
-    const front = ensureRequiredString(data.front, 'front');
-    const back = ensureRequiredString(data.back, 'back');
+    const front = ensureRequiredString(data.front, 'front', 3);
+    const back = ensureRequiredString(data.back, 'back', 3);
     const difficulty = normalizeDifficulty(data.difficulty);
     const tags = normalizeTags(data.tags, 'tags');
     const source = normalizeSource(data.source);

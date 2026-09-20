@@ -329,3 +329,33 @@ test('TEST 10 — no side effects / no schema modification / no extra service us
   assert.equal(typeof saveQuestion, 'function');
   assert.equal(typeof saveFlashcard, 'function');
 });
+
+test('TEST 11 — A2 schema integrity and index coverage', () => {
+  const questionIndexes = Question.schema.indexes().map((index) => Object.keys(index[0] || {}));
+  const flashcardIndexes = Flashcard.schema.indexes().map((index) => Object.keys(index[0] || {}));
+
+  assert.ok(questionIndexes.some((keys) => keys.includes('userId')));
+  assert.ok(questionIndexes.some((keys) => keys.includes('subjectId')));
+  assert.ok(questionIndexes.some((keys) => keys.includes('topicId')));
+  assert.ok(questionIndexes.some((keys) => keys.includes('createdAt')));
+  assert.ok(questionIndexes.some((keys) => keys.includes('userId') && keys.includes('subjectId')));
+  assert.ok(questionIndexes.some((keys) => keys.includes('userId') && keys.includes('topicId')));
+  assert.ok(questionIndexes.some((keys) => keys.includes('subjectId') && keys.includes('topicId')));
+  assert.ok(questionIndexes.some((keys) => keys.includes('difficulty')));
+
+  assert.ok(flashcardIndexes.some((keys) => keys.includes('userId')));
+  assert.ok(flashcardIndexes.some((keys) => keys.includes('subjectId')));
+  assert.ok(flashcardIndexes.some((keys) => keys.includes('topicId')));
+  assert.ok(flashcardIndexes.some((keys) => keys.includes('createdAt')));
+  assert.ok(flashcardIndexes.some((keys) => keys.includes('userId') && keys.includes('subjectId')));
+  assert.ok(flashcardIndexes.some((keys) => keys.includes('userId') && keys.includes('topicId')));
+  assert.ok(flashcardIndexes.some((keys) => keys.includes('subjectId') && keys.includes('topicId')));
+
+  assert.equal(Question.schema.path('userId').isRequired, true);
+  assert.equal(Question.schema.path('subjectId').isRequired, true);
+  assert.equal(Question.schema.path('questionText').options.trim, true);
+  assert.equal(Flashcard.schema.path('userId').isRequired, true);
+  assert.equal(Flashcard.schema.path('subjectId').isRequired, true);
+  assert.equal(Flashcard.schema.path('front').options.trim, true);
+  assert.equal(Flashcard.schema.path('back').options.trim, true);
+});

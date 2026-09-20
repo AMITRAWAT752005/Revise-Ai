@@ -258,6 +258,42 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 # 11. Phase 4J — Revision Session
 
 - [ ] Implement API to fetch "Today's Revision" (topics due for review based on `RevisionSchedule`).
+
+---
+
+### Amit Rawat — A2: Add Validation, Indexing, and Data Integrity Rules to Question & Flashcard Schemas
+
+- [x] Reviewed the A1 `Question` and `Flashcard` implementations and preserved their structure while tightening validation and indexing.
+- [x] Added strict field validation for required references, string minimum lengths, enum constraints, MCQ structure, and AI metadata.
+- [x] Added the required single and compound indexes for `userId`, `subjectId`, `topicId`, `createdAt`, and user/subject/topic composite lookups.
+- [x] Confirmed the schemas enforce consistent data types and reject invalid relationships without introducing new schema-level relationships.
+- [x] Verified the A2 regression suite for validation, index coverage, and integrity enforcement.
+
+**Developer:** Amit Rawat  
+**Task:** A-2  
+**Files modified:**  
+- `server/src/models/Question.js`  
+- `server/src/models/Flashcard.js`  
+- `server/src/services/contentValidationService.js`  
+- `server/tests/content_validation_persistence.test.js`  
+
+**Validation added:**  
+- required-field enforcement for `userId`, `subjectId`, and core content fields  
+- enum validation for `difficulty`, `type`, `status`, and `source`  
+- minimum-length checks for `questionText`, `front`, and `back`  
+- MCQ-specific validation for non-empty `options` and matching `correctAnswer`  
+- tag array validation and AI metadata validation  
+
+**Indexes added:**  
+- single: `userId`, `subjectId`, `topicId`, `createdAt`  
+- compound: `userId + subjectId`, `userId + topicId`, `subjectId + topicId`  
+- optional: `difficulty`  
+
+**Actual testing performed:**  
+- Ran `cd /Users/amitrawat/Documents/ReviseAi/Revise-Ai/server && node --test tests/content_validation_persistence.test.js`  
+- Result: 11/11 tests passed; 0 failed  
+
+**Date and time:** 2026-09-20 15:55 IST
 - [ ] Combine questions and flashcards into a unified revision workflow.
 - [ ] Process session completion to update schedules.
 

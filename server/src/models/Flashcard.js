@@ -34,11 +34,13 @@ const flashcardSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      minlength: 3,
     },
     back: {
       type: String,
       required: true,
       trim: true,
+      minlength: 3,
     },
     difficulty: {
       type: String,
@@ -91,8 +93,13 @@ const flashcardSchema = new mongoose.Schema(
 flashcardSchema.index({ userId: 1 });
 flashcardSchema.index({ subjectId: 1 });
 flashcardSchema.index({ topicId: 1 });
+flashcardSchema.index({ createdAt: -1 });
+flashcardSchema.index({ userId: 1, subjectId: 1 });
+flashcardSchema.index({ userId: 1, topicId: 1 });
+flashcardSchema.index({ subjectId: 1, topicId: 1 });
 flashcardSchema.index({ userId: 1, subjectId: 1, topicId: 1, materialId: 1 });
 flashcardSchema.index({ userId: 1, materialId: 1, status: 1 });
+flashcardSchema.index({ difficulty: 1 });
 
 const Flashcard = mongoose.model('Flashcard', flashcardSchema);
 
