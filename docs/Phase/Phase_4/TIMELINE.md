@@ -1134,3 +1134,42 @@ Phase 4E/4F Task B-2 — Multi-Type Prompt Templates
 
 **Status:**
 Completed
+
+## Date: 20 September 2026
+
+### Time: 4:45 PM
+
+### Team Member Name: Amit Rawat
+
+**Task Worked On:**
+A-4 (Ownership & Hierarchy Validation)
+
+**Changes Made:**
+- Created a dedicated validation service limited to ownership and hierarchy checks.
+- Added `validateOwnership(userId, subjectId)` to verify the authenticated user owns the subject.
+- Added `validateUnitHierarchy(subjectId, unitId)` to enforce `unit.subjectId === subjectId`.
+- Added `validateTopicHierarchy(unitId, topicId)` to enforce `topic.unitId === unitId`.
+- Added `validateMaterialHierarchy(topicId, materialId)` to enforce `material.topicId === topicId`.
+- Added `validateFullHierarchy(userId, subjectId, unitId, topicId, materialId)` to compose the full chain in one reusable validator.
+- Kept all changes strictly within the validation layer and did not modify schemas, persistence logic, or controllers.
+
+**Files Created:**
+- `server/src/services/validationService.js`
+- `server/tests/validationService.test.js`
+
+**Files Modified:**
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Validation logic implemented:**
+- `UnauthorizedError` for invalid ownership
+- `InvalidHierarchyError` for broken parent/child relationships
+- `NotFoundError` for missing entity references or invalid IDs
+- Reusable validation for the full chain: `user -> subject -> unit -> topic -> material`
+
+**Testing Performed:**
+- Ran `cd /Users/amitrawat/Documents/ReviseAi/Revise-Ai/server && node --test tests/validationService.test.js`
+- Result: 5/5 tests passed with 0 failed.
+
+**Status:**
+Completed

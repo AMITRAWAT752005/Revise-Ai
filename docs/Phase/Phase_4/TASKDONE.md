@@ -426,3 +426,40 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Created server/src/prompts/promptTemplates.js to modularize LLM instructions.
 - [x] Integrated dynamic template builder into iGenerationService.js.
 - [x] Verified prompt construction logic and generation contract with test suites.
+
+### Amit Rawat — A-4 (Ownership & Hierarchy Validation)
+
+- [x] Implemented reusable ownership validation for the authenticated user against the owning subject.
+- [x] Added strict unit, topic, and material hierarchy checks to enforce the full chain: user -> subject -> unit -> topic -> material.
+- [x] Kept validation focused on ownership and relationship integrity only, without touching persistence, schemas, or controllers.
+- [x] Return structured domain errors for unauthorized access, broken hierarchy, and missing resources.
+- [x] Added focused A4 validation coverage for valid chains, invalid ownership, invalid hierarchy, and missing/invalid IDs.
+
+**Developer:** Amit Rawat  
+**Task:** A-4 (Ownership & Hierarchy Validation)  
+**Files created:**  
+- `server/src/services/validationService.js`  
+- `server/tests/validationService.test.js`  
+
+**Files modified:**  
+- `docs/Phase/Phase_4/TASKDONE.md`  
+- `docs/Phase/Phase_4/TIMELINE.md`  
+
+**Validation logic implemented:**  
+- `validateOwnership(userId, subjectId)` verifies subject existence and the logged-in user owns the subject.  
+- `validateUnitHierarchy(subjectId, unitId)` enforces `unit.subjectId === subjectId`.  
+- `validateTopicHierarchy(unitId, topicId)` enforces `topic.unitId === unitId`.  
+- `validateMaterialHierarchy(topicId, materialId)` enforces `material.topicId === topicId`.  
+- `validateFullHierarchy(userId, subjectId, unitId, topicId, materialId)` composes the full chain and returns normalized IDs.  
+
+**Error handling:**  
+- `UnauthorizedError` for invalid ownership.  
+- `InvalidHierarchyError` for broken parent-child links.  
+- `NotFoundError` for missing subject, unit, topic, or material.  
+
+**Actual testing performed:**  
+- Ran `cd /Users/amitrawat/Documents/ReviseAi/Revise-Ai/server && node --test tests/validationService.test.js`  
+- Result: 5/5 tests passed with 0 failed.  
+
+**Date:** 20 September 2026  
+**Time:** 10:45 AM
