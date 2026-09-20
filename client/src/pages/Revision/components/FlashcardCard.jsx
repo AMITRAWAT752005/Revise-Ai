@@ -19,12 +19,15 @@ const defaultFlashcard = {
   ]
 };
 
+import { normalizeFlashcardData } from '../mockRevisionData';
+
 const FlashcardCard = ({
-  data = defaultFlashcard,
+  data,
   initialFlipped = false,
   onRate,
   onBack
 }) => {
+  const normalizedData = normalizeFlashcardData(data);
   const [isFlipped, setIsFlipped] = useState(initialFlipped);
 
   const handleFlip = () => {
@@ -38,7 +41,7 @@ const FlashcardCard = ({
     }
   };
 
-  const progressPercent = Math.round(((data.index || 12) / (data.total || 50)) * 100);
+  const progressPercent = Math.round(((normalizedData.index || 12) / (normalizedData.total || 50)) * 100);
 
   return (
     <div className={styles.container}>
@@ -55,10 +58,10 @@ const FlashcardCard = ({
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
           )}
-          <span className={styles.subjectText}>{data.subject}</span>
+          <span className={styles.subjectText}>{normalizedData.subject}</span>
         </div>
         <span className={styles.countText}>
-          {data.index || 12} / {data.total || 50}
+          {normalizedData.index || 12} / {normalizedData.total || 50}
         </span>
       </div>
 
@@ -110,8 +113,8 @@ const FlashcardCard = ({
               </span>
             </div>
 
-            <h2 className={styles.frontTitle}>{data.question}</h2>
-            <p className={styles.frontCategory}>{data.category}</p>
+            <h2 className={styles.frontTitle}>{normalizedData.question}</h2>
+            <p className={styles.frontCategory}>{normalizedData.category}</p>
 
             <div className={styles.tapPrompt}>
               <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
@@ -135,16 +138,16 @@ const FlashcardCard = ({
             </div>
 
             <div className={styles.backContent}>
-              <h2 className={styles.backTitle}>{data.answerTitle}</h2>
-              <p className={styles.backDefinition}>{data.answerDefinition}</p>
+              <h2 className={styles.backTitle}>{normalizedData.answerTitle}</h2>
+              <p className={styles.backDefinition}>{normalizedData.answerDefinition}</p>
 
-              {data.conditions && data.conditions.length > 0 && (
+              {normalizedData.conditions && normalizedData.conditions.length > 0 && (
                 <div className={styles.conditionsBox}>
                   <span className={styles.conditionsHeading}>
-                    {data.conditionsTitle || 'Key Conditions:'}
+                    {normalizedData.conditionsTitle || 'Key Conditions:'}
                   </span>
                   <ul className={styles.conditionsList}>
-                    {data.conditions.map((item, idx) => (
+                    {normalizedData.conditions.map((item, idx) => (
                       <li key={idx}>{item}</li>
                     ))}
                   </ul>

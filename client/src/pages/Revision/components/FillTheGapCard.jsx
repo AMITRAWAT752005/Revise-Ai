@@ -11,7 +11,10 @@ const defaultData = {
   options: ['latency', 'redundancy', 'security', 'complexity']
 };
 
-const FillTheGapCard = ({ data = defaultData, onContinue, onBack }) => {
+import { normalizeFillGapData } from '../mockRevisionData';
+
+const FillTheGapCard = ({ data, onContinue, onBack }) => {
+  const normalizedData = normalizeFillGapData(data);
   const [selectedWord, setSelectedWord] = useState(null);
   const [showHint, setShowHint] = useState(false);
   const [evaluated, setEvaluated] = useState(false);
@@ -22,7 +25,7 @@ const FillTheGapCard = ({ data = defaultData, onContinue, onBack }) => {
     setEvaluated(true);
   };
 
-  const isCorrect = selectedWord === data.correctAnswer;
+  const isCorrect = selectedWord === normalizedData.correctAnswer;
 
   const handleReset = () => {
     setSelectedWord(null);
@@ -44,17 +47,17 @@ const FillTheGapCard = ({ data = defaultData, onContinue, onBack }) => {
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
           )}
-          <span className={styles.topicBadge}>{data.topic}</span>
+          <span className={styles.topicBadge}>{normalizedData.topic}</span>
         </div>
 
         <div className={styles.progressContainer}>
           <div className={styles.track}>
             <div
               className={styles.bar}
-              style={{ width: `${data.progress}%` }}
+              style={{ width: `${normalizedData.progress}%` }}
             ></div>
           </div>
-          <span className={styles.percentText}>{data.progress}%</span>
+          <span className={styles.percentText}>{normalizedData.progress}%</span>
         </div>
       </div>
 
@@ -80,7 +83,7 @@ const FillTheGapCard = ({ data = defaultData, onContinue, onBack }) => {
         {/* Sentence with Gap */}
         <div className={styles.sentenceWrapper}>
           <h2 className={styles.sentenceText}>
-            {data.prefix}{' '}
+            {normalizedData.prefix}{' '}
             <span
               className={`${styles.gapTarget} ${
                 selectedWord
@@ -92,15 +95,15 @@ const FillTheGapCard = ({ data = defaultData, onContinue, onBack }) => {
             >
               {selectedWord || '__________'}
             </span>{' '}
-            {data.suffix}
+            {normalizedData.suffix}
           </h2>
         </div>
 
         {/* Answer Options Grid */}
         <div className={styles.optionsGrid}>
-          {data.options.map((opt) => {
+          {normalizedData.options.map((opt) => {
             const isSelected = selectedWord === opt;
-            const isTargetCorrect = opt === data.correctAnswer;
+            const isTargetCorrect = opt === normalizedData.correctAnswer;
 
             let chipStyle = styles.chipBtn;
             if (evaluated) {
@@ -145,7 +148,7 @@ const FillTheGapCard = ({ data = defaultData, onContinue, onBack }) => {
                   ? 'Excellent!'
                   : 'Not quite! The primary goal is reducing duplicate data.'}
               </p>
-              <p className={styles.feedbackExplanation}>{data.explanation}</p>
+              <p className={styles.feedbackExplanation}>{normalizedData.explanation}</p>
             </div>
           </div>
         )}

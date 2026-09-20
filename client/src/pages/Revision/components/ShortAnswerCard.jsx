@@ -12,8 +12,18 @@ const defaultShortAnswer = {
 };
 
 const ShortAnswerCard = ({ data = defaultShortAnswer, onSubmit, onBack }) => {
-  const [answer, setAnswer] = useState(data.initialAnswer || '');
-  const maxLength = data.maxLength || 300;
+  const activeData = {
+    subject: data.subject || 'Networking Fundamentals',
+    questionIndex: data.questionIndex || 4,
+    totalQuestions: data.totalQuestions || 10,
+    question: data.question || data.questionText || 'What is the primary difference between TCP and UDP?',
+    description: data.description || data.idealAnswer || 'Provide a brief explanation focusing on connection type and reliability.',
+    maxLength: data.maxLength || 300,
+    initialAnswer: data.initialAnswer || ''
+  };
+
+  const [answer, setAnswer] = useState(activeData.initialAnswer || '');
+  const maxLength = activeData.maxLength || 300;
 
   const handleChange = (e) => {
     if (e.target.value.length <= maxLength) {
@@ -48,11 +58,11 @@ const ShortAnswerCard = ({ data = defaultShortAnswer, onSubmit, onBack }) => {
           <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#464554' }}>
             dns
           </span>
-          <span className={styles.subjectText}>{data.subject}</span>
+          <span className={styles.subjectText}>{activeData.subject}</span>
         </div>
 
         <span className={styles.questionCount}>
-          Question {data.questionIndex || 4} of {data.totalQuestions || 10}
+          Question {activeData.questionIndex} of {activeData.totalQuestions}
         </span>
       </div>
 
@@ -73,8 +83,8 @@ const ShortAnswerCard = ({ data = defaultShortAnswer, onSubmit, onBack }) => {
 
         {/* Title & Description */}
         <div className={styles.cardHeader}>
-          <h2 className={styles.questionTitle}>{data.question}</h2>
-          <p className={styles.questionSubtitle}>{data.description}</p>
+          <h2 className={styles.questionTitle}>{activeData.question}</h2>
+          <p className={styles.questionSubtitle}>{activeData.description}</p>
         </div>
 
         {/* Text Area with Character Counter */}

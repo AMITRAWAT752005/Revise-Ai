@@ -24,6 +24,19 @@ import RankItCard from './components/RankItCard';
 import SessionCompleteCard from './components/SessionCompleteCard';
 
 import useAIGeneration from '../../hooks/useAIGeneration';
+import {
+  MOCK_MCQ_ITEMS,
+  MOCK_FILL_BLANK_ITEMS,
+  MOCK_FLASHCARD_ITEMS,
+  MOCK_MATCH_ITEMS,
+  MOCK_SEQUENCE_ITEMS,
+  MOCK_SPOT_MISTAKE_ITEMS,
+  MOCK_TRUE_FALSE_ITEMS,
+  MOCK_SCENARIO_CHOICE_ITEMS,
+  MOCK_WHAT_HAPPENS_NEXT_ITEMS,
+  MOCK_RANK_IT_ITEMS,
+  MOCK_SHORT_ANSWER_ITEMS
+} from './mockRevisionData';
 import styles from './Revision.module.css';
 
 const STITCH_MODES = [
@@ -324,6 +337,7 @@ const Revision = () => {
               {/* 1. Quick Pick */}
               {currentMode === 'quick_pick' && (
                 <QuickPickCard
+                  data={generatedContent.find((c) => c.type === 'MCQ') || MOCK_MCQ_ITEMS[0]}
                   onSelectOption={handleQuickPickOption}
                   onBack={() => setSessionActive(false)}
                 />
@@ -332,6 +346,7 @@ const Revision = () => {
               {/* 2. Fill the Gap */}
               {currentMode === 'fill_gap' && (
                 <FillTheGapCard
+                  data={generatedContent.find((c) => c.type === 'FillInTheBlank') || MOCK_FILL_BLANK_ITEMS[0]}
                   onContinue={handleFillGapContinue}
                   onBack={() => setCurrentMode('quick_pick')}
                 />
@@ -340,6 +355,7 @@ const Revision = () => {
               {/* 3. Flashcard Front */}
               {currentMode === 'flashcard_front' && (
                 <FlashcardCard
+                  data={generatedContent.find((c) => c.type === 'Flashcard') || MOCK_FLASHCARD_ITEMS[0]}
                   initialFlipped={false}
                   onRate={handleFlashcardRate}
                   onBack={() => setCurrentMode('rank_it')}
@@ -349,6 +365,7 @@ const Revision = () => {
               {/* 4. Flashcard Back */}
               {currentMode === 'flashcard_back' && (
                 <FlashcardCard
+                  data={generatedContent.find((c) => c.type === 'Flashcard') || MOCK_FLASHCARD_ITEMS[0]}
                   initialFlipped={true}
                   onRate={handleFlashcardRate}
                   onBack={() => setCurrentMode('flashcard_front')}
@@ -358,6 +375,7 @@ const Revision = () => {
               {/* 5. Short Answer Empty/Input */}
               {currentMode === 'short_answer' && (
                 <ShortAnswerCard
+                  data={generatedContent.find((c) => c.type === 'ShortAnswer') || MOCK_SHORT_ANSWER_ITEMS[0]}
                   onSubmit={handleShortAnswerSubmit}
                   onBack={() => setCurrentMode('flashcard_front')}
                 />
@@ -369,7 +387,7 @@ const Revision = () => {
                   data={{
                     questionIndex: 6,
                     totalQuestions: 17,
-                    question: 'What is the primary difference between TCP and UDP?',
+                    question: generatedContent.find((c) => c.type === 'ShortAnswer')?.question || MOCK_SHORT_ANSWER_ITEMS[0].question,
                     userAnswer:
                       userAnswer ||
                       'TCP is connection-oriented and provides reliable, ordered data delivery with error checking. UDP is connectionless and lightweight without delivery guarantees.',
@@ -379,22 +397,8 @@ const Revision = () => {
                     headline: 'Outstanding Precision!',
                     summary:
                       "You've grasped the core distinction between reliability, handshake overhead, and streaming throughput.",
-                    criteria: [
-                      {
-                        title: 'Connection Type Distinction',
-                        description:
-                          'Accurately identified TCP as connection-oriented and UDP as connectionless.',
-                        passed: true
-                      },
-                      {
-                        title: 'Reliability & Flow Control',
-                        description:
-                          'Correctly explained packet acknowledgment and retransmission trade-offs.',
-                        passed: true
-                      }
-                    ],
-                    quickTip:
-                      'Mentioning real-world protocols (TCP for HTTP/TLS, UDP for DNS/WebRTC) adds extra depth to exam answers.'
+                    criteria: MOCK_SHORT_ANSWER_ITEMS[0].criteria,
+                    quickTip: MOCK_SHORT_ANSWER_ITEMS[0].quickTip
                   }}
                   onNext={handleEvaluationNext}
                   onReport={() => alert('Feedback noted for AI fine-tuning.')}
@@ -405,6 +409,7 @@ const Revision = () => {
               {/* 7. Match It (Prompt 2) */}
               {currentMode === 'match_it' && (
                 <MatchItCard
+                  data={generatedContent.find((c) => c.type === 'MatchTheFollowing') || MOCK_MATCH_ITEMS[0]}
                   onCorrect={() => {}}
                   onNext={handleMatchItNext}
                 />
@@ -413,6 +418,7 @@ const Revision = () => {
               {/* 8. Put in Order / Immersion (Prompt 2) */}
               {currentMode === 'put_in_order' && (
                 <PutInOrderCard
+                  data={generatedContent.find((c) => c.type === 'Sequence') || MOCK_SEQUENCE_ITEMS[0]}
                   onCorrect={() => {}}
                   onNext={handlePutInOrderNext}
                 />
@@ -421,6 +427,7 @@ const Revision = () => {
               {/* 9. Spot the Mistake (Prompt 2) */}
               {currentMode === 'spot_mistake' && (
                 <SpotTheMistakeCard
+                  data={generatedContent.find((c) => c.type === 'SpotTheMistake') || MOCK_SPOT_MISTAKE_ITEMS[0]}
                   onCorrect={() => {}}
                   onNext={handleSpotMistakeNext}
                 />
@@ -429,6 +436,7 @@ const Revision = () => {
               {/* 10. True / False (Prompt 2) */}
               {currentMode === 'true_false' && (
                 <TrueFalseCard
+                  data={generatedContent.find((c) => c.type === 'TrueFalse') || MOCK_TRUE_FALSE_ITEMS[0]}
                   onCorrect={() => {}}
                   onNext={handleTrueFalseNext}
                 />
@@ -437,6 +445,7 @@ const Revision = () => {
               {/* 11. Scenario Choice (Prompt 2) */}
               {currentMode === 'scenario_choice' && (
                 <ScenarioChoiceCard
+                  data={generatedContent.find((c) => c.type === 'ScenarioChoice') || MOCK_SCENARIO_CHOICE_ITEMS[0]}
                   onCorrect={() => {}}
                   onNext={handleScenarioChoiceNext}
                 />
@@ -445,6 +454,7 @@ const Revision = () => {
               {/* 12. What Happens Next? (Prompt 2) */}
               {currentMode === 'what_happens_next' && (
                 <WhatHappensNextCard
+                  data={generatedContent.find((c) => c.type === 'WhatHappensNext') || MOCK_WHAT_HAPPENS_NEXT_ITEMS[0]}
                   onCorrect={() => {}}
                   onNext={handleWhatHappensNext}
                 />
@@ -453,6 +463,7 @@ const Revision = () => {
               {/* 13. Rank It (Prompt 2) */}
               {currentMode === 'rank_it' && (
                 <RankItCard
+                  data={generatedContent.find((c) => c.type === 'RankIt') || MOCK_RANK_IT_ITEMS[0]}
                   onCorrect={() => {}}
                   onNext={handleRankItNext}
                 />

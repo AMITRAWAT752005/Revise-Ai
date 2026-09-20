@@ -8,14 +8,25 @@ const DEFAULT_OPTIONS = [
   { id: 'D', text: 'Both processes run at locked static priority, causing immediate system deadlock.', isCorrect: false }
 ];
 
+import { normalizeWhatHappensNextData } from '../mockRevisionData';
+
 export default function WhatHappensNextCard({ 
+  data,
   onCorrect, 
   onNext,
-  title = "Process Scheduling & Starvation Prevention",
-  scenario = "A critical monitoring daemon (sys_monitor) begins consuming 95% of CPU cycles. Simultaneously, a user-initiated database snapshot starts, requesting high I/O priority. The scheduler operates on multi-level feedback queues with dynamic priority aging.",
-  subject = "Operating Systems",
-  topic = "CPU Scheduling & Concurrency"
+  title,
+  scenario,
+  subject,
+  topic
 }) {
+  const normalized = normalizeWhatHappensNextData(data || {});
+  const activeTitle = title || normalized.title || "Process Scheduling & Starvation Prevention";
+  const activeScenario = scenario || normalized.scenario || "A critical monitoring daemon (sys_monitor) begins consuming 95% of CPU cycles. Simultaneously, a user-initiated database snapshot starts, requesting high I/O priority. The scheduler operates on multi-level feedback queues with dynamic priority aging.";
+  const activeSubject = subject || normalized.subject || "Operating Systems";
+  const activeTopic = topic || normalized.topic || "CPU Scheduling & Concurrency";
+  const options = normalized.options || DEFAULT_OPTIONS;
+  const explanation = normalized.explanation || "Dynamic priority aging lowers CPU-bound processes to prevent starvation and ensure I/O tasks receive timely time slices.";
+
   const [selectedId, setSelectedId] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
 
@@ -28,7 +39,7 @@ export default function WhatHappensNextCard({
     }
   };
 
-  const selectedOption = DEFAULT_OPTIONS.find(o => o.id === selectedId);
+  const selectedOption = options.find(o => o.id === selectedId);
   const isCorrect = selectedOption?.isCorrect;
 
   return (
@@ -42,7 +53,7 @@ export default function WhatHappensNextCard({
             </span>
             What Happens Next?
           </span>
-          <span className={styles.topicText}>{subject} • {topic}</span>
+          <span className={styles.topicText}>{activeSubject} • {activeTopic}</span>
         </div>
         <div className={styles.sparkleBadge}>
           <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>auto_awesome</span>
@@ -58,13 +69,13 @@ export default function WhatHappensNextCard({
             <span className={`material-symbols-outlined ${styles.cpuIcon}`} style={{ fontSize: '24px' }}>
               memory
             </span>
-            <h2 className={styles.scenarioTitle}>{title}</h2>
+            <h2 className={styles.scenarioTitle}>{activeTitle}</h2>
           </div>
           <span className={`material-symbols-outlined ${styles.sparkleIcon}`} style={{ fontSize: '22px' }}>
             auto_awesome
           </span>
         </div>
-        <p className={styles.scenarioBody}>{scenario}</p>
+        <p className={styles.scenarioBody}>{activeScenario}</p>
 
         <div className={styles.questionPrompt}>
           <span className={`material-symbols-outlined ${styles.questionIcon}`} style={{ fontSize: '20px' }}>
@@ -76,7 +87,7 @@ export default function WhatHappensNextCard({
 
       {/* Bento Grid Options */}
       <div className={styles.optionsGrid}>
-        {DEFAULT_OPTIONS.map((option) => {
+        {options.map((option) => {
           const isSelected = selectedId === option.id;
           const isItemCorrect = isAnswered && option.isCorrect;
           const isItemWrong = isSelected && !option.isCorrect;
@@ -116,7 +127,7 @@ export default function WhatHappensNextCard({
               </div>
               <div className={styles.bannerSubtext}>
                 {isCorrect 
-                  ? "Dynamic priority aging lowers CPU-bound processes to prevent starvation and ensure I/O tasks receive timely time slices."
+                  ? explanation
                   : "Modern operating systems use dynamic aging to downgrade compute-heavy tasks and ensure all processes make progress."}
               </div>
             </div>
