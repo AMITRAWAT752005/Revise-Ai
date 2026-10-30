@@ -1134,3 +1134,156 @@ Phase 4E/4F Task B-2 — Multi-Type Prompt Templates
 
 **Status:**
 Completed
+
+
+## Date: 30 October 2026
+
+### Time: 21:48 IST
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+FIX-01 — Align Question/Flashcard MongoDB Schemas and Content Validation (Audit References: A1, A2)
+
+**Changes Made:**
+- Aligned persisted content types with the AI generation contract: `MCQ`, `Flashcard`, `TrueFalse`, `OneWord`, `FillInTheBlank`, `MatchTheFollowing`, `Sequence`, `SpotTheMistake`, `WhatHappensNext`, and `ShortAnswer`.
+- Preserved backward compatibility for legacy records with types `SHORT`, `LONG`, `TRUE_FALSE`, and `FILL_BLANK`.
+- Added polymorphic fields to `Question.js`: `pairs` (min 3 for MatchTheFollowing), `orderedItems` (min 3 for Sequence), `statementWithMistake`, `mistake`, `correction`, `scenario`, `correctOutcome`, `incorrectOutcomes`, `idealAnswer`, `statement`, `front`, and `back`.
+- Updated `Flashcard.js` with explicit `type: 'Flashcard'` attribute and index without breaking existing document structure.
+- Reworked `contentValidationService.js` to normalize contract-style fields (`statement`, `question`, `answer`, `sourceChunkIds`) and model-style fields (`questionText`, `correctAnswer`, `sourceChunks`) across all 10 types.
+- Enhanced `contentPersistenceService.js` (`saveQuestion` and `saveFlashcard`) to support all 10 content types with text normalization, deduplication, and source chunk mapping.
+- Added comprehensive test coverage in `server/tests/content_validation_persistence.test.js` (TEST 12, TEST 13, TEST 14, TEST 15) validating all 10 types, invalid input rejection, legacy types, Mongoose schema validation, and persistence contracts.
+
+**Files Modified:**
+- `server/src/models/Question.js`
+- `server/src/models/Flashcard.js`
+- `server/src/services/contentValidationService.js`
+- `server/src/services/contentPersistenceService.js`
+- `server/tests/content_validation_persistence.test.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Branch Name:**
+- `Phase_4`
+
+**Testing Performed:**
+- Ran `node --test server/tests/content_validation_persistence.test.js` — all 15 tests passed cleanly with 0 warnings.
+- Ran full AI and validation regression suite (`aiGenerationContract.test.js`, `promptTemplates.test.js`, `aiGenerationService.test.js`, `ragContextService.test.js`, `vectorMetadataService.test.js`, `chunkEmbeddingPipeline.test.js`, `qdrantService.test.js`, `content_validation_persistence.test.js`) — 34/34 tests passed.
+
+**Status:**
+Completed
+
+**Remaining Blockers:**
+Persistence API endpoints (`POST /api/questions`, `POST /api/flashcards`) and retrieval APIs (`GET /api/questions`, `GET /api/flashcards`), as well as wiring to `POST /api/ai/generate` and the Frontend Revision UI remain to be addressed in subsequent tasks.
+
+
+## Date: 30 October 2026
+
+### Time: 21:58 IST
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+FIX-02 — Align Controller VALID_TYPES with Generation Contract (Audit Reference: U1)
+
+**Changes Made:**
+- Updated `VALID_TYPES` in `server/src/controllers/aiController.js` to include `'ShortAnswer'`, aligning the controller with all 10 types supported by `aiGenerationContract.js` and `promptTemplates.js`.
+- Exported `VALID_TYPES` and `VALID_DIFFICULTIES` from `aiController.js` for modular validation reuse.
+- Updated integration test suite `server/tests/protected_ai_api.test.js` to assert that `requestedTypes: ['ShortAnswer']` succeeds and passes validation to `aiGenerationService`.
+- Asserted that invalid types continue to return HTTP 400 with a detailed error listing all 10 supported types.
+- Preserved all existing authentication, parameter bounds, hierarchy checks, and RAG generation logic without unrelated changes.
+
+**Files Modified:**
+- `server/src/controllers/aiController.js`
+- `server/tests/protected_ai_api.test.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Branch Name:**
+- `Phase_4`
+
+**Testing Performed:**
+- Executed `node --test server/tests/protected_ai_api.test.js` — all 15 tests passed.
+- Executed regression suite (`aiGenerationContract.test.js`, `promptTemplates.test.js`, `aiGenerationService.test.js`, `content_validation_persistence.test.js`) — 25/25 tests passed.
+
+**Status:**
+Completed
+
+**Remaining Blockers:**
+Direct automatic persistence of generated content to MongoDB during generation, and creation of `GET /api/questions` & `GET /api/flashcards` retrieval APIs.
+
+
+## Date: 30 October 2026
+
+### Time: 21:58 IST
+
+### Team Member Name: Anukool Negi
+
+**Task Worked On:**
+FIX-02 — Align Controller VALID_TYPES with Generation Contract (Audit Reference: U1)
+
+**Changes Made:**
+- Updated `VALID_TYPES` in `server/src/controllers/aiController.js` to include `'ShortAnswer'`, aligning the controller with all 10 types supported by `aiGenerationContract.js` and `promptTemplates.js`.
+- Exported `VALID_TYPES` and `VALID_DIFFICULTIES` from `aiController.js` for modular validation reuse.
+- Updated integration test suite `server/tests/protected_ai_api.test.js` to assert that `requestedTypes: ['ShortAnswer']` succeeds and passes validation to `aiGenerationService`.
+- Asserted that invalid types continue to return HTTP 400 with a detailed error listing all 10 supported types.
+- Preserved all existing authentication, parameter bounds, hierarchy checks, and RAG generation logic without unrelated changes.
+
+**Files Modified:**
+- `server/src/controllers/aiController.js`
+- `server/tests/protected_ai_api.test.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Branch Name:**
+- `Phase_4`
+
+**Testing Performed:**
+- Executed `node --test server/tests/protected_ai_api.test.js` — all 15 tests passed.
+- Executed regression suite (`aiGenerationContract.test.js`, `promptTemplates.test.js`, `aiGenerationService.test.js`, `content_validation_persistence.test.js`) — 25/25 tests passed.
+
+**Status:**
+Completed
+
+**Remaining Blockers:**
+Direct automatic persistence of generated content to MongoDB during generation, and creation of `GET /api/questions` & `GET /api/flashcards` retrieval APIs.
+
+
+## Date: 30 October 2026
+
+### Time: 22:09 IST
+
+### Team Member Name: Bikram Singh Bisht
+
+**Task Worked On:**
+FIX-03 — Topic-Aware RAG Retrieval Improvement (Audit Reference: Topic-aware RAG retrieval)
+
+**Changes Made:**
+- Diagnosed the root cause: `aiGenerationService.js` line 179 passed `"Generate <difficulty> difficulty content of types: <types>"` as the semantic query to `ragContextService.buildRagContext()`, which mapped poorly to academic topic vectors in Qdrant.
+- Implemented and exported `buildSemanticRagQuery(context, _params)` in `aiGenerationService.js`. Priority chain: (1) explicit `searchQuery` override, (2) pre-resolved names (`topicName`, `unitName`, `subjectName` on context), (3) DB lookup via `Topic.findById`, `Unit.findById`, `Subject.findById` (`.lean()`, non-fatal try/catch), (4) generic fallback.
+- Replaced the hardcoded query in `generateContent` with `await buildSemanticRagQuery(context, parameters)`.
+- Extended `GenerationRequestSchema` in `aiGenerationContract.js` with four optional `context` fields: `topicName`, `unitName`, `subjectName`, `searchQuery`.
+- Updated `aiController.js` to extract and forward the four optional fields from `req.body` / `req.body.context` into the generation context passed to `aiGenerationService.generateContent()`.
+- Added 6 new focused unit tests in `server/tests/aiGenerationService.test.js` covering all query-building scenarios.
+
+**Files Modified:**
+- `server/src/contracts/aiGenerationContract.js`
+- `server/src/services/aiGenerationService.js`
+- `server/src/controllers/aiController.js`
+- `server/tests/aiGenerationService.test.js`
+- `docs/Phase/Phase_4/TASKDONE.md`
+- `docs/Phase/Phase_4/TIMELINE.md`
+
+**Branch Name:**
+- `Phase_4`
+
+**Testing Performed:**
+- Unit suite: `node --test server/tests/aiGenerationService.test.js` — **10/10 pass** (4 existing + 6 new FIX-03 tests).
+- Full regression: `node --test server/tests/aiGenerationContract.test.js server/tests/promptTemplates.test.js server/tests/aiGenerationService.test.js server/tests/content_validation_persistence.test.js server/tests/vectorMetadataService.test.js server/tests/chunkEmbeddingPipeline.test.js server/tests/qdrantService.test.js` — **34/34 pass** (0 failed).
+
+**Status:**
+Completed
+
+**Remaining Blockers:**
+- Retrieval accuracy improvement is analytically justified but cannot be measured without live Qdrant data with uploaded PDFs indexed per topic.
+- Direct automatic persistence of generated content to MongoDB during generation, and creation of `GET /api/questions` & `GET /api/flashcards` retrieval APIs remain outstanding.

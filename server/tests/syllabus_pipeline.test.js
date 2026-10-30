@@ -8,6 +8,7 @@ import {
   extractSubjectsFromText,
   extractSubjectsWithAI,
   validateAndDeduplicateSubjects,
+  isDisallowedSubjectName,
 } from '../src/services/aiSubjectService.js';
 
 const temporaryDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'reviseai-syllabus-'));
@@ -33,10 +34,21 @@ assert.deepEqual(deduplicated.subjects, [
   { name: 'Computer Networks', code: 'CS602', category: 'core', units: [] },
 ]);
 
-assert.throws(
-  () => validateAndDeduplicateSubjects({ subjects: [{ name: 'Normalization' }, { code: 'CS601' }] }),
-  /invalid subject list/i,
-);
+assert.equal(isDisallowedSubjectName('B.Tech. Computer Science and Engineering'), true);
+assert.equal(isDisallowedSubjectName('Bachelor of Technology in Information Technology'), true);
+assert.equal(isDisallowedSubjectName('Department of Computer Science'), true);
+assert.equal(isDisallowedSubjectName('Semester IV'), true);
+assert.equal(isDisallowedSubjectName('Operating Systems'), false);
+assert.equal(isDisallowedSubjectName('Database Management Systems'), false);
+
+const withDegree = validateAndDeduplicateSubjects({
+  subjects: [
+    { name: 'B.Tech. Computer Science and Engineering' },
+    { name: 'Operating Systems' },
+    { name: 'Department of Electrical Engineering' },
+  ],
+});
+assert.deepEqual(withDegree.subjects, [{ name: 'Operating Systems', units: [] }]);
 
 assert.deepEqual(
   extractSubjectsFromText('Subject: Database Management Systems\nCS602: Computer Networks\nModule - Operating Systems'),
@@ -79,8 +91,8 @@ globalThis.fetch = async () => ({
 });
 const fallbackResult = await extractSubjectsWithAI('Course: Data Structures\nSubject: Discrete Mathematics');
 assert.deepEqual(fallbackResult.subjects, [
-  { name: 'Data Structures' },
-  { name: 'Discrete Mathematics' },
+  { name: 'Data Structures', units: [] },
+  { name: 'Discrete Mathematics', units: [] },
 ]);
 globalThis.fetch = originalFetch;
 

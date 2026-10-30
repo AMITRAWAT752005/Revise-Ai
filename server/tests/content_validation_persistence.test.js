@@ -359,3 +359,411 @@ test('TEST 11 — A2 schema integrity and index coverage', () => {
   assert.equal(Flashcard.schema.path('front').options.trim, true);
   assert.equal(Flashcard.schema.path('back').options.trim, true);
 });
+
+
+test('TEST 12 — validation of all 10 AI contract content types (valid & invalid cases)', () => {
+  const baseMeta = {
+    userId: validUserId,
+    subjectId,
+    materialId,
+    sourceChunks: validChunks,
+    difficulty: 'medium',
+    tags: ['audit', 'fix-01'],
+    source: 'AI',
+    aiMetadata: {
+      promptId: 'prompt-fix-01',
+      model: 'gemini-2.5-flash',
+      generatedAt: new Date(),
+    },
+    status: 'active',
+  };
+
+  // 1. MCQ
+  const validMcq = {
+    ...baseMeta,
+    type: 'MCQ',
+    question: 'What is the primary function of an OS?',
+    options: ['Resource management', 'Compile code', 'Power CPU', 'Route packets'],
+    answer: 'Resource management',
+    explanation: 'The OS manages hardware and software resources.',
+  };
+  assert.equal(validateQuestion(validMcq).success, true);
+
+  const invalidMcq = { ...validMcq, answer: 'Non-existent option' };
+  assert.equal(validateQuestion(invalidMcq).success, false);
+
+  // 2. Flashcard
+  const validFlashcard = {
+    ...baseMeta,
+    type: 'Flashcard',
+    front: 'Virtual Memory',
+    back: 'An abstraction providing the illusion of a large contiguous memory space.',
+  };
+  assert.equal(validateQuestion(validFlashcard).success, true);
+  assert.equal(validateFlashcard(validFlashcard).success, true);
+
+  const invalidFlashcard = { ...validFlashcard, back: '   ' };
+  assert.equal(validateQuestion(invalidFlashcard).success, false);
+  assert.equal(validateFlashcard(invalidFlashcard).success, false);
+
+  // 3. TrueFalse
+  const validTrueFalse = {
+    ...baseMeta,
+    type: 'TrueFalse',
+    statement: 'UDP is a connectionless protocol.',
+    answer: true,
+    explanation: 'UDP does not establish a handshake.',
+  };
+  assert.equal(validateQuestion(validTrueFalse).success, true);
+
+  const invalidTrueFalse = { ...validTrueFalse, answer: 'maybe' };
+  assert.equal(validateQuestion(invalidTrueFalse).success, false);
+
+  // 4. OneWord
+  const validOneWord = {
+    ...baseMeta,
+    type: 'OneWord',
+    question: 'Which CPU register holds the address of the next instruction to execute?',
+    answer: 'Program Counter',
+  };
+  assert.equal(validateQuestion(validOneWord).success, true);
+
+  const invalidOneWord = { ...validOneWord, answer: '' };
+  assert.equal(validateQuestion(invalidOneWord).success, false);
+
+  // 5. FillInTheBlank
+  const validFillBlank = {
+    ...baseMeta,
+    type: 'FillInTheBlank',
+    statement: 'In networking, DNS translates hostnames to [BLANK] addresses.',
+    answer: 'IP',
+  };
+  assert.equal(validateQuestion(validFillBlank).success, true);
+
+  const invalidFillBlank = {
+    ...baseMeta,
+    type: 'FillInTheBlank',
+    statement: 'Statement without the blank token.',
+    answer: 'Missing',
+  };
+  assert.equal(validateQuestion(invalidFillBlank).success, false);
+
+  // 6. MatchTheFollowing
+  const validMatch = {
+    ...baseMeta,
+    type: 'MatchTheFollowing',
+    question: 'Match OSI layers to their standard protocols:',
+    pairs: [
+      { left: 'Application', right: 'HTTP' },
+      { left: 'Transport', right: 'TCP' },
+      { left: 'Network', right: 'IP' },
+    ],
+  };
+  assert.equal(validateQuestion(validMatch).success, true);
+
+  const invalidMatchTooFew = {
+    ...validMatch,
+    pairs: [
+      { left: 'Application', right: 'HTTP' },
+      { left: 'Transport', right: 'TCP' },
+    ],
+  };
+  assert.equal(validateQuestion(invalidMatchTooFew).success, false);
+
+  // 7. Sequence
+  const validSequence = {
+    ...baseMeta,
+    type: 'Sequence',
+    question: 'Arrange TCP three-way handshake in correct chronological order:',
+    orderedItems: ['SYN sent by client', 'SYN-ACK sent by server', 'ACK sent by client'],
+  };
+  assert.equal(validateQuestion(validSequence).success, true);
+
+  const invalidSequence = {
+    ...validSequence,
+    orderedItems: ['SYN sent', 'ACK sent'], // only 2 items
+  };
+  assert.equal(validateQuestion(invalidSequence).success, false);
+
+  // 8. SpotTheMistake
+  const validSpotMistake = {
+    ...baseMeta,
+    type: 'SpotTheMistake',
+    statementWithMistake: 'TCP is an unreliable protocol that guarantees fast streaming.',
+    mistake: 'unreliable',
+    correction: 'reliable',
+  };
+  assert.equal(validateQuestion(validSpotMistake).success, true);
+
+  const invalidSpotMistake = {
+    ...validSpotMistake,
+    mistake: '   ',
+  };
+  assert.equal(validateQuestion(invalidSpotMistake).success, false);
+
+  // 9. WhatHappensNext
+  const validWhatNext = {
+    ...baseMeta,
+    type: 'WhatHappensNext',
+    scenario: 'A process initiates an I/O disk read operation.',
+    correctOutcome: 'The CPU switches state from Running to Blocked/Waiting.',
+    incorrectOutcomes: ['The process immediately terminates', 'The process preempts the kernel'],
+  };
+  assert.equal(validateQuestion(validWhatNext).success, true);
+
+  const invalidWhatNext = {
+    ...validWhatNext,
+    correctOutcome: '',
+  };
+  assert.equal(validateQuestion(invalidWhatNext).success, false);
+
+  // 10. ShortAnswer
+  const validShortAnswer = {
+    ...baseMeta,
+    type: 'ShortAnswer',
+    question: 'Explain the difference between a process and a thread.',
+    idealAnswer: 'A process is an executing program with isolated address space, while a thread is a lightweight unit of execution sharing the process address space.',
+  };
+  assert.equal(validateQuestion(validShortAnswer).success, true);
+
+  const invalidShortAnswer = {
+    ...validShortAnswer,
+    idealAnswer: undefined,
+    correctAnswer: undefined,
+  };
+  assert.equal(validateQuestion(invalidShortAnswer).success, false);
+});
+
+test('TEST 13 — legacy question type backward compatibility', () => {
+  const legacyBase = {
+    userId: validUserId,
+    subjectId,
+    materialId,
+    sourceChunks: validChunks,
+    difficulty: 'easy',
+    tags: ['legacy'],
+    source: 'manual',
+    aiMetadata: {
+      promptId: 'legacy-p1',
+      model: 'manual-entry',
+      generatedAt: new Date(),
+    },
+    status: 'active',
+  };
+
+  // SHORT
+  const shortQ = {
+    ...legacyBase,
+    type: 'SHORT',
+    questionText: 'What is semaphore in OS?',
+    correctAnswer: 'A synchronization variable used for mutual exclusion.',
+  };
+  assert.equal(validateQuestion(shortQ).success, true);
+
+  // LONG
+  const longQ = {
+    ...legacyBase,
+    type: 'LONG',
+    questionText: 'Describe paging and segmentation with diagrams and trade-offs.',
+    correctAnswer: 'Paging divides memory into fixed blocks; segmentation into logical units.',
+  };
+  assert.equal(validateQuestion(longQ).success, true);
+
+  // TRUE_FALSE
+  const tfQ = {
+    ...legacyBase,
+    type: 'TRUE_FALSE',
+    questionText: 'HTTP is a stateless protocol.',
+    correctAnswer: 'true',
+  };
+  assert.equal(validateQuestion(tfQ).success, true);
+
+  // FILL_BLANK
+  const fbQ = {
+    ...legacyBase,
+    type: 'FILL_BLANK',
+    questionText: 'A process waiting indefinitely for an event experiences starvation.',
+    correctAnswer: 'starvation',
+  };
+  assert.equal(validateQuestion(fbQ).success, true);
+});
+
+test('TEST 14 — Mongoose model schema validation across all supported types', async () => {
+  const baseDoc = {
+    userId: validUserId,
+    subjectId,
+    materialId,
+    sourceChunks: validChunks,
+    difficulty: 'medium',
+    tags: ['schema-test'],
+    source: 'AI',
+    aiMetadata: {
+      promptId: 'p-14',
+      model: 'gemini-2.5-flash',
+      generatedAt: new Date(),
+    },
+    status: 'active',
+  };
+
+  // 1. MCQ
+  const mcqDoc = new Question({
+    ...baseDoc,
+    type: 'MCQ',
+    questionText: 'Which protocol is connection-oriented?',
+    options: ['TCP', 'UDP', 'ICMP', 'IGMP'],
+    correctAnswer: 'TCP',
+  });
+  await mcqDoc.validate();
+
+  // 2. TrueFalse
+  const tfDoc = new Question({
+    ...baseDoc,
+    type: 'TrueFalse',
+    questionText: 'DNS uses UDP for standard queries.',
+    correctAnswer: 'true',
+  });
+  await tfDoc.validate();
+
+  // 3. OneWord
+  const oneWordDoc = new Question({
+    ...baseDoc,
+    type: 'OneWord',
+    questionText: 'Name the fastest memory in the computer hierarchy.',
+    correctAnswer: 'Register',
+  });
+  await oneWordDoc.validate();
+
+  // 4. FillInTheBlank
+  const fillDoc = new Question({
+    ...baseDoc,
+    type: 'FillInTheBlank',
+    questionText: 'The process table entry is stored in the [BLANK].',
+    correctAnswer: 'PCB',
+  });
+  await fillDoc.validate();
+
+  // 5. MatchTheFollowing
+  const matchDoc = new Question({
+    ...baseDoc,
+    type: 'MatchTheFollowing',
+    questionText: 'Match protocols to default ports:',
+    pairs: [
+      { left: 'HTTP', right: '80' },
+      { left: 'HTTPS', right: '443' },
+      { left: 'SSH', right: '22' },
+    ],
+  });
+  await matchDoc.validate();
+
+  // Invalid Match (fewer than 3 pairs)
+  const invalidMatchDoc = new Question({
+    ...baseDoc,
+    type: 'MatchTheFollowing',
+    questionText: 'Match pairs:',
+    pairs: [{ left: 'A', right: '1' }],
+  });
+  await assert.rejects(async () => invalidMatchDoc.validate());
+
+  // 6. Sequence
+  const seqDoc = new Question({
+    ...baseDoc,
+    type: 'Sequence',
+    questionText: 'Arrange compile stages:',
+    orderedItems: ['Lexical Analysis', 'Syntax Analysis', 'Semantic Analysis'],
+  });
+  await seqDoc.validate();
+
+  // Invalid Sequence (fewer than 3 items)
+  const invalidSeqDoc = new Question({
+    ...baseDoc,
+    type: 'Sequence',
+    questionText: 'Order items:',
+    orderedItems: ['Item 1'],
+  });
+  await assert.rejects(async () => invalidSeqDoc.validate());
+
+  // 7. SpotTheMistake
+  const spotDoc = new Question({
+    ...baseDoc,
+    type: 'SpotTheMistake',
+    questionText: 'RAM is non-volatile primary storage.',
+    statementWithMistake: 'RAM is non-volatile primary storage.',
+    mistake: 'non-volatile',
+    correction: 'volatile',
+    correctAnswer: 'volatile',
+  });
+  await spotDoc.validate();
+
+  // 8. WhatHappensNext
+  const whatNextDoc = new Question({
+    ...baseDoc,
+    type: 'WhatHappensNext',
+    questionText: 'A timer interrupt occurs during CPU execution.',
+    scenario: 'A timer interrupt occurs during CPU execution.',
+    correctOutcome: 'The scheduler runs and may context switch.',
+    correctAnswer: 'The scheduler runs and may context switch.',
+    incorrectOutcomes: ['System shuts down immediately'],
+  });
+  await whatNextDoc.validate();
+
+  // 9. ShortAnswer
+  const shortDoc = new Question({
+    ...baseDoc,
+    type: 'ShortAnswer',
+    questionText: 'What is thrashing in OS virtual memory?',
+    idealAnswer: 'Excessive paging where CPU spends more time swapping pages than executing instructions.',
+    correctAnswer: 'Excessive paging where CPU spends more time swapping pages than executing instructions.',
+  });
+  await shortDoc.validate();
+
+  // 10. Flashcard model
+  const flashcardDoc = new Flashcard({
+    ...baseDoc,
+    front: 'TLB',
+    back: 'Translation Lookaside Buffer caching virtual to physical address translations.',
+  });
+  await flashcardDoc.validate();
+});
+
+test('TEST 15 — saveQuestion and saveFlashcard persistence with contract fields and sourceChunkIds', async () => {
+  mockHierarchy();
+
+  let createdDoc = null;
+  Question.findOne = async () => null;
+  Question.create = async (payload) => {
+    createdDoc = { _id: 'created-q-id', ...payload };
+    return createdDoc;
+  };
+
+  const contractQuestionPayload = {
+    userId: validUserId,
+    subjectId,
+    materialId,
+    sourceChunkIds: validChunks, // Contract field
+    type: 'Sequence',
+    question: 'Arrange memory access times from fastest to slowest:', // Contract field
+    orderedItems: ['Registers', 'L1 Cache', 'Main Memory'],
+    difficulty: 'hard',
+    tags: ['computer-architecture'],
+    source: 'AI',
+    aiMetadata: {
+      promptId: 'contract-prompt-1',
+      model: 'gemini-2.5-flash',
+      generatedAt: new Date(),
+    },
+    status: 'active',
+  };
+
+  const result = await saveQuestion(contractQuestionPayload, validUserId);
+  assert.equal(result.success, true);
+  assert.equal(result.duplicate, false);
+  assert.ok(createdDoc);
+  assert.equal(createdDoc.questionText, 'Arrange memory access times from fastest to slowest:');
+  assert.deepEqual(createdDoc.sourceChunks, validChunks);
+  assert.equal(createdDoc.type, 'Sequence');
+  assert.deepEqual(createdDoc.orderedItems, ['Registers', 'L1 Cache', 'Main Memory']);
+
+  Question.create = originalQuestionCreate;
+  Question.findOne = originalQuestionFindOne;
+  restoreHierarchyMocks();
+});

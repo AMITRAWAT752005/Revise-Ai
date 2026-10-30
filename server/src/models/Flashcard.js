@@ -30,6 +30,11 @@ const flashcardSchema = new mongoose.Schema(
       ref: 'DocumentChunk',
       default: [],
     },
+    type: {
+      type: String,
+      enum: ['Flashcard'],
+      default: 'Flashcard',
+    },
     front: {
       type: String,
       required: true,
@@ -100,6 +105,7 @@ flashcardSchema.index({ subjectId: 1, topicId: 1 });
 flashcardSchema.index({ userId: 1, subjectId: 1, topicId: 1, materialId: 1 });
 flashcardSchema.index({ userId: 1, materialId: 1, status: 1 });
 flashcardSchema.index({ difficulty: 1 });
+flashcardSchema.index({ type: 1 });
 
 const Flashcard = mongoose.model('Flashcard', flashcardSchema);
 

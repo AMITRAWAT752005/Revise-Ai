@@ -119,7 +119,15 @@ export const saveQuestion = async (data, authenticatedUserId) => {
       materialId: data.materialId,
     });
 
-    const normalizedText = normalizeText(data.questionText);
+    const questionTextToSave =
+      data.questionText ||
+      data.question ||
+      data.statement ||
+      data.statementWithMistake ||
+      data.scenario ||
+      data.front;
+
+    const normalizedText = normalizeText(questionTextToSave);
     const existing = await Question.findOne({
       userId: data.userId,
       materialId: data.materialId,
@@ -130,7 +138,13 @@ export const saveQuestion = async (data, authenticatedUserId) => {
       return createSuccessResponse(existing, true);
     }
 
-    const created = await Question.create(data);
+    const payloadToSave = {
+      ...data,
+      questionText: questionTextToSave,
+      ...(!data.sourceChunks && Array.isArray(data.sourceChunkIds) ? { sourceChunks: data.sourceChunkIds } : {}),
+    };
+
+    const created = await Question.create(payloadToSave);
     return createSuccessResponse(created, false);
   } catch (err) {
     if (err && err.status === 'error' && err.error) {
@@ -166,7 +180,8 @@ export const saveFlashcard = async (data, authenticatedUserId) => {
       materialId: data.materialId,
     });
 
-    const normalizedFront = normalizeText(data.front);
+    const frontToSave = data.front || data.questionText || data.question;
+    const normalizedFront = normalizeText(frontToSave);
     const existing = await Flashcard.findOne({
       userId: data.userId,
       materialId: data.materialId,
@@ -177,7 +192,13 @@ export const saveFlashcard = async (data, authenticatedUserId) => {
       return createSuccessResponse(existing, true);
     }
 
-    const created = await Flashcard.create(data);
+    const payloadToSave = {
+      ...data,
+      front: frontToSave,
+      ...(!data.sourceChunks && Array.isArray(data.sourceChunkIds) ? { sourceChunks: data.sourceChunkIds } : {}),
+    };
+
+    const created = await Flashcard.create(payloadToSave);
     return createSuccessResponse(created, false);
   } catch (err) {
     if (err && err.status === 'error' && err.error) {

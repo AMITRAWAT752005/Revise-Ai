@@ -2,12 +2,88 @@ import { z } from 'zod';
 import { AIGenerationResponseSchema, GenerationRequestSchema } from '../contracts/aiGenerationContract.js';
 import ragContextService from './ragContextService.js';
 import { buildSystemInstruction } from '../prompts/promptTemplates.js';
+import Topic from '../models/Topic.js';
+import Unit from '../models/Unit.js';
+import Subject from '../models/Subject.js';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
 const RETRYABLE_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Builds a meaningful semantic RAG query from academic context.
+ *
+ * Priority:
+ *   1. Explicit context.searchQuery — used verbatim.
+ *   2. Pre-resolved context names (topicName, unitName, subjectName) — no DB lookup needed.
+ *   3. ObjectId-based DB lookup for topic → unit → subject names.
+ *   4. Graceful fallback when nothing is available.
+ *
+ * @param {Object} context  - Generation context from the validated request.
+ * @param {Object} _params  - Generation parameters (currently unused, reserved for future use).
+ * @returns {Promise<string>} A meaningful semantic search query.
+ */
+export const buildSemanticRagQuery = async (context, _params) => {
+  // 1. Explicit override takes absolute precedence.
+  if (context.searchQuery && context.searchQuery.trim().length > 0) {
+    return context.searchQuery.trim();
+  }
+
+  // 2. Use pre-resolved names if the caller supplied them.
+  let topicName = context.topicName?.trim() || '';
+  let unitName = context.unitName?.trim() || '';
+  let subjectName = context.subjectName?.trim() || '';
+
+  // 3. If IDs are present but names were not supplied, attempt DB lookup.
+  if (!topicName && context.topicId) {
+    try {
+      const topicDoc = await Topic.findById(context.topicId).select('name description').lean();
+      if (topicDoc) {
+        topicName = topicDoc.name || '';
+      }
+    } catch {
+      // Non-fatal: fall back gracefully (e.g. test environment without DB).
+    }
+  }
+
+  if (!unitName && context.unitId) {
+    try {
+      const unitDoc = await Unit.findById(context.unitId).select('name').lean();
+      if (unitDoc) {
+        unitName = unitDoc.name || '';
+      }
+    } catch {
+      // Non-fatal fallback.
+    }
+  }
+
+  if (!subjectName && context.subjectId) {
+    try {
+      const subjectDoc = await Subject.findById(context.subjectId).select('name').lean();
+      if (subjectDoc) {
+        subjectName = subjectDoc.name || '';
+      }
+    } catch {
+      // Non-fatal fallback.
+    }
+  }
+
+  // 4. Compose the academic query from whatever resolved.
+  const parts = [];
+  if (topicName) parts.push(topicName);
+  if (unitName && unitName !== topicName) parts.push(unitName);
+  if (subjectName && subjectName !== unitName && subjectName !== topicName) parts.push(subjectName);
+
+  if (parts.length === 0) {
+    // 5. Nothing resolved — use a generic academic fallback.
+    return 'Key concepts, core definitions, principles, and fundamental explanations';
+  }
+
+  const academicPhrase = parts.join(' in ');
+  return `${academicPhrase}: key concepts, definitions, principles, formulas, and core explanations`;
+};
 
 const parseJsonResponse = (content) => {
   const withoutFence = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
@@ -173,10 +249,11 @@ export const generateContent = async (request) => {
   
   const { context, parameters } = parsedRequest.data;
   
-  // 2. Retrieve RAG Context
+  // 2. Build a topic-aware semantic query and retrieve RAG Context
+  const semanticQuery = await buildSemanticRagQuery(context, parameters);
   const ragResult = await ragContextService.buildRagContext({
     userId: context.userId,
-    query: `Generate ${parameters.difficulty} difficulty content of types: ${parameters.requestedTypes.join(', ')}`,
+    query: semanticQuery,
     subjectId: context.subjectId,
     unitId: context.unitId,
     topicId: context.topicId,

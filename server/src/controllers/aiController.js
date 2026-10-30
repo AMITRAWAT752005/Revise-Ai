@@ -1,9 +1,13 @@
 import mongoose from 'mongoose';
 import aiGenerationService from '../services/aiGenerationService.js';
 import { validateHierarchyOwnership } from '../services/studyMaterialService.js';
+import {
+  resolveMaterialId,
+  persistGeneratedItems,
+} from '../services/generationPersistenceService.js';
 
-const VALID_DIFFICULTIES = ['easy', 'medium', 'hard', 'mixed'];
-const VALID_TYPES = [
+export const VALID_DIFFICULTIES = ['easy', 'medium', 'hard', 'mixed'];
+export const VALID_TYPES = [
   'MCQ',
   'Flashcard',
   'TrueFalse',
@@ -13,6 +17,7 @@ const VALID_TYPES = [
   'Sequence',
   'SpotTheMistake',
   'WhatHappensNext',
+  'ShortAnswer',
 ];
 
 const isValidObjectId = (id) => typeof id === 'string' && id.trim().length > 0 && mongoose.Types.ObjectId.isValid(id.trim());
@@ -38,7 +43,24 @@ export const generateContentController = async (req, res) => {
     const subjectId = (body.subjectId || body.context?.subjectId || '').trim();
     const unitId = (body.unitId || body.context?.unitId || '').trim() || undefined;
     const topicId = (body.topicId || body.context?.topicId || '').trim() || undefined;
+    // Optional: caller may supply the materialId to pin which study material to
+    // attribute the generated content to. When absent, auto-resolved at persistence time.
+    const callerMaterialId = (body.materialId || body.context?.materialId || '').trim() || undefined;
     const sourceMaterials = Array.isArray(body.sourceMaterials) ? body.sourceMaterials : undefined;
+
+    // Optional pre-resolved academic names for topic-aware RAG query building.
+    const topicName = typeof (body.topicName || body.context?.topicName) === 'string'
+      ? (body.topicName || body.context?.topicName).trim() || undefined
+      : undefined;
+    const unitName = typeof (body.unitName || body.context?.unitName) === 'string'
+      ? (body.unitName || body.context?.unitName).trim() || undefined
+      : undefined;
+    const subjectName = typeof (body.subjectName || body.context?.subjectName) === 'string'
+      ? (body.subjectName || body.context?.subjectName).trim() || undefined
+      : undefined;
+    const searchQuery = typeof (body.searchQuery || body.context?.searchQuery) === 'string'
+      ? (body.searchQuery || body.context?.searchQuery).trim() || undefined
+      : undefined;
 
     // 3. Subject / Unit / Topic ID Validation
     if (!subjectId) {
@@ -130,6 +152,10 @@ export const generateContentController = async (req, res) => {
         subjectId,
         unitId,
         topicId,
+        topicName,
+        unitName,
+        subjectName,
+        searchQuery,
       },
       sourceMaterials,
       parameters: {
@@ -139,10 +165,70 @@ export const generateContentController = async (req, res) => {
       },
     });
 
-    // 7. Standardized Success Response
+    // 7. Persist validated AI output into MongoDB
+    //    Resolve a materialId to attribute the generated content to the correct source.
+    //    This is non-blocking: persistence failures are reported in the response but do
+    //    NOT cause the API to return 500 — the generated content is still returned.
+    let persistenceSummary = null;
+    try {
+      const resolvedMaterialId = await resolveMaterialId({
+        userId: userId.toString(),
+        subjectId,
+        unitId,
+        topicId,
+        materialId: callerMaterialId,
+      });
+
+      if (resolvedMaterialId) {
+        const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+        const generatedAt = new Date();
+        const promptId = `gen-${generatedAt.toISOString()}`;
+
+        persistenceSummary = await persistGeneratedItems(
+          generationResult.generatedContent,
+          {
+            userId: userId.toString(),
+            subjectId,
+            unitId,
+            topicId,
+            materialId: resolvedMaterialId,
+            difficulty,
+            model,
+            promptId,
+            generatedAt,
+          }
+        );
+      } else {
+        // No completed study material found — skip persistence gracefully.
+        persistenceSummary = {
+          saved: 0,
+          duplicates: 0,
+          failed: 0,
+          errors: [],
+          savedIds: [],
+          skipped: true,
+          reason: 'No completed study material found for this subject/unit/topic. Upload and process a PDF first.',
+        };
+      }
+    } catch (persistErr) {
+      // Persistence layer error — log but do not fail the entire request.
+      console.error('[aiController] Persistence error after generation:', persistErr?.message);
+      persistenceSummary = {
+        saved: 0,
+        duplicates: 0,
+        failed: generationResult.generatedContent.length,
+        errors: [{ type: 'batch', error: persistErr?.message || 'Persistence batch error' }],
+        savedIds: [],
+      };
+    }
+
+    // 8. Standardized Success Response (enriched with persistence summary)
     return res.status(200).json({
       success: true,
-      data: generationResult,
+      data: {
+        ...generationResult,
+        persistence: persistenceSummary,
+      },
     });
   } catch (error) {
     const statusCode = error.statusCode || 500;
@@ -161,4 +247,6 @@ export const generateContentController = async (req, res) => {
 
 export default {
   generateContentController,
+  VALID_TYPES,
+  VALID_DIFFICULTIES,
 };

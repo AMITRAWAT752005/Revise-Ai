@@ -1,6 +1,21 @@
 import mongoose from 'mongoose';
 
-const QUESTION_TYPES = ['MCQ', 'SHORT', 'LONG', 'TRUE_FALSE', 'FILL_BLANK'];
+const CANONICAL_QUESTION_TYPES = [
+  'MCQ',
+  'Flashcard',
+  'TrueFalse',
+  'OneWord',
+  'FillInTheBlank',
+  'MatchTheFollowing',
+  'Sequence',
+  'SpotTheMistake',
+  'WhatHappensNext',
+  'ShortAnswer',
+];
+
+const LEGACY_QUESTION_TYPES = ['SHORT', 'LONG', 'TRUE_FALSE', 'FILL_BLANK'];
+
+const ALL_QUESTION_TYPES = [...CANONICAL_QUESTION_TYPES, ...LEGACY_QUESTION_TYPES];
 
 const createValidationError = (message, statusCode = 400, code = 'VALIDATION_ERROR') => ({
   success: false,
@@ -55,12 +70,18 @@ const ensureOptionalString = (value, fieldName) => {
   return trimmed || undefined;
 };
 
-const normalizeSourceChunks = (sourceChunks) => {
-  if (!Array.isArray(sourceChunks) || sourceChunks.length === 0) {
+const normalizeSourceChunks = (sourceChunks, sourceChunkIds) => {
+  const rawChunks = Array.isArray(sourceChunks) && sourceChunks.length > 0
+    ? sourceChunks
+    : Array.isArray(sourceChunkIds) && sourceChunkIds.length > 0
+      ? sourceChunkIds
+      : sourceChunks;
+
+  if (!Array.isArray(rawChunks) || rawChunks.length === 0) {
     throw createValidationError('sourceChunks must be a non-empty array of valid ObjectIds.', 400, 'INVALID_SOURCE_CHUNKS');
   }
 
-  const normalized = sourceChunks.map((chunkId) => {
+  const normalized = rawChunks.map((chunkId) => {
     if (!isValidObjectId(chunkId)) {
       throw createValidationError('Each sourceChunks entry must be a valid ObjectId.', 400, 'INVALID_SOURCE_CHUNK');
     }
@@ -161,14 +182,19 @@ const validateCommonMetadata = (data, entityName) => {
 export const validateQuestion = (data) => {
   try {
     const metadata = validateCommonMetadata(data, 'Question');
-    const sourceChunks = normalizeSourceChunks(data.sourceChunks);
+    const sourceChunks = normalizeSourceChunks(data.sourceChunks, data.sourceChunkIds);
 
-    const type = typeof data.type === 'string' ? data.type.trim().toUpperCase() : '';
-    if (!QUESTION_TYPES.includes(type)) {
-      throw createValidationError('Question type must be one of: MCQ, SHORT, LONG, TRUE_FALSE, FILL_BLANK.', 400, 'INVALID_QUESTION_TYPE');
+    const rawType = typeof data.type === 'string' ? data.type.trim() : '';
+    const matchedType = ALL_QUESTION_TYPES.find((t) => t.toLowerCase() === rawType.toLowerCase());
+    if (!matchedType) {
+      throw createValidationError(
+        `Question type must be one of: ${ALL_QUESTION_TYPES.join(', ')}.`,
+        400,
+        'INVALID_QUESTION_TYPE',
+      );
     }
+    const type = matchedType;
 
-    const questionText = ensureRequiredString(data.questionText, 'questionText', 3);
     const explanation = ensureOptionalString(data.explanation, 'explanation');
     const difficulty = normalizeDifficulty(data.difficulty);
     const tags = normalizeTags(data.tags, 'tags');
@@ -176,59 +202,187 @@ export const validateQuestion = (data) => {
     const aiMetadata = normalizeAiMetadata(data.aiMetadata);
     const status = validateStatus(data.status ?? 'active');
 
-    let options;
-    if (type === 'MCQ') {
-      if (!Array.isArray(data.options) || data.options.length < 2) {
-        throw createValidationError('MCQ questions require an options array with at least 2 entries.', 400, 'INVALID_MCQ_OPTIONS');
-      }
-
-      const normalizedOptions = data.options.map((option) => {
-        if (typeof option !== 'string') {
-          throw createValidationError('Each MCQ option must be a string.', 400, 'INVALID_MCQ_OPTION_TYPE');
-        }
-        const trimmed = option.trim();
-        if (!trimmed) {
-          throw createValidationError('MCQ options cannot be empty.', 400, 'EMPTY_MCQ_OPTION');
-        }
-        return trimmed;
-      });
-
-      options = normalizedOptions;
-    }
-
-    const rawCorrectAnswer = data.correctAnswer;
-    if (rawCorrectAnswer === undefined || rawCorrectAnswer === null || rawCorrectAnswer === '') {
-      throw createValidationError('correctAnswer is required.', 400, 'REQUIRED_FIELD');
-    }
-
+    let questionText;
     let correctAnswer;
-    if (type === 'MCQ') {
-      if (typeof rawCorrectAnswer !== 'string') {
-        throw createValidationError('MCQ correctAnswer must be a string matching one of the options.', 400, 'INVALID_MCQ_ANSWER');
+    let options;
+    let pairs;
+    let orderedItems;
+    let statementWithMistake;
+    let mistake;
+    let correction;
+    let scenario;
+    let correctOutcome;
+    let incorrectOutcomes;
+    let idealAnswer;
+    let statement;
+    let front;
+    let back;
+
+    switch (type) {
+      case 'MCQ': {
+        questionText = ensureRequiredString(data.questionText || data.question, 'questionText', 3);
+
+        if (!Array.isArray(data.options) || data.options.length < 2) {
+          throw createValidationError('MCQ questions require an options array with at least 2 entries.', 400, 'INVALID_MCQ_OPTIONS');
+        }
+
+        const normalizedOptions = data.options.map((option) => {
+          if (typeof option !== 'string') {
+            throw createValidationError('Each MCQ option must be a string.', 400, 'INVALID_MCQ_OPTION_TYPE');
+          }
+          const trimmed = option.trim();
+          if (!trimmed) {
+            throw createValidationError('MCQ options cannot be empty.', 400, 'EMPTY_MCQ_OPTION');
+          }
+          return trimmed;
+        });
+
+        options = normalizedOptions;
+
+        const rawAnswer = data.correctAnswer !== undefined ? data.correctAnswer : data.answer;
+        if (rawAnswer === undefined || rawAnswer === null || rawAnswer === '') {
+          throw createValidationError('correctAnswer is required.', 400, 'REQUIRED_FIELD');
+        }
+        if (typeof rawAnswer !== 'string') {
+          throw createValidationError('MCQ correctAnswer must be a string matching one of the options.', 400, 'INVALID_MCQ_ANSWER');
+        }
+        const normalizedAnswer = rawAnswer.trim();
+        if (!normalizedAnswer) {
+          throw createValidationError('MCQ correctAnswer cannot be empty.', 400, 'EMPTY_MCQ_ANSWER');
+        }
+        if (!options.includes(normalizedAnswer)) {
+          throw createValidationError('MCQ correctAnswer must match one of the provided options.', 400, 'MCQ_ANSWER_NOT_IN_OPTIONS');
+        }
+        correctAnswer = normalizedAnswer;
+        break;
       }
-      const normalizedAnswer = rawCorrectAnswer.trim();
-      if (!normalizedAnswer) {
-        throw createValidationError('MCQ correctAnswer cannot be empty.', 400, 'EMPTY_MCQ_ANSWER');
+
+      case 'TrueFalse':
+      case 'TRUE_FALSE': {
+        questionText = ensureRequiredString(data.questionText || data.statement || data.question, 'questionText', 3);
+        statement = data.statement || questionText;
+
+        const rawAnswer = data.correctAnswer !== undefined ? data.correctAnswer : data.answer;
+        if (rawAnswer === undefined || rawAnswer === null || rawAnswer === '') {
+          throw createValidationError('correctAnswer is required.', 400, 'REQUIRED_FIELD');
+        }
+
+        const normalizedAnswer = typeof rawAnswer === 'boolean' ? rawAnswer : String(rawAnswer).trim().toLowerCase();
+        if (normalizedAnswer !== true && normalizedAnswer !== false && normalizedAnswer !== 'true' && normalizedAnswer !== 'false') {
+          throw createValidationError('TrueFalse correctAnswer must be true or false.', 400, 'INVALID_TRUE_FALSE_ANSWER');
+        }
+        correctAnswer = (normalizedAnswer === true || normalizedAnswer === 'true') ? 'true' : 'false';
+        break;
       }
-      if (!options.includes(normalizedAnswer)) {
-        throw createValidationError('MCQ correctAnswer must match one of the provided options.', 400, 'MCQ_ANSWER_NOT_IN_OPTIONS');
+
+      case 'OneWord': {
+        questionText = ensureRequiredString(data.questionText || data.question, 'questionText', 3);
+        const rawAnswer = data.correctAnswer !== undefined ? data.correctAnswer : data.answer;
+        correctAnswer = ensureRequiredString(rawAnswer, 'correctAnswer', 1);
+        break;
       }
-      correctAnswer = normalizedAnswer;
-    } else if (type === 'TRUE_FALSE') {
-      const normalizedAnswer = typeof rawCorrectAnswer === 'boolean' ? rawCorrectAnswer : String(rawCorrectAnswer).trim().toLowerCase();
-      if (normalizedAnswer !== 'true' && normalizedAnswer !== 'false' && normalizedAnswer !== true && normalizedAnswer !== false) {
-        throw createValidationError('TRUE_FALSE correctAnswer must be true or false.', 400, 'INVALID_TRUE_FALSE_ANSWER');
+
+      case 'FillInTheBlank':
+      case 'FILL_BLANK': {
+        questionText = ensureRequiredString(data.questionText || data.statement || data.question, 'questionText', 3);
+        statement = data.statement || questionText;
+
+        if (type === 'FillInTheBlank' && !questionText.includes('[BLANK]')) {
+          throw createValidationError('FillInTheBlank statement must contain the exact string "[BLANK]".', 400, 'INVALID_FILL_BLANK_STATEMENT');
+        }
+
+        const rawAnswer = data.correctAnswer !== undefined ? data.correctAnswer : data.answer;
+        correctAnswer = ensureRequiredString(rawAnswer, 'correctAnswer', 1);
+        break;
       }
-      correctAnswer = normalizedAnswer === true || normalizedAnswer === 'true' ? 'true' : 'false';
-    } else {
-      if (typeof rawCorrectAnswer !== 'string') {
-        throw createValidationError('correctAnswer must be a string for this question type.', 400, 'INVALID_ANSWER_TYPE');
+
+      case 'MatchTheFollowing': {
+        questionText = ensureRequiredString(data.questionText || data.question, 'questionText', 3);
+
+        if (!Array.isArray(data.pairs) || data.pairs.length < 3) {
+          throw createValidationError('MatchTheFollowing requires a pairs array with at least 3 entries.', 400, 'INVALID_MATCH_PAIRS');
+        }
+
+        pairs = data.pairs.map((p, idx) => {
+          if (!p || typeof p !== 'object' || Array.isArray(p)) {
+            throw createValidationError(`Pair at index ${idx} must be an object with left and right properties.`, 400, 'INVALID_PAIR_FORMAT');
+          }
+          const left = ensureRequiredString(p.left, `pairs[${idx}].left`, 1);
+          const right = ensureRequiredString(p.right, `pairs[${idx}].right`, 1);
+          return { left, right };
+        });
+
+        if (data.correctAnswer !== undefined && data.correctAnswer !== null) {
+          correctAnswer = ensureOptionalString(data.correctAnswer, 'correctAnswer');
+        }
+        break;
       }
-      const normalizedAnswer = rawCorrectAnswer.trim();
-      if (!normalizedAnswer) {
-        throw createValidationError('correctAnswer cannot be empty.', 400, 'EMPTY_ANSWER');
+
+      case 'Sequence': {
+        questionText = ensureRequiredString(data.questionText || data.question, 'questionText', 3);
+
+        if (!Array.isArray(data.orderedItems) || data.orderedItems.length < 3) {
+          throw createValidationError('Sequence requires an orderedItems array with at least 3 entries.', 400, 'INVALID_SEQUENCE_ITEMS');
+        }
+
+        orderedItems = data.orderedItems.map((item, idx) => {
+          return ensureRequiredString(item, `orderedItems[${idx}]`, 1);
+        });
+
+        if (data.correctAnswer !== undefined && data.correctAnswer !== null) {
+          correctAnswer = ensureOptionalString(data.correctAnswer, 'correctAnswer');
+        }
+        break;
       }
-      correctAnswer = normalizedAnswer;
+
+      case 'SpotTheMistake': {
+        questionText = ensureRequiredString(data.questionText || data.statementWithMistake || data.question, 'questionText', 3);
+        statementWithMistake = ensureRequiredString(data.statementWithMistake || questionText, 'statementWithMistake', 3);
+        mistake = ensureRequiredString(data.mistake, 'mistake', 1);
+        correction = ensureRequiredString(data.correction, 'correction', 1);
+        correctAnswer = data.correctAnswer ? ensureRequiredString(data.correctAnswer, 'correctAnswer', 1) : correction;
+        break;
+      }
+
+      case 'WhatHappensNext': {
+        questionText = ensureRequiredString(data.questionText || data.scenario || data.question, 'questionText', 3);
+        scenario = ensureRequiredString(data.scenario || questionText, 'scenario', 3);
+        const rawOutcome = data.correctOutcome || data.correctAnswer || data.answer;
+        correctOutcome = ensureRequiredString(rawOutcome, 'correctOutcome', 1);
+        correctAnswer = correctOutcome;
+
+        if (data.incorrectOutcomes !== undefined && data.incorrectOutcomes !== null) {
+          if (!Array.isArray(data.incorrectOutcomes)) {
+            throw createValidationError('incorrectOutcomes must be an array of strings.', 400, 'INVALID_INCORRECT_OUTCOMES');
+          }
+          incorrectOutcomes = data.incorrectOutcomes.map((item, idx) => ensureRequiredString(item, `incorrectOutcomes[${idx}]`, 1));
+        }
+        break;
+      }
+
+      case 'ShortAnswer':
+      case 'SHORT':
+      case 'LONG': {
+        questionText = ensureRequiredString(data.questionText || data.question, 'questionText', 3);
+        const rawAnswer = data.idealAnswer || data.correctAnswer || data.answer;
+        correctAnswer = ensureRequiredString(rawAnswer, 'correctAnswer', 1);
+        if (data.idealAnswer) {
+          idealAnswer = ensureRequiredString(data.idealAnswer, 'idealAnswer', 1);
+        }
+        break;
+      }
+
+      case 'Flashcard': {
+        front = ensureRequiredString(data.front || data.questionText || data.question, 'front', 3);
+        back = ensureRequiredString(data.back || data.correctAnswer || data.answer, 'back', 3);
+        questionText = front;
+        correctAnswer = back;
+        break;
+      }
+
+      default: {
+        throw createValidationError(`Unsupported question type '${type}'.`, 400, 'UNSUPPORTED_QUESTION_TYPE');
+      }
     }
 
     return {
@@ -239,8 +393,20 @@ export const validateQuestion = (data) => {
         type,
         questionText,
         ...(options ? { options } : {}),
-        correctAnswer,
+        ...(correctAnswer !== undefined ? { correctAnswer } : {}),
         ...(explanation ? { explanation } : {}),
+        ...(pairs ? { pairs } : {}),
+        ...(orderedItems ? { orderedItems } : {}),
+        ...(statementWithMistake ? { statementWithMistake } : {}),
+        ...(mistake ? { mistake } : {}),
+        ...(correction ? { correction } : {}),
+        ...(scenario ? { scenario } : {}),
+        ...(correctOutcome ? { correctOutcome } : {}),
+        ...(incorrectOutcomes ? { incorrectOutcomes } : {}),
+        ...(idealAnswer ? { idealAnswer } : {}),
+        ...(statement ? { statement } : {}),
+        ...(front ? { front } : {}),
+        ...(back ? { back } : {}),
         difficulty,
         tags,
         source,
@@ -259,10 +425,10 @@ export const validateQuestion = (data) => {
 export const validateFlashcard = (data) => {
   try {
     const metadata = validateCommonMetadata(data, 'Flashcard');
-    const sourceChunks = normalizeSourceChunks(data.sourceChunks);
+    const sourceChunks = normalizeSourceChunks(data.sourceChunks, data.sourceChunkIds);
 
-    const front = ensureRequiredString(data.front, 'front', 3);
-    const back = ensureRequiredString(data.back, 'back', 3);
+    const front = ensureRequiredString(data.front || data.questionText, 'front', 3);
+    const back = ensureRequiredString(data.back || data.correctAnswer, 'back', 3);
     const difficulty = normalizeDifficulty(data.difficulty);
     const tags = normalizeTags(data.tags, 'tags');
     const source = normalizeSource(data.source);
@@ -273,6 +439,7 @@ export const validateFlashcard = (data) => {
       success: true,
       data: {
         ...metadata,
+        type: 'Flashcard',
         sourceChunks,
         front,
         back,

@@ -47,6 +47,15 @@ const parseJsonResponse = (content) => {
   }
 };
 
+const DEGREE_OR_PROGRAM_PATTERN = /^(b\.?\s*tech|m\.?\s*tech|b\.?\s*e\.?|m\.?\s*e\.?|bca|mca|b\.?\s*sc|m\.?\s*sc|b\.?\s*com|m\.?\s*com|bba|mba|ph\.?d|bachelor\s+of|master\s+of|doctorate|diploma\s+in|department\s+of|faculty\s+of|school\s+of|semester\s+[ivx\d]+|curriculum\s+for|syllabus\s+for|evaluation\s+scheme|course\s+structure)\b/i;
+
+export const isDisallowedSubjectName = (name) => {
+  if (!name || typeof name !== 'string') return true;
+  const trimmed = name.trim();
+  if (trimmed.length < 2) return true;
+  return DEGREE_OR_PROGRAM_PATTERN.test(trimmed);
+};
+
 // ─── Validate + deduplicate a raw subjects payload ───────────────────────────
 export const validateAndDeduplicateSubjects = (payload) => {
   const parsed = subjectResultSchema.safeParse(payload);
@@ -73,6 +82,7 @@ export const validateAndDeduplicateSubjects = (payload) => {
         })),
     }))
     .filter((subject) => {
+      if (isDisallowedSubjectName(subject.name)) return false;
       const key = subject.name.toLocaleLowerCase();
       if (seen.has(key)) return false;
       seen.add(key);
@@ -96,7 +106,7 @@ export const extractSubjectsFromText = (text) => {
   const addCandidate = (value) => {
     const name = cleanCandidateName(value);
     const key  = name.toLocaleLowerCase();
-    if (name.length < 2 || name.length > 200 || seen.has(key)) return;
+    if (name.length < 2 || name.length > 200 || isDisallowedSubjectName(name) || seen.has(key)) return;
     seen.add(key);
     candidates.push({ name, units: [] });
   };
@@ -166,7 +176,8 @@ const extractFromChunk = async (chunkText, apiKey, apiUrl, model, signal, attemp
 Schema: {"subjects":[{"name":"...","code":"...","category":"...","units":[{"name":"...","description":"...","order":1}]}]}
 
 Rules:
-- Identify every distinct academic course/subject listed in this text.
+- Identify every distinct academic subject taught to students (e.g., "Operating Systems", "Data Structures", "Database Management Systems", "Compiler Design", "Engineering Mathematics").
+- CRITICAL EXCLUSIONS: NEVER extract degree names, programs of study, branches, departments, or semester headers as subjects (e.g., NEVER extract "B.Tech", "Bachelor of Technology", "M.Tech", "B.E.", "BCA", "MCA", "B.Sc", "B.Tech. Computer Science and Engineering", "Department of Computer Science", "Semester 1", "Semester IV", "Evaluation Scheme").
 - For each subject, extract ALL its units (Unit 1, Unit 2, Unit I, Unit II, etc.).
 - Keep units associated with the CORRECT parent subject — never mix units across subjects.
 - "name" for a unit MUST be short (max 60 chars) — use just the unit label like "Unit 1: Introduction" not the full topic list.

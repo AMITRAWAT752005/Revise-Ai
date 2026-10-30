@@ -32,7 +32,22 @@ const questionSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['MCQ', 'SHORT', 'LONG', 'TRUE_FALSE', 'FILL_BLANK'],
+      enum: [
+        'MCQ',
+        'Flashcard',
+        'TrueFalse',
+        'OneWord',
+        'FillInTheBlank',
+        'MatchTheFollowing',
+        'Sequence',
+        'SpotTheMistake',
+        'WhatHappensNext',
+        'ShortAnswer',
+        'SHORT',
+        'LONG',
+        'TRUE_FALSE',
+        'FILL_BLANK',
+      ],
       required: true,
     },
     questionText: {
@@ -59,14 +74,96 @@ const questionSchema = new mongoose.Schema(
     },
     correctAnswer: {
       type: String,
-      required: true,
       trim: true,
-      minlength: 1,
+      validate: {
+        validator(value) {
+          if (['MatchTheFollowing', 'Sequence', 'Flashcard'].includes(this.type)) {
+            return true;
+          }
+          return typeof value === 'string' && value.trim().length > 0;
+        },
+        message: 'correctAnswer is required for this question type.',
+      },
     },
     explanation: {
       type: String,
       trim: true,
       minlength: 1,
+    },
+    pairs: {
+      type: [
+        {
+          left: { type: String, required: true, trim: true },
+          right: { type: String, required: true, trim: true },
+        },
+      ],
+      default: undefined,
+      validate: {
+        validator(value) {
+          if (this.type !== 'MatchTheFollowing') {
+            return value === undefined || value === null || value.length === 0;
+          }
+          return Array.isArray(value) && value.length >= 3;
+        },
+        message: 'MatchTheFollowing questions require at least 3 pairs.',
+      },
+    },
+    orderedItems: {
+      type: [String],
+      default: undefined,
+      validate: {
+        validator(value) {
+          if (this.type !== 'Sequence') {
+            return value === undefined || value === null || value.length === 0;
+          }
+          return (
+            Array.isArray(value) &&
+            value.length >= 3 &&
+            value.every((item) => typeof item === 'string' && item.trim().length > 0)
+          );
+        },
+        message: 'Sequence questions require at least 3 non-empty ordered items.',
+      },
+    },
+    statementWithMistake: {
+      type: String,
+      trim: true,
+    },
+    mistake: {
+      type: String,
+      trim: true,
+    },
+    correction: {
+      type: String,
+      trim: true,
+    },
+    scenario: {
+      type: String,
+      trim: true,
+    },
+    correctOutcome: {
+      type: String,
+      trim: true,
+    },
+    incorrectOutcomes: {
+      type: [String],
+      default: undefined,
+    },
+    idealAnswer: {
+      type: String,
+      trim: true,
+    },
+    statement: {
+      type: String,
+      trim: true,
+    },
+    front: {
+      type: String,
+      trim: true,
+    },
+    back: {
+      type: String,
+      trim: true,
     },
     difficulty: {
       type: String,

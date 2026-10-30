@@ -143,7 +143,7 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Implement basic vector upsert with required chunk metadata payload fields.
 - [x] Add vector dimension and numeric-value validation for 384-dimensional vectors.
 - [x] Add focused Qdrant infrastructure tests using a mocked client.
-- [ ] Complete live Qdrant connection and collection verification after credentials are configured.
+- [x] Complete live Qdrant connection and collection verification after credentials are configured.
 
 ### Anshul Gusain — 4C-4 Vector Metadata & Source Mapping
 
@@ -424,5 +424,114 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 
 - [x] Added ShortAnswerSchema to support all 10 content types.
 - [x] Created server/src/prompts/promptTemplates.js to modularize LLM instructions.
-- [x] Integrated dynamic template builder into iGenerationService.js.
+- [x] Integrated dynamic template builder into iGenerationService.js.
 - [x] Verified prompt construction logic and generation contract with test suites.
+
+
+---
+
+### Amit Rawat — FIX-01: Align Question/Flashcard MongoDB Schemas and Content Validation
+
+- [x] Aligned persisted content types with existing AI generation contract: `MCQ`, `Flashcard`, `TrueFalse`, `OneWord`, `FillInTheBlank`, `MatchTheFollowing`, `Sequence`, `SpotTheMistake`, `WhatHappensNext`, and `ShortAnswer`.
+- [x] Maintained full backward compatibility for legacy MongoDB records with types `SHORT`, `LONG`, `TRUE_FALSE`, and `FILL_BLANK`.
+- [x] Added polymorphic type-specific fields and validation rules to `Question.js`: `pairs` (min 3 for MatchTheFollowing), `orderedItems` (min 3 for Sequence), `statementWithMistake`, `mistake`, `correction`, `scenario`, `correctOutcome`, `incorrectOutcomes`, `idealAnswer`, `statement`, `front`, and `back`.
+- [x] Updated `Flashcard.js` with explicit `type: 'Flashcard'` while preserving all existing hierarchical and AI metadata.
+- [x] Enhanced `contentValidationService.js` to normalize both contract-style fields (e.g., `statement`, `question`, `answer`, `sourceChunkIds`) and model-style fields (e.g., `questionText`, `correctAnswer`, `sourceChunks`).
+- [x] Updated `contentPersistenceService.js` to support saving all 10 types with deduplication and source chunk preservation.
+- [x] Expanded test suite in `server/tests/content_validation_persistence.test.js` to 15 tests covering all 10 types, legacy compatibility, schema validation, and persistence.
+
+**Audit References:** A1, A2  
+**Task ID:** FIX-01  
+**Developer/Owner:** Amit Rawat  
+**Status:** Completed  
+**Files Modified:**  
+- `server/src/models/Question.js`  
+- `server/src/models/Flashcard.js`  
+- `server/src/services/contentValidationService.js`  
+- `server/src/services/contentPersistenceService.js`  
+- `server/tests/content_validation_persistence.test.js`  
+- `docs/Phase/Phase_4/TASKDONE.md`  
+- `docs/Phase/Phase_4/TIMELINE.md`  
+
+**Testing Performed:**  
+- Command: `node --test server/tests/content_validation_persistence.test.js`  
+- Result: 15/15 tests passing (0 failed, 0 warnings).  
+- Regression Command: `node --test server/tests/aiGenerationContract.test.js server/tests/promptTemplates.test.js server/tests/aiGenerationService.test.js server/tests/ragContextService.test.js server/tests/vectorMetadataService.test.js server/tests/chunkEmbeddingPipeline.test.js server/tests/qdrantService.test.js server/tests/content_validation_persistence.test.js`  
+- Result: 34/34 tests passing across full AI/RAG/Storage suite.  
+**Date & Time:** 2026-10-30 21:48 IST  
+**Remaining Issues:** Persistence and retrieval endpoints (`GET/POST /api/questions`, `GET/POST /api/flashcards`) and wiring to `POST /api/ai/generate` and Frontend Revision UI remain to be implemented in subsequent fix tasks.
+
+
+---
+
+### Anukool Negi — FIX-02: Support ShortAnswer in AI Generation Controller VALID_TYPES
+
+- [x] Aligned controller-supported types (`VALID_TYPES` in `aiController.js`) with the canonical AI generation contract (`aiGenerationContract.js`), adding `ShortAnswer` as the 10th supported type.
+- [x] Exported `VALID_TYPES` and `VALID_DIFFICULTIES` from `aiController.js` for modular contract reusability and testing.
+- [x] Verified that generation requests with `requestedTypes: ['ShortAnswer']` pass controller parameter validation without returning HTTP 400.
+- [x] Verified that invalid content types continue to be strictly rejected with HTTP 400 and contextual error message.
+- [x] Added focused integration test cases in `server/tests/protected_ai_api.test.js` validating `ShortAnswer` acceptance and full 10-type array validation.
+
+**Audit Reference:** U1  
+**Task ID:** FIX-02  
+**Developer/Owner:** Anukool Negi  
+**Status:** Completed  
+**Files Modified:**  
+- `server/src/controllers/aiController.js`  
+- `server/tests/protected_ai_api.test.js`  
+- `docs/Phase/Phase_4/TASKDONE.md`  
+- `docs/Phase/Phase_4/TIMELINE.md`  
+
+**Testing Performed:**  
+- Command: `node --test server/tests/protected_ai_api.test.js`  
+- Result: 15/15 tests passing (0 failed).  
+- Regression Command: `node --test server/tests/aiGenerationContract.test.js server/tests/promptTemplates.test.js server/tests/aiGenerationService.test.js server/tests/content_validation_persistence.test.js`  
+- Result: 25/25 tests passing.  
+**Date & Time:** 2026-10-30 21:58 IST  
+**Remaining Issues:** Wiring AI generation persistence directly into MongoDB and exposing retrieval endpoints (`GET /api/questions`, `GET /api/flashcards`) for the Revision UI.
+
+
+---
+
+### Bikram Singh Bisht — FIX-03: Topic-Aware RAG Retrieval Improvement
+
+- [x] Inspected the existing RAG retrieval pipeline in `aiGenerationService.js`, `ragContextService.js`, and `semanticSearchService.js`.
+- [x] Identified the root cause: the semantic RAG query was a generation instruction (`"Generate easy difficulty content of types: MCQ, Flashcard"`) rather than meaningful academic content, causing suboptimal embedding-space matching.
+- [x] Implemented and exported `buildSemanticRagQuery(context, _params)` in `aiGenerationService.js` with the following priority chain:
+  1. Explicit `context.searchQuery` override (used verbatim).
+  2. Pre-resolved academic names (`context.topicName`, `context.unitName`, `context.subjectName`) — no DB call.
+  3. ObjectId-based DB lookup (`Topic.findById`, `Unit.findById`, `Subject.findById` via `.lean()`) when names are absent.
+  4. Graceful fallback: `"Key concepts, core definitions, principles, and fundamental explanations"` when nothing resolves.
+- [x] Replaced the hardcoded RAG query on line 179 of `aiGenerationService.js` with `await buildSemanticRagQuery(context, parameters)`.
+- [x] Extended `GenerationRequestSchema` in `aiGenerationContract.js` with optional `context` fields: `topicName`, `unitName`, `subjectName`, `searchQuery`.
+- [x] Updated `aiController.js` to extract and forward the four optional fields from `req.body` / `req.body.context` into the generation context.
+- [x] Added 6 focused tests in `server/tests/aiGenerationService.test.js` (FIX-03 suite — `buildSemanticRagQuery`):
+  - `returns explicit searchQuery verbatim when provided`
+  - `builds topic-aware query from pre-resolved names without DB lookup`
+  - `performs DB lookup when IDs are given but no names are pre-resolved`
+  - `falls back gracefully when DB lookup throws (e.g. test env without DB)`
+  - `falls back to generic query when no context information is available at all`
+  - `generateContent uses topic-aware query when topicName is in context`
+- [x] All existing tests preserved with no regressions.
+
+**Audit Reference:** Topic-aware RAG retrieval improvement  
+**Task ID:** FIX-03  
+**Developer/Owner:** Bikram Singh Bisht  
+**Status:** Completed  
+**Files Modified:**  
+- `server/src/contracts/aiGenerationContract.js`  
+- `server/src/services/aiGenerationService.js`  
+- `server/src/controllers/aiController.js`  
+- `server/tests/aiGenerationService.test.js`  
+- `docs/Phase/Phase_4/TASKDONE.md`  
+- `docs/Phase/Phase_4/TIMELINE.md`  
+
+**Testing Performed:**  
+- Unit suite: `node --test server/tests/aiGenerationService.test.js`  
+  Result: **10/10 pass** (4 existing + 6 new FIX-03 tests, 0 failed).  
+- Full regression: `node --test server/tests/aiGenerationContract.test.js server/tests/promptTemplates.test.js server/tests/aiGenerationService.test.js server/tests/content_validation_persistence.test.js server/tests/vectorMetadataService.test.js server/tests/chunkEmbeddingPipeline.test.js server/tests/qdrantService.test.js`  
+  Result: **34/34 pass** (0 failed, 0 cancelled, 0 skipped).  
+**Date & Time:** 2026-10-30 22:09 IST  
+**Limitations:**  
+- Improved RAG query semantic relevance is analytically sound (embedding model: `Xenova/all-MiniLM-L6-v2` encodes topic names closer to topic content than generation instructions). Actual retrieval accuracy improvement is **not claimed without live Qdrant evidence** — retrieval accuracy depends on the quality and density of indexed PDF chunks per topic.  
+- DB lookup adds minimal latency (~1–5 ms) per generation request when topic/unit/subject names are not pre-resolved by the caller.

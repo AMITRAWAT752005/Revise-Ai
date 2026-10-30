@@ -121,6 +121,13 @@ export const GenerationRequestSchema = z.object({
     subjectId: z.string().trim().min(1),
     unitId: z.string().trim().optional(),
     topicId: z.string().trim().optional(),
+    // Optional pre-resolved academic names for topic-aware RAG query building.
+    // When provided, these take precedence over DB lookups.
+    topicName: z.string().trim().optional(),
+    unitName: z.string().trim().optional(),
+    subjectName: z.string().trim().optional(),
+    // Explicit override: if provided, used as-is as the RAG semantic query.
+    searchQuery: z.string().trim().optional(),
   }),
   // If empty, the system will rely solely on the hierarchical context for search filters
   sourceMaterials: z.array(z.string()).optional(),

@@ -9,6 +9,7 @@ import Topic from '../src/models/Topic.js';
 import { generateAccessToken } from '../src/utils/tokenUtils.js';
 import { AUTH_COOKIE_NAME } from '../src/utils/authCookie.js';
 import aiGenerationService from '../src/services/aiGenerationService.js';
+import { VALID_TYPES } from '../src/controllers/aiController.js';
 
 describe('Protected AI Content Generation API — POST /api/ai/generate', () => {
   const userAId = new mongoose.Types.ObjectId();
@@ -105,7 +106,7 @@ describe('Protected AI Content Generation API — POST /api/ai/generate', () => 
     it('should reject unauthenticated requests with HTTP 401', async () => {
       const res = await makeRequest(null, { subjectId: subjectAId.toString() });
       assert.equal(res.status, 401);
-      assert.equal(res.body.success, undefined); // Auth middleware format or error format
+      assert.match(res.body.error || res.body.message, /access token required|authentication required/i);
     });
   });
 
@@ -118,7 +119,7 @@ describe('Protected AI Content Generation API — POST /api/ai/generate', () => 
     });
 
     it('should reject invalid subjectId format with HTTP 400', async () => {
-      const res = await makeRequest(userACookieToken, { subjectId: 'invalid-id-format' });
+      const res = await makeRequest(userACookieToken, { subjectId: '123-invalid-id' });
       assert.equal(res.status, 400);
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, 'Invalid subjectId format.');
@@ -172,6 +173,51 @@ describe('Protected AI Content Generation API — POST /api/ai/generate', () => 
       assert.equal(res.status, 400);
       assert.equal(res.body.success, false);
       assert.match(res.body.message, /Invalid content type/);
+    });
+
+    it('should accept ShortAnswer in requestedTypes and pass input validation (FIX-02)', async () => {
+      let passedParams = null;
+      mock.method(aiGenerationService, 'generateContent', async (payload) => {
+        passedParams = payload.parameters;
+        return {
+          generatedContent: [
+            {
+              type: 'ShortAnswer',
+              question: 'Explain thrashing.',
+              idealAnswer: 'Excessive page swapping.',
+              sourceChunkIds: ['chunk-1'],
+            },
+          ],
+          meta: { totalItemsGenerated: 1, difficulty: 'mixed' },
+        };
+      });
+
+      const res = await makeRequest(userACookieToken, {
+        subjectId: subjectAId.toString(),
+        parameters: { requestedTypes: ['ShortAnswer'] },
+      });
+
+      assert.equal(res.status, 200);
+      assert.equal(res.body.success, true);
+      assert.deepEqual(passedParams.requestedTypes, ['ShortAnswer']);
+    });
+
+    it('should validate all 10 canonical content types in requestedTypes and export VALID_TYPES', async () => {
+      assert.equal(VALID_TYPES.includes('ShortAnswer'), true);
+      assert.equal(VALID_TYPES.length, 10);
+
+      mock.method(aiGenerationService, 'generateContent', async () => ({
+        generatedContent: [],
+        meta: { totalItemsGenerated: 0, difficulty: 'mixed' },
+      }));
+
+      const res = await makeRequest(userACookieToken, {
+        subjectId: subjectAId.toString(),
+        parameters: { requestedTypes: VALID_TYPES },
+      });
+
+      assert.equal(res.status, 200);
+      assert.equal(res.body.success, true);
     });
   });
 
