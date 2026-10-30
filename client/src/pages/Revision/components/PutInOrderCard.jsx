@@ -7,15 +7,25 @@ const INITIAL_STEPS = [
   { id: 'step-3', label: 'ACK', title: 'Client returns ACK packet', desc: 'Client acknowledges server synchronization; connection transitions to ESTABLISHED state', correctPos: 2 }
 ];
 
+import { normalizeSequenceData } from '../mockRevisionData';
+
 export default function PutInOrderCard({ 
+  data,
   onCorrect, 
   onNext,
-  title = "TCP 3-Way Handshake",
-  instruction = "Arrange the packets in the correct chronological sequence to establish a connection.",
-  subject = "Computer Networks",
-  topic = "Transport Layer"
+  title,
+  instruction,
+  subject,
+  topic
 }) {
-  const [items, setItems] = useState(INITIAL_STEPS);
+  const normalized = normalizeSequenceData(data || {});
+  const activeTitle = title || normalized.title || "TCP 3-Way Handshake";
+  const activeInstruction = instruction || normalized.instruction || "Arrange the packets in the correct chronological sequence to establish a connection.";
+  const activeSubject = subject || normalized.subject || "Computer Networks";
+  const activeTopic = topic || normalized.topic || "Transport Layer";
+  const initialItems = normalized.items || INITIAL_STEPS;
+
+  const [items, setItems] = useState(initialItems);
   const [isChecked, setIsChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
@@ -40,7 +50,7 @@ export default function PutInOrderCard({
   };
 
   const handleReset = () => {
-    setItems([...INITIAL_STEPS]);
+    setItems([...initialItems]);
     setIsChecked(false);
     setIsCorrect(false);
   };
@@ -56,7 +66,7 @@ export default function PutInOrderCard({
             </span>
             Put in Order (Immersion)
           </span>
-          <span className={styles.topicText}>{subject} • {topic}</span>
+          <span className={styles.topicText}>{activeSubject} • {activeTopic}</span>
         </div>
         <div className={styles.hintBadge}>
           <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>help_outline</span>
@@ -65,8 +75,8 @@ export default function PutInOrderCard({
       </div>
 
       <div className={styles.titleSection}>
-        <h2 className={styles.title}>{title}</h2>
-        <p className={styles.subtitle}>{instruction}</p>
+        <h2 className={styles.title}>{activeTitle}</h2>
+        <p className={styles.subtitle}>{activeInstruction}</p>
       </div>
 
       {/* Sequence List */}

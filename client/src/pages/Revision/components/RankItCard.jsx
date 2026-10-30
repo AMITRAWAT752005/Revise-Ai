@@ -9,12 +9,21 @@ const INITIAL_ITEMS = [
 ];
 
 export default function RankItCard({ 
+  data,
   onCorrect, 
   onNext,
-  subject = "Computer Architecture",
-  topic = "Memory Hierarchy & Latency"
+  title,
+  instruction,
+  subject,
+  topic
 }) {
-  const [items, setItems] = useState(INITIAL_ITEMS);
+  const activeTitle = data?.title || title || "Rank Memory Hierarchy";
+  const activeInstruction = data?.instruction || instruction || "Arrange the storage types from FASTEST to SLOWEST access latency.";
+  const activeSubject = data?.subject || subject || "Computer Architecture";
+  const activeTopic = data?.topic || topic || "Memory Hierarchy & Latency";
+  const initialItems = data?.items || INITIAL_ITEMS;
+
+  const [items, setItems] = useState(initialItems);
   const [isChecked, setIsChecked] = useState(false);
   const [isPerfect, setIsPerfect] = useState(false);
 
@@ -39,7 +48,7 @@ export default function RankItCard({
   };
 
   const handleReset = () => {
-    setItems([...INITIAL_ITEMS]);
+    setItems([...initialItems]);
     setIsChecked(false);
     setIsPerfect(false);
   };
@@ -55,7 +64,7 @@ export default function RankItCard({
             </span>
             Rank It
           </span>
-          <span className={styles.topicText}>{subject} • {topic}</span>
+          <span className={styles.topicText}>{activeSubject} • {activeTopic}</span>
         </div>
         <div className={styles.sparkleBadge}>
           <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>auto_awesome</span>
@@ -64,10 +73,8 @@ export default function RankItCard({
       </div>
 
       <div className={styles.titleSection}>
-        <h2 className={styles.title}>Rank Memory Hierarchy</h2>
-        <p className={styles.subtitle}>
-          Arrange the storage types from <strong className={styles.fastestText}>FASTEST</strong> to <strong className={styles.slowestText}>SLOWEST</strong> access latency.
-        </p>
+        <h2 className={styles.title}>{activeTitle}</h2>
+        <p className={styles.subtitle}>{activeInstruction}</p>
       </div>
 
       {/* Main Game Area with Visual Track Indicators */}

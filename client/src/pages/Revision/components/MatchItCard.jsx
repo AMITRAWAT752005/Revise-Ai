@@ -8,13 +8,21 @@ const DEFAULT_PAIRS = [
   { id: '4', concept: 'BGP', definition: 'Exterior gateway routing protocol managing paths across autonomous systems' }
 ];
 
+import { normalizeMatchData } from '../mockRevisionData';
+
 export default function MatchItCard({ 
+  data,
   onCorrect, 
   onNext,
   timerSeconds = 45,
-  subject = "Computer Networks",
-  topic = "Transport & Routing Protocols"
+  subject,
+  topic
 }) {
+  const normalized = normalizeMatchData(data || {});
+  const activeSubject = subject || normalized.subject || "Computer Networks";
+  const activeTopic = topic || normalized.topic || "Transport & Routing Protocols";
+  const pairs = normalized.pairs;
+
   const [selectedConcept, setSelectedConcept] = useState(null);
   const [matches, setMatches] = useState({}); // { conceptId: definitionId }
   const [mismatched, setMismatched] = useState(null); // { conceptId, defId }
@@ -22,7 +30,7 @@ export default function MatchItCard({
 
   // Scramble definitions for display on the right
   const [scrambledDefs] = useState(() => {
-    return [...DEFAULT_PAIRS].sort(() => Math.random() - 0.5);
+    return [...pairs].sort(() => Math.random() - 0.5);
   });
 
   const handleConceptClick = (item) => {
@@ -42,7 +50,7 @@ export default function MatchItCard({
       setSelectedConcept(null);
       setMismatched(null);
 
-      if (Object.keys(newMatches).length === DEFAULT_PAIRS.length) {
+      if (Object.keys(newMatches).length === pairs.length) {
         setIsCompleted(true);
         if (onCorrect) onCorrect();
       }
@@ -64,7 +72,7 @@ export default function MatchItCard({
   };
 
   const matchedCount = Object.keys(matches).length;
-  const totalCount = DEFAULT_PAIRS.length;
+  const totalCount = pairs.length;
 
   return (
     <div className={styles.container}>
@@ -77,7 +85,7 @@ export default function MatchItCard({
             </span>
             Match It
           </span>
-          <span className={styles.topicText}>{subject} • {topic}</span>
+          <span className={styles.topicText}>{activeSubject} • {activeTopic}</span>
         </div>
         <div className={styles.statusGroup}>
           <div className={styles.timerBadge}>
@@ -101,7 +109,7 @@ export default function MatchItCard({
         {/* Left Column: Concepts */}
         <div className={styles.column}>
           <div className={styles.columnHeader}>Concepts</div>
-          {DEFAULT_PAIRS.map((item) => {
+          {pairs.map((item) => {
             const isMatched = !!matches[item.id];
             const isSelected = selectedConcept === item.id;
             const isError = mismatched?.conceptId === item.id;

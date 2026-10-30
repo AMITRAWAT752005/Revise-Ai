@@ -2,14 +2,27 @@ import React, { useState } from 'react';
 import styles from './TrueFalseCard.module.css';
 
 export default function TrueFalseCard({ 
+  data,
   onCorrect, 
   onNext,
-  statement = "HTTP/3 uses UDP as its underlying transport layer protocol instead of TCP (using the QUIC protocol).",
-  correctAnswer = true,
-  rationale = "HTTP/3 replaces TCP with QUIC, an application-level transport protocol built over UDP to eliminate head-of-line blocking and speed up handshakes.",
-  subject = "Computer Networks",
-  topic = "Application & Transport Protocols"
+  statement,
+  correctAnswer,
+  rationale,
+  subject,
+  topic
 }) {
+  const activeStatement = data?.statement || statement || "HTTP/3 uses UDP as its underlying transport layer protocol instead of TCP (using the QUIC protocol).";
+  const activeCorrectAnswer = typeof data?.answer === 'boolean' 
+    ? data.answer 
+    : typeof data?.correctAnswer === 'boolean' 
+      ? data.correctAnswer 
+      : typeof correctAnswer === 'boolean' 
+        ? correctAnswer 
+        : true;
+  const activeRationale = data?.explanation || data?.rationale || rationale || "HTTP/3 replaces TCP with QUIC, an application-level transport protocol built over UDP to eliminate head-of-line blocking and speed up handshakes.";
+  const activeSubject = data?.subject || subject || "Computer Networks";
+  const activeTopic = data?.topic || topic || "Application & Transport Protocols";
+
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -18,7 +31,7 @@ export default function TrueFalseCard({
     if (isAnswered) return;
     setSelectedAnswer(answer);
     setIsAnswered(true);
-    const correct = answer === correctAnswer;
+    const correct = answer === activeCorrectAnswer;
     setIsCorrect(correct);
     if (correct && onCorrect) {
       onCorrect();
@@ -36,7 +49,7 @@ export default function TrueFalseCard({
             </span>
             True / False
           </span>
-          <span className={styles.topicText}>{subject} • {topic}</span>
+          <span className={styles.topicText}>{activeSubject} • {activeTopic}</span>
         </div>
         <div className={styles.sparkleBadge}>
           <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>auto_awesome</span>
@@ -56,7 +69,7 @@ export default function TrueFalseCard({
         ${isAnswered && !isCorrect ? styles.wrongCardBorder : ''}
       `}>
         <div className={styles.sparkleAccent} />
-        <p className={styles.statementText}>"{statement}"</p>
+        <p className={styles.statementText}>"{activeStatement}"</p>
       </div>
 
       {/* Action Buttons: False vs True */}
@@ -69,7 +82,7 @@ export default function TrueFalseCard({
             ${styles.choiceBtn} 
             ${styles.falseBtn}
             ${selectedAnswer === false ? (isCorrect ? styles.selectedCorrect : styles.selectedWrong) : ''}
-            ${isAnswered && correctAnswer === false ? styles.highlightCorrect : ''}
+            ${isAnswered && activeCorrectAnswer === false ? styles.highlightCorrect : ''}
           `}
         >
           <div className={styles.iconCircleFalse}>
@@ -86,7 +99,7 @@ export default function TrueFalseCard({
             ${styles.choiceBtn} 
             ${styles.trueBtn}
             ${selectedAnswer === true ? (isCorrect ? styles.selectedCorrect : styles.selectedWrong) : ''}
-            ${isAnswered && correctAnswer === true ? styles.highlightCorrect : ''}
+            ${isAnswered && activeCorrectAnswer === true ? styles.highlightCorrect : ''}
           `}
         >
           <div className={styles.iconCircleTrue}>
@@ -110,7 +123,7 @@ export default function TrueFalseCard({
                 {isCorrect ? "CORRECT! +10 XP" : "INCORRECT"}
               </div>
               <div className={styles.bannerSubtext}>
-                {rationale}
+                {activeRationale}
               </div>
             </div>
           </div>

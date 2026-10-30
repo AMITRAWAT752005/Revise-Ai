@@ -211,6 +211,16 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 - [x] Standardize API success responses (`{ success: true, data: { generatedContent, meta } }`) and error responses without leaking credentials or internal stack traces.
 - [x] Verify complete test suite `server/tests/protected_ai_api.test.js` (13/13 tests passing) and zero regression across 37 Phase 4 AI suite tests.
 
+### Anukool Negi — API Request & Response Integration
+
+- [x] Create reusable frontend API client module `client/src/services/aiService.js` supporting `generateRevisionContent` with native `fetch` and `credentials: 'include'`.
+- [x] Format API request payload (`subjectId`, `unitId`, `topicId`, `sourceMaterials`, `parameters: { totalItems, difficulty, requestedTypes }`) matching backend contracts.
+- [x] Implement structured API response parsing for `{ success: true, data: { generatedContent, meta } }` and extraction of backend error messages for failed requests.
+- [x] Create `useAIGeneration` custom React hook (`client/src/hooks/useAIGeneration.js`) to manage API request/response lifecycle, loading state, and error handling.
+- [x] Connect `useAIGeneration` hook to `Revision.jsx` application flow for subject/unit/topic search parameter integration while preserving all existing visual layout and card styling.
+- [x] Create and pass automated test suite `server/tests/aiServiceIntegration.test.js` (6/6 tests passing) covering client-side validation, request formatting, credentials header, response parsing, status code error handling (400, 401, 403, 404, 500), and network failure fallback.
+
+
 ---
 
 # 6. Phase 4E — Question Bank & Flashcards
@@ -535,3 +545,88 @@ Phase 4 implements the core learning and AI engine of ReviseAI. It involves proc
 **Limitations:**  
 - Improved RAG query semantic relevance is analytically sound (embedding model: `Xenova/all-MiniLM-L6-v2` encodes topic names closer to topic content than generation instructions). Actual retrieval accuracy improvement is **not claimed without live Qdrant evidence** — retrieval accuracy depends on the quality and density of indexed PDF chunks per topic.  
 - DB lookup adds minimal latency (~1–5 ms) per generation request when topic/unit/subject names are not pre-resolved by the caller.
+
+### Amit Rawat — A-4 (Ownership & Hierarchy Validation)
+
+- [x] Implemented reusable ownership validation for the authenticated user against the owning subject.
+- [x] Added strict unit, topic, and material hierarchy checks to enforce the full chain: user -> subject -> unit -> topic -> material.
+- [x] Kept validation focused on ownership and relationship integrity only, without touching persistence, schemas, or controllers.
+- [x] Return structured domain errors for unauthorized access, broken hierarchy, and missing resources.
+- [x] Added focused A4 validation coverage for valid chains, invalid ownership, invalid hierarchy, and missing/invalid IDs.
+
+**Developer:** Amit Rawat  
+**Task:** A-4 (Ownership & Hierarchy Validation)  
+**Files created:**  
+- `server/src/services/validationService.js`  
+- `server/tests/validationService.test.js`  
+
+**Files modified:**  
+- `docs/Phase/Phase_4/TASKDONE.md`  
+- `docs/Phase/Phase_4/TIMELINE.md`  
+
+**Validation logic implemented:**  
+- `validateOwnership(userId, subjectId)` verifies subject existence and the logged-in user owns the subject.  
+- `validateUnitHierarchy(subjectId, unitId)` enforces `unit.subjectId === subjectId`.  
+- `validateTopicHierarchy(unitId, topicId)` enforces `topic.unitId === unitId`.  
+- `validateMaterialHierarchy(topicId, materialId)` enforces `material.topicId === topicId`.  
+- `validateFullHierarchy(userId, subjectId, unitId, topicId, materialId)` composes the full chain and returns normalized IDs.  
+
+**Error handling:**  
+- `UnauthorizedError` for invalid ownership.  
+- `InvalidHierarchyError` for broken parent-child links.  
+- `NotFoundError` for missing subject, unit, topic, or material.  
+
+**Actual testing performed:**  
+- Ran `cd /Users/amitrawat/Documents/ReviseAi/Revise-Ai/server && node --test tests/validationService.test.js`  
+- Result: 5/5 tests passed with 0 failed.  
+
+**Date:** 20 September 2026  
+**Time:** 10:45 AM
+
+---
+
+### Anshul Gusain — S1: Review existing static UI and required data fields
+
+- [x] Conducted comprehensive audit of all 17 Revision frontend components (`QuickPickCard`, `FillTheGapCard`, `FlashcardCard`, `ShortAnswerCard`, `ShortAnswerEvaluation`, `MatchItCard`, `PutInOrderCard`, `SpotTheMistakeCard`, `TrueFalseCard`, `ScenarioChoiceCard`, `WhatHappensNextCard`, `RankItCard`, `SessionCompleteCard`, feedback modals).
+- [x] Cross-referenced UI props against Phase 4 AI Generation Contract schemas (`MCQ`, `Flashcard`, `TrueFalse`, `OneWord`, `FillInTheBlank`, `MatchTheFollowing`, `Sequence`, `SpotTheMistake`, `WhatHappensNext`, `ShortAnswer`) and database models (`Question`, `Flashcard`).
+- [x] Documented required data fields, format disparities (string arrays vs object arrays, `[BLANK]` tokenization, pair structures, sequence ordering), and mapped normalizer specifications.
+
+---
+
+### Anshul Gusain — S2: Necessary frontend compatibility fixes using mock data
+
+- [x] Created `client/src/pages/Revision/mockRevisionData.js` providing rich mock data fixtures strictly matching all Phase 4 backend schemas.
+- [x] Implemented robust data normalizers (`normalizeMCQData`, `normalizeFillGapData`, `normalizeFlashcardData`, `normalizeMatchData`, `normalizeSequenceData`, `normalizeSpotMistakeData`, `normalizeWhatHappensNextData`) to guarantee full backward and forward compatibility.
+- [x] Updated Revision card components to consume normalized data from raw backend contract outputs, Mongoose models, or UI props seamlessly.
+- [x] Connected `Revision.jsx` to dynamically supply generated AI revision content or schema-compliant fallback fixtures across all revision modes.
+- [x] Validated production build (`npm run build`) and executed normalizer test suite with 100% passing results (8/8 tests passed).
+
+**Developer:** Anshul Gusain  
+**Tasks:** S1 & S2 (UI Data Review & Frontend Compatibility Fixes with Mock Data)  
+**Files created:**  
+- `client/src/pages/Revision/mockRevisionData.js`  
+
+**Files modified:**  
+- `client/src/pages/Revision/components/QuickPickCard.jsx`  
+- `client/src/pages/Revision/components/FillTheGapCard.jsx`  
+- `client/src/pages/Revision/components/FlashcardCard.jsx`  
+- `client/src/pages/Revision/components/MatchItCard.jsx`  
+- `client/src/pages/Revision/components/PutInOrderCard.jsx`  
+- `client/src/pages/Revision/components/SpotTheMistakeCard.jsx`  
+- `client/src/pages/Revision/components/TrueFalseCard.jsx`  
+- `client/src/pages/Revision/components/ScenarioChoiceCard.jsx`  
+- `client/src/pages/Revision/components/WhatHappensNextCard.jsx`  
+- `client/src/pages/Revision/components/RankItCard.jsx`  
+- `client/src/pages/Revision/components/ShortAnswerCard.jsx`  
+- `client/src/pages/Revision/components/ShortAnswerEvaluation.jsx`  
+- `client/src/pages/Revision/Revision.jsx`  
+- `docs/Phase/Phase_4/TASKDONE.md`  
+- `docs/Phase/Phase_4/TIMELINE.md`  
+
+**Actual testing performed:**  
+- Unit testing of normalizers via `node --test`: 8/8 tests passed.  
+- Client production bundle verification via `npm run build`: built in 727ms with zero errors.  
+
+**Date:** 20 September 2026  
+**Time:** 09:15 PM IST  
+

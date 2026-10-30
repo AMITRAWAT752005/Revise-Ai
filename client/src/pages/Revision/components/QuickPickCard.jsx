@@ -14,7 +14,10 @@ const defaultQuestion = {
   ]
 };
 
-const QuickPickCard = ({ data = defaultQuestion, onSelectOption, onBack }) => {
+import { normalizeMCQData } from '../mockRevisionData';
+
+const QuickPickCard = ({ data, onSelectOption, onBack }) => {
+  const normalizedData = normalizeMCQData(data);
   const [selectedId, setSelectedId] = useState(null);
 
   const handleSelect = (option) => {
@@ -40,13 +43,13 @@ const QuickPickCard = ({ data = defaultQuestion, onSelectOption, onBack }) => {
         <div className={styles.progressTrack}>
           <div
             className={styles.progressBar}
-            style={{ width: `${data.progress || 33}%` }}
+            style={{ width: `${normalizedData.progress || 33}%` }}
           >
             <div className={styles.progressShimmer}></div>
           </div>
         </div>
 
-        <span className={styles.progressPercent}>{data.progress || 33}%</span>
+        <span className={styles.progressPercent}>{normalizedData.progress || 33}%</span>
       </div>
 
       {/* Main Card */}
@@ -63,13 +66,13 @@ const QuickPickCard = ({ data = defaultQuestion, onSelectOption, onBack }) => {
 
         {/* Question Header */}
         <div className={styles.cardHeader}>
-          <h1 className={styles.questionTitle}>{data.question}</h1>
-          <p className={styles.questionSubtitle}>{data.description}</p>
+          <h1 className={styles.questionTitle}>{normalizedData.question}</h1>
+          <p className={styles.questionSubtitle}>{normalizedData.description}</p>
         </div>
 
         {/* Options Grid */}
         <div className={styles.optionsGrid}>
-          {data.options.map((opt) => {
+          {normalizedData.options.map((opt) => {
             const isSelected = selectedId === opt.id;
             return (
               <button
@@ -93,11 +96,11 @@ const QuickPickCard = ({ data = defaultQuestion, onSelectOption, onBack }) => {
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
               folder_open
             </span>
-            <span className={styles.metaText}>{data.subject}</span>
+            <span className={styles.metaText}>{normalizedData.subject}</span>
           </div>
 
           <div className={styles.metaItem}>
-            <span className={styles.metaText}>{data.module}</span>
+            <span className={styles.metaText}>{normalizedData.module}</span>
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
               chevron_right
             </span>

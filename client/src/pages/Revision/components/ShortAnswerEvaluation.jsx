@@ -35,9 +35,24 @@ const ShortAnswerEvaluation = ({
   onReport,
   onBack
 }) => {
-  const scorePercent = Math.round(((data.score || 8) / (data.maxScore || 10)) * 100);
+  const activeData = {
+    questionIndex: data?.questionIndex || 4,
+    totalQuestions: data?.totalQuestions || 10,
+    question: data?.question || 'What is the primary difference between TCP and UDP?',
+    userAnswer: data?.userAnswer || 'TCP is connection-oriented while UDP is connectionless.',
+    score: typeof data?.score === 'number' ? data.score : 8,
+    maxScore: typeof data?.maxScore === 'number' ? data.maxScore : 10,
+    xpEarned: typeof data?.xpEarned === 'number' ? data.xpEarned : 20,
+    headline: data?.headline || 'Solid Understanding!',
+    summary: data?.summary || "You've grasped the core concept perfectly.",
+    criteria: Array.isArray(data?.criteria) && data.criteria.length > 0 
+      ? data.criteria 
+      : defaultEvaluation.criteria,
+    quickTip: data?.quickTip || 'Remember to emphasize connection overhead in future responses.'
+  };
+
+  const scorePercent = Math.round(((activeData.score) / (activeData.maxScore)) * 100);
   // Calculate SVG stroke dash offset
-  // Circumference for r=15.9155 is ~100
   const dashArray = `${scorePercent}, 100`;
 
   return (
@@ -56,14 +71,14 @@ const ShortAnswerEvaluation = ({
             </button>
           )}
           <span className={styles.questionBadge}>
-            Question {data.questionIndex || 4} of {data.totalQuestions || 10}
+            Question {activeData.questionIndex} of {activeData.totalQuestions}
           </span>
         </div>
 
-        <h2 className={styles.questionTitle}>{data.question}</h2>
+        <h2 className={styles.questionTitle}>{activeData.question}</h2>
 
         <div className={styles.userAnswerBox}>
-          <p className={styles.userAnswerText}>"{data.userAnswer}"</p>
+          <p className={styles.userAnswerText}>"{activeData.userAnswer}"</p>
         </div>
       </div>
 
@@ -77,7 +92,7 @@ const ShortAnswerEvaluation = ({
           >
             workspace_premium
           </span>
-          <span>+{data.xpEarned || 20} XP</span>
+          <span>+{activeData.xpEarned} XP</span>
         </div>
 
         {/* AI Sparkle */}
@@ -105,20 +120,20 @@ const ShortAnswerEvaluation = ({
               />
             </svg>
             <div className={styles.scoreTextOverlay}>
-              <span className={styles.currentScore}>{data.score || 8}</span>
-              <span className={styles.maxScore}>/ {data.maxScore || 10}</span>
+              <span className={styles.currentScore}>{activeData.score}</span>
+              <span className={styles.maxScore}>/ {activeData.maxScore}</span>
             </div>
           </div>
 
           <div className={styles.summaryTextGroup}>
-            <h3 className={styles.evalHeadline}>{data.headline}</h3>
-            <p className={styles.evalSummary}>{data.summary}</p>
+            <h3 className={styles.evalHeadline}>{activeData.headline}</h3>
+            <p className={styles.evalSummary}>{activeData.summary}</p>
           </div>
         </div>
 
         {/* Criteria Breakdown */}
         <div className={styles.criteriaGrid}>
-          {data.criteria.map((item, idx) => (
+          {activeData.criteria.map((item, idx) => (
             <div key={idx} className={styles.criteriaItem}>
               <div className={styles.checkCircle}>
                 <span className="material-symbols-outlined" style={{ fontSize: '18px', fontWeight: 'bold' }}>
@@ -145,7 +160,7 @@ const ShortAnswerEvaluation = ({
           </div>
           <div>
             <h4 className={styles.tipTitle}>AI Quick Tip</h4>
-            <p className={styles.tipText}>{data.quickTip}</p>
+            <p className={styles.tipText}>{activeData.quickTip}</p>
           </div>
         </div>
       </div>

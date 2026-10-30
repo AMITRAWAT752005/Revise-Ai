@@ -19,13 +19,22 @@ const SENTENCE_TOKENS = [
   { id: 't-15', text: 'data.' }
 ];
 
+import { normalizeSpotMistakeData } from '../mockRevisionData';
+
 export default function SpotTheMistakeCard({ 
+  data,
   onCorrect, 
   onNext,
   timerSeconds = 30,
-  subject = "Computer Networks",
-  topic = "Reliable Transport Protocols"
+  subject,
+  topic
 }) {
+  const normalized = normalizeSpotMistakeData(data || {});
+  const activeSubject = subject || normalized.subject || "Computer Networks";
+  const activeTopic = topic || normalized.topic || "Reliable Transport Protocols";
+  const tokens = normalized.tokens || SENTENCE_TOKENS;
+  const explanation = normalized.explanation || "TCP is designed specifically to guarantee reliable, in-order packet delivery using acknowledgments (ACKs), sequence numbers, checksums, and retransmission timers.";
+
   const [selectedTokenId, setSelectedTokenId] = useState(null);
   const [isFound, setIsFound] = useState(false);
   const [wrongClickId, setWrongClickId] = useState(null);
@@ -56,7 +65,7 @@ export default function SpotTheMistakeCard({
             </span>
             Spot the Mistake
           </span>
-          <span className={styles.topicText}>{subject} • {topic}</span>
+          <span className={styles.topicText}>{activeSubject} • {activeTopic}</span>
         </div>
         <div className={styles.timerBadge}>
           <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>timer</span>
@@ -72,7 +81,7 @@ export default function SpotTheMistakeCard({
       {/* Interactive Sentence Board */}
       <div className={styles.sentenceBoard}>
         <div className={styles.tokenContainer}>
-          {SENTENCE_TOKENS.map((token) => {
+          {tokens.map((token) => {
             const isTarget = token.id === selectedTokenId && isFound;
             const isWrong = token.id === wrongClickId;
 
@@ -131,8 +140,7 @@ export default function SpotTheMistakeCard({
               <h4>AI Explanation</h4>
             </div>
             <p className={styles.aiText}>
-              <strong>TCP</strong> is designed specifically to guarantee <strong>reliable</strong>, in-order packet delivery using acknowledgments (ACKs), sequence numbers, checksums, and retransmission timers. 
-              <strong> UDP</strong>, by contrast, is the connectionless protocol that offers <em>unreliable</em> best-effort delivery.
+              {explanation}
             </p>
           </div>
 
